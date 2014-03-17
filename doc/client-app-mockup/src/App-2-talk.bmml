@@ -1,0 +1,99 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1166" measuredH="663" mockupW="940" mockupH="573">
+  <controls>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::iPhone" x="575" y="90" w="-1" h="-1" measuredW="282" measuredH="573" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <model>IPhone5</model>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Image" x="597" y="187" w="231" h="396" measuredW="339" measuredH="314" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./src/green-bg.png</src>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Image" x="628" y="273" w="177" h="206" measuredW="256" measuredH="256" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>./src/MIC.png</src>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::TextArea" x="604" y="202" w="224" h="30" measuredW="200" measuredH="140" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Please%20mute%20while%20you%20are%20silent.</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::StickyNote" x="226" y="307" w="220" h="140" measuredW="109" measuredH="123" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u041F%u043E%u043C%u0435%u0442%u043A%u0430%2C%20%u0447%u0442%u043E%u0431%u044B%20%u0432%u044B%u043A%u043B%u044E%u0447%u0430%u043B%u0438%20%u043C%u0438%u043A%u0440%u043E%u0444%u043E%u043D%2C%20%u043A%u043E%u0433%u0434%u0430%20%u043E%u043D%20%u0431%u0435%u0437%20%u043D%u0430%u0434%u043E%u0431%u043D%u043E%u0441%u0442%u0438%20%u0438%20%u043D%u0435%20%u0437%u0430%u0432%u043E%u0434%u0438%u043B%u0430%u0441%u044C%20%u0430%u043A%u0443%u0441%u0442%u0438%u043A%u0430.%20%u041C%u0431%20%u043D%u0430%20%u0441%u0435%u0440%u0432%u0435%u0440%u043D%u043E%u0439%20%u0441%u0442%u043E%u0440%u043E%u043D%u0435%20%u043F%u043E%u043F%u043E%u0437%u0436%u0435%20%u043C%u043E%u0436%u043D%u043E%20%u0431%u0443%u0434%u0435%u0442%20%u0440%u0435%u0430%u043B%u0438%u0437%u043E%u0432%u0430%u0442%u044C%20%u0437%u0430%u0449%u0438%u0442%u0443%20%3A3</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::Arrow" x="393" y="221" w="206" h="68" measuredW="150" measuredH="100" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <backgroundAlpha>1</backgroundAlpha>
+        <color>13576743</color>
+        <direction>bottom</direction>
+        <leftArrow>false</leftArrow>
+        <rightArrow>true</rightArrow>
+        <stroke>solid</stroke>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Switch" x="692" y="503" w="-1" h="-1" measuredW="49" measuredH="28" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>2848996</color>
+        <href>App-1-muted%26bm%3BApp-1-muted.bmml%26bm%3BApp-1-muted.bmml%26bm%3BApp-1-muted.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22466%2C413%2C515%2C441%22%20href%3D%22App-1-muted.bmml%22%20alt%3D%22App-1-muted%22%20id%3D%2215%22/%3E</map>
+        <onOffState>on</onOffState>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::TextArea" x="683" y="537" w="67" h="31" measuredW="200" measuredH="140" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <align>center</align>
+        <borderColor>16777215</borderColor>
+        <text>Talk%21</text>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="17" controlTypeID="com.balsamiq.mockups::StickyNote" x="889" y="149" w="211" h="215" measuredW="109" measuredH="123" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u041F%u0440%u0438%20%u0437%u0430%u043F%u0443%u0441%u043A%u0435%20%u043F%u0440%u0438%u043B%u043E%u0436%u0435%u043D%u0438%u044F%20%u0443%u0441%u0442%u0440%u043E%u0439%u0441%u0442%u0432%u043E%20%u0441%u043E%u0435%u0434%u0438%u043D%u044F%u0435%u0442%u0441%u044F%20%u0441%20%u0441%u0435%u0440%u0432%u0435%u0440%u043E%u043C%20%u0438%20%u043F%u043E%u043B%u044C%u0437%u043E%u0432%u0430%u0442%u0435%u043B%u044C%20%u043F%u043E%u0436%u0435%u0442%20%u043F%u0435%u0440%u0435%u043A%u043B%u044E%u0447%u0430%u0442%u044C%20%u0440%u0435%u0436%u0438%u043C%20talk/mute.%20%u041F%u043E%u0434%u043D%u044F%u0442%u0438%u0435%20%u0440%u0443%u043A%u0438%20%u043F%u0440%u0435%u0434%u043B%u0430%u0442%u0430%u044E%20%u043F%u043E%u043A%u0430%20%u043E%u0441%u0442%u0430%u0432%u0438%u0442%u044C%20%u0430%u043D%u0430%u043B%u043E%u0433%u043E%u0432%u043E%u043C%u0443%20%u043C%u0438%u0440%u0443.</text>
+      </controlProperties>
+    </control>
+    <control controlID="18" controlTypeID="com.balsamiq.mockups::StickyNote" x="961" y="404" w="205" h="148" measuredW="109" measuredH="123" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u0427%u0442%u043E%u0431%u044B%20%u0438%u0437%u0431%u0435%u0436%u0430%u0442%u044C%20%u0441%u043B%u0443%u0447%u0430%u0439%u043D%u044B%u0445%20%u043F%u0435%u0440%u0435%u043A%u043B%u044E%u0447%u0435%u043D%u0438%u0439%20%u0440%u0435%u0436%u0438%u043C%u0430%2C%20%u043F%u0435%u0440%u0435%u043A%u043B%u044E%u0447%u0435%u043D%u0438%u0435%20%u043F%u0440%u043E%u0438%u0441%u0445%u043E%u0434%u0438%u0442%20%u0442%u043E%u043B%u044C%u043A%u043E%20%u043F%u0440%u0438%20%u043D%u0430%u0436%u0430%u0442%u0438%u0438%20%u043D%u0430%20%u043F%u0435%u0440%u0435%u043A%u043B%u044E%u0447%u0430%u0442%u0435%u043B%u044C%2C%20%u0430%20%u043D%u0435%20%u043D%u0430%20%u043B%u044E%u0431%u0443%u044E%20%u043E%u0431%u043B%u0430%u0441%u0442%u044C%20%u044D%u043A%u0440%u0430%u043D%u0430.</text>
+      </controlProperties>
+    </control>
+    <control controlID="19" controlTypeID="com.balsamiq.mockups::Arrow" x="741" y="441" w="220" h="62" measuredW="150" measuredH="100" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>13576743</color>
+        <direction>bottom</direction>
+        <rightArrow>false</rightArrow>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="20" controlTypeID="com.balsamiq.mockups::CallOut" x="301" y="237" w="-1" h="-1" measuredW="73" measuredH="39" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>2%20%u044D%u043A%u0440%u0430%u043D</text>
+      </controlProperties>
+    </control>
+    <control controlID="23" controlTypeID="com.balsamiq.mockups::Button" x="246" y="525" w="-1" h="-1" measuredW="287" measuredH="27" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>App-3-blocked%26bm%3BApp-3-blocked.bmml%26bm%3BApp-3-blocked.bmml%26bm%3BApp-3-blocked.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2220%2C435%2C307%2C462%22%20href%3D%22App-3-blocked.bmml%22%20alt%3D%22App-3-blocked%22%20id%3D%2223%22/%3E</map>
+        <text>%u0415%u0441%u043B%u0438%20%u043F%u043E%u043B%u044C%u0437%u043E%u0432%u0430%u0442%u0435%u043B%u044F%20%u0437%u0430%u0431%u043B%u043E%u043A%u0438%u0440%u043E%u0432%u0430%u043B%20%u043C%u043E%u0434%u0435%u0440%u0430%u0442%u043E%u0440</text>
+      </controlProperties>
+    </control>
+    <control controlID="24" controlTypeID="com.balsamiq.mockups::Arrow" x="416" y="479" w="109" h="24" measuredW="150" measuredH="100" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <backgroundAlpha>1</backgroundAlpha>
+        <color>13576743</color>
+        <direction>bottom</direction>
+        <leftArrow>true</leftArrow>
+        <rightArrow>false</rightArrow>
+        <stroke>solid</stroke>
+        <text/>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>
