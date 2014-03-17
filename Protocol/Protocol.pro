@@ -4,8 +4,6 @@
 #
 #-------------------------------------------------
 
-QT       += network
-
 QT       -= gui
 
 TARGET = Protocol
@@ -13,14 +11,15 @@ TEMPLATE = lib
 CONFIG += staticlib
 
 SOURCES += \
-    control_packet.cpp \
     user_information.cpp \
-    server_information.cpp
+    server_information.cpp \
+    server_error.cpp
 
 HEADERS += \
-    control_packet.h \
     user_information.h \
-    server_information.h
+    server_information.h \
+    cs_packet.h \
+    server_error.h
 
 unix {
     target.path = /usr/lib

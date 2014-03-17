@@ -11,8 +11,6 @@
 #ifndef QTQUICK1APPLICATIONVIEWER_H
 #define QTQUICK1APPLICATIONVIEWER_H
 
-#include <QDebug>
-
 #include <QDeclarativeView>
 
 class QtQuick1ApplicationViewer : public QDeclarativeView

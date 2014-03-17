@@ -1,4 +1,6 @@
 #include "connector.h"
+#include <cs_packet.h>
+#include <server_error.h>
 
 Connector::Connector(QObject *parent)
     : QObject(parent)
@@ -9,18 +11,23 @@ Connector::Connector(QObject *parent)
 
 void Connector::setServer(ServerInformation &server)
 {
-    sock.connectToHost(server.getAddress(), server.getPort());
+    sock.connectToHost(server.address, server.port);
 }
 
 void Connector::sockReadyRead()
 {
     QByteArray buffer = sock.readAll();
     QDataStream ds(&buffer, QIODevice::ReadOnly);
-    ControlPacket res(ds);
-    if (res.getType() == ControlPacket::RESPONSE_SUCCESS)
+    ServerError err;
+    quint8 packetType;
+    ds >> packetType;
+    if (packetType == PacketType::RESPONSE_SUCCESS)
         emit succesResponse();
     else
-        emit failureResponse();
+    {
+        ds >> err;
+        emit failureResponse(err.message);
+    }
 }
 
 void Connector::registerUser(UserInformation &user)
@@ -32,8 +39,10 @@ void Connector::registerUser(UserInformation &user)
     }
 
     // Send user registration request
-    ControlPacket req(ControlPacket::REGISTRATION);
-    sock.write(req.serialize() + user.serialize());
+    QByteArray buffer;
+    QDataStream ds(&buffer, QIODevice::WriteOnly);
+    ds << PacketType::REGISTRATION << user;
+    sock.write(buffer);
 }
 
 void Connector::startTransmit()
@@ -45,5 +54,8 @@ void Connector::startTransmit()
     }
 
     // Send transmit request packet
-    sock.write(ControlPacket(ControlPacket::TRANSMIT).serialize());
+    QByteArray buffer;
+    QDataStream ds(&buffer, QIODevice::WriteOnly);
+    ds << PacketType::TRANSMIT;
+    sock.write(buffer);
 }

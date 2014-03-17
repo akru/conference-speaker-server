@@ -10,25 +10,32 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(quint16 port, QObject *parent = 0);
+    explicit Server(QHostAddress address,
+                    quint16 port,
+                    QObject *parent = 0);
 
 signals:
-    void registrationRequest(Connection *client, UserInformation *info);
-    void transmitRequest(Connection *client);
-
-    void userConnected(UserInformation info);
-    void userDisconnected(UserInformation info);
+    void userConnected(QString, UserInformation);
+    void userDisconnected(QString, UserInformation);
 
 public slots:
+
+
+signals:
+    void registrationRequest(Connection *, UserInformation);
+    void transmitRequest(Connection *);
+
+private slots:
     void newConnection();
     void connectionReadyRead(Connection *client);
     void connectionClose(Connection *client);
-    void registerUser(Connection *client, UserInformation *info);
+    void registerUser(Connection *client, UserInformation info);
 
 private:
+    // TCP server instance
     QTcpServer server;
+    // User information by address map
     QMap<QString, UserInformation> users;
-    QMap<QString, Connection*> connections;
 };
 
 #endif // SERVER_H

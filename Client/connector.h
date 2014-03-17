@@ -15,7 +15,7 @@ public:
 signals:
     void connected();
     void succesResponse();
-    void failureResponse();
+    void failureResponse(QString);
 
 public slots:
     void setServer(ServerInformation &server);

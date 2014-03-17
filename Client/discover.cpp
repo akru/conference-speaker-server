@@ -1,4 +1,5 @@
 #include "discover.h"
+#include <cs_packet.h>
 
 Discover::Discover(QObject *parent)
     : QObject(parent)
@@ -9,17 +10,22 @@ Discover::Discover(QObject *parent)
 
 void Discover::readPacket()
 {
+    quint8 packetType;
+    ServerInformation server;
     QByteArray readBuffer;
+    QDataStream ds(&readBuffer, QIODevice::ReadOnly);
     // Resize buffer by pending data
     readBuffer.resize(sock.pendingDatagramSize());
     // Receive data
     sock.readDatagram(readBuffer.data(), readBuffer.size());
-    try {
-        ServerInformation server(readBuffer);
-        emit discovered(server);
-    }
-    catch (BadPacket)
+    // Parse packet
+    ds >> packetType;
+    // Check packet type
+    if (packetType != PacketType::DISCOVER)
+        qDebug() << "Discover :: Bad packet type";
+    else
     {
-        qDebug() << "Discover :: Bad packet exception";
+        ds >> server;
+        emit discovered(server);
     }
 }

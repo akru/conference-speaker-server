@@ -14,7 +14,7 @@ void Client::setUserInfo(UserInformation userInfo)
 
 void Client::serverDiscovered(ServerInformation server)
 {
-    qDebug() << "Server discovered:" << server.getAddress() << ":" << server.getPort();
+    qDebug() << "Server discovered:" << server.address << ":" << server.port;
     disconnect(&discover, SIGNAL(discovered(ServerInformation)), this, 0);
     connector = new Connector();
     connect(connector, SIGNAL(connected()), SLOT(serverConnected()));

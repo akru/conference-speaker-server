@@ -1,27 +1,19 @@
 #ifndef USER_INFORMATION_H
 #define USER_INFORMATION_H
 
-#include <QDataStream>
+#include <QString>
 
-class UserInformation
+struct UserInformation
 {
-public:
-    // Constructior
     UserInformation(QString userName = "")
         : name(userName)
     {}
-    // Deserialization constructor
-    UserInformation(QDataStream &ds);
-    // Packet serialization by data stream
-    QByteArray serialize();
 
-    inline QString getName() const
-    {
-        return name;
-    }
-
-private:
     QString name;
 };
+
+QDataStream &operator >>(QDataStream &ds, UserInformation &p);
+QDataStream &operator <<(QDataStream &ds, const UserInformation &p);
+
 
 #endif // USER_INFORMATION_H

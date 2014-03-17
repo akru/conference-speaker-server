@@ -28,8 +28,8 @@ public:
     }
 
 signals:
-    void disconnected(Connection *me);
-    void readyRead(Connection *me);
+    void disconnected(Connection *);
+    void readyRead(Connection *);
 
 private slots:
     void sockDisconnected()

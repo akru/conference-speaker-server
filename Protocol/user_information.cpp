@@ -1,15 +1,11 @@
 #include "user_information.h"
 
-UserInformation::UserInformation(QDataStream &ds)
+QDataStream &operator >>(QDataStream &ds, UserInformation &p)
 {
-    // Restore custom values
-    ds >> name;
+    return ds >> p.name;
 }
 
-QByteArray UserInformation::serialize()
+QDataStream &operator <<(QDataStream &ds, const UserInformation &p)
 {
-    QByteArray buffer;
-    QDataStream ds(&buffer, QIODevice::WriteOnly);
-    ds << name;                             // Packet value
-    return buffer;
+    return ds << p.name; // Packet info
 }

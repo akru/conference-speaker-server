@@ -3,7 +3,7 @@
 
 #include <QUdpSocket>
 
-#include "server_information.h"
+#include <server_information.h>
 
 class Discover : public QObject
 {

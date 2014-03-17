@@ -1,7 +1,9 @@
 # Add more folders to ship with the application, here
-folder_01.source = qml/Client
-folder_01.target = qml
-DEPLOYMENTFOLDERS = folder_01
+qml_files.source = qml/Client
+qml_files.target = qml
+images.source = images
+images.target = images
+DEPLOYMENTFOLDERS = qml_files images
 
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
@@ -28,8 +30,7 @@ HEADERS += \
 include(qtquick1applicationviewer/qtquick1applicationviewer.pri)
 qtcAddDeployment()
 
-RESOURCES += \
-    res.qrc
+RESOURCES += res.qrc
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -lProtocol
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol
@@ -43,4 +44,3 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Prot
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Protocol/release/Protocol.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Protocol/debug/Protocol.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
-
