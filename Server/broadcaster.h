@@ -3,8 +3,7 @@
 
 #include <QTimer>
 #include <QUdpSocket>
-
-#include "server_information.h"
+#include <server_information.h>
 
 const int BROADCASTER_TIME_INTERVAL = 1000;
 

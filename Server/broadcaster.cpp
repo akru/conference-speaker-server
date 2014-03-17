@@ -1,4 +1,5 @@
 #include "broadcaster.h"
+#include <cs_packet.h>
 
 Broadcaster::Broadcaster(QObject *parent)
     : QObject(parent)
@@ -13,7 +14,7 @@ void Broadcaster::setServerInformation(ServerInformation &info)
     QByteArray buffer;
     QDataStream ds(&buffer, QIODevice::WriteOnly);
     // Serialisation
-    ds << info;
+    ds << PacketType::DISCOVER << info;
     // Store serialized packet
     serverPacket = buffer;
 }

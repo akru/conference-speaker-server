@@ -17,8 +17,8 @@ public:
     ~MainWindow();
 
 public slots:
-    void appendUser(UserInformation info);
-    void dropUser(UserInformation info);
+    void appendUser(QString address, UserInformation info);
+    void dropUser(QString address, UserInformation info);
 
 private:
     Ui::MainWindow *ui;

@@ -21,7 +21,8 @@ void Server::newConnection()
     QTcpSocket *sock = server.nextPendingConnection();
     while (sock)
     {
-        qDebug() << "New connection from:" << sock->peerAddress();
+        qDebug() << "New connection from:"
+                 << sock->peerAddress().toString();
         // Create connection instance
         Connection *c = new Connection(sock);
         // Connect to incoming data handler

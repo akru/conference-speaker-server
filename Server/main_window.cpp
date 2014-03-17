@@ -8,8 +8,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     s = new Server(QHostAddress::Any, 12345);
-    connect(s, SIGNAL(userConnected(UserInformation)), SLOT(appendUser(UserInformation)));
-    connect(s, SIGNAL(userDisconnected(UserInformation)), SLOT(dropUser(UserInformation)));
+    connect(s, SIGNAL(userConnected(QString,UserInformation)),
+            SLOT(appendUser(QString,UserInformation)));
+    connect(s, SIGNAL(userDisconnected(QString,UserInformation)),
+            SLOT(dropUser(QString,UserInformation)));
 }
 
 MainWindow::~MainWindow()
@@ -17,14 +19,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::appendUser(UserInformation info)
+void MainWindow::appendUser(QString address, UserInformation info)
 {
-    ui->listWidget->addItem(info.name);
+    ui->listWidget->addItem(address + " :: " + info.name);
 }
 
-void MainWindow::dropUser(UserInformation info)
+void MainWindow::dropUser(QString address, UserInformation info)
 {
-    QList<QListWidgetItem *> items =
-        ui->listWidget->findItems(info.name, Qt::MatchFixedString);
-    ui->listWidget->removeItemWidget(items[0]);
+    Q_UNUSED(address)
+    Q_UNUSED(info)
 }

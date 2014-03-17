@@ -1,18 +1,11 @@
-#include "qtquick1applicationviewer.h"
+#include <QtGui/QGuiApplication>
+#include <QtQml/QQmlApplicationEngine>
 #include "client.h"
-#include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-
-    QtQuick1ApplicationViewer viewer;
-    viewer.addImportPath(QLatin1String("modules"));
-    viewer.setOrientation(QtQuick1ApplicationViewer::ScreenOrientationAuto);
-    viewer.setMainQmlFile(QLatin1String("qml/Client/main.qml"));
-    viewer.showExpanded();
-
-    Client client;
+    QGuiApplication app(argc, argv);
+    QQmlApplicationEngine engine(QUrl("qrc:qml/main.qml"));
 
     return app.exec();
 }
