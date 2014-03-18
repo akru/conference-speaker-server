@@ -2,12 +2,21 @@
 #define RECEIVER_H
 
 #include <QObject>
+#include <channel_information.h>
 
 class Receiver : public QObject
 {
     Q_OBJECT
 public:
-    Receiver(QObject *parent = 0);
+    explicit Receiver(QObject *parent = 0);
+
+    ChannelInformation getChannel() const
+    {
+        return channel;
+    }
+
+private:
+    ChannelInformation channel;
 };
 
 #endif // RECEIVER_H

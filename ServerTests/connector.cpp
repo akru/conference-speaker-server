@@ -15,7 +15,8 @@ Connector::Connector(QObject *parent)
 
 void Connector::setServer(ServerInformation server)
 {
-    disconnect(this, SLOT(setServer(ServerInformation)));
+    if (sock.state() == QAbstractSocket::ConnectedState)
+        return;
     qDebug() << "connection to" << server.name;
     sock.connectToHost(server.address, server.port);
 }
@@ -35,9 +36,12 @@ void Connector::sockReadyRead()
     if (res.type == Request::REGISTRATION)
     {
         if (res.result == Response::SUCCESS)
+        {
+            qDebug() << "Success registration";
             emit successRegistration();
+        }
         else
-            emit failureRegistration(res.message);
+            qDebug() << "Registratuion fail:" << res.message;
     }
     if (res.type == Request::CHANNEL)
     {
@@ -48,14 +52,14 @@ void Connector::sockReadyRead()
                         QJsonDocument::fromJson(buffer).object();
                 ChannelInformation chan =
                         ChannelResponse::fromJson(packet).channel;
-                emit successChannel(chan);
+                qDebug() << "Success channel:" << chan.toJson();
             } catch (...) {
                 qDebug() << "Bad packet:" << buffer;
                 return;
             }
         }
         else
-            emit failureChannel(res.message);
+            qDebug() << "Channel fail:" << res.message;
     }
 }
 

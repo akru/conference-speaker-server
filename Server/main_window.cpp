@@ -13,6 +13,10 @@ MainWindow::MainWindow(Server *server, QWidget *parent) :
             SLOT(appendUser(QString,UserInformation)));
     connect(server, SIGNAL(userDisconnected(QString,UserInformation)),
             SLOT(dropUser(QString,UserInformation)));
+
+    // TODO: change
+    connect(server, SIGNAL(channelRequest(Connection*)),
+            server, SLOT(openChannel(Connection*)));
 }
 
 MainWindow::~MainWindow()
@@ -22,13 +26,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::appendUser(QString address, UserInformation info)
 {
-    ui->listWidget->addItem(address + " :: " + info.name);
+    ui->listWidget->addItem(info.name + " (" + address + ")");
 }
 
 void MainWindow::dropUser(QString address, UserInformation info)
 {
-    Q_UNUSED(address)
     Q_UNUSED(info)
+    delete ui->listWidget->findItems(address, Qt::MatchContains)[0];
 }
 
 void MainWindow::on_actionAbout_triggered()

@@ -16,9 +16,6 @@ public:
 signals:
     void connected();
     void successRegistration();
-    void successChannel(ChannelInformation);
-    void failureRegistration(QString);
-    void failureChannel(QString);
 
 public slots:
     void setServer(ServerInformation server);

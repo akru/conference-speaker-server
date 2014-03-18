@@ -6,6 +6,7 @@
 #include <cs_packet.h>
 #include <request.h>
 #include <response.h>
+#include <channel_response.h>
 #include <registration_request.h>
 #include <user_information.h>
 
@@ -34,14 +35,14 @@ void Server::newConnection()
                 SLOT(connectionReadyRead(Connection*)));
         // Connect to connection destroyer
         connect(c, SIGNAL(disconnected(Connection*)),
-                SLOT(connectionClose(Connection*)));
+                SLOT(connectionClosed(Connection*)));
 
         // Get new connection
         sock = server.nextPendingConnection();
     }
 }
 
-void Server::connectionClose(Connection *client)
+void Server::connectionClosed(Connection *client)
 {
     QString address = client->getAddress();
     qDebug() << "Connection closed:" << address;
@@ -50,8 +51,15 @@ void Server::connectionClose(Connection *client)
     emit userDisconnected(address, user);
 
     // Drop user from map
-    users.remove(address);
-    // Delete connection
+    if (users.contains(address))
+        users.remove(address);
+    // Close opened channel
+    if (channels.contains(address))
+    {
+        delete channels[address];
+        channels.remove(address);
+    }
+    // Delete client connection
     delete client;
 }
 
@@ -111,6 +119,32 @@ void Server::registerUser(Connection *client, UserInformation info)
     }
 
     QJsonObject resJson = res.toJson();
+    QByteArray buffer = QJsonDocument(resJson).toJson();
+    client->write(buffer);
+}
+
+void Server::openChannel(Connection *client)
+{
+    QJsonObject resJson;
+    if (!users.contains(client->getAddress()))
+    {
+        qDebug() << "Unregistered:" << client->getAddress();
+        Response res(Request::REGISTRATION,
+                       Response::ERROR, "Please register first");
+        resJson = res.toJson();
+    }
+    else
+    {
+        // Allocate receiver channel
+        Receiver *r = new Receiver();
+        // Append to channel map
+        channels.insert(client->getAddress(), r);
+        // Make success response
+        ChannelResponse res(r->getChannel());
+        resJson = res.toJson();
+        qDebug() << "Success channel open:" << r->getChannel().toJson();
+    }
+
     QByteArray buffer = QJsonDocument(resJson).toJson();
     client->write(buffer);
 }

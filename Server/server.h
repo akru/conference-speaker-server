@@ -5,6 +5,7 @@
 #include <QTcpServer>
 #include "user_information.h"
 #include "connection.h"
+#include "receiver.h"
 
 class Server : public QObject
 {
@@ -28,14 +29,16 @@ signals:
 private slots:
     void newConnection();
     void connectionReadyRead(Connection *client);
-    void connectionClose(Connection *client);
+    void connectionClosed(Connection *client);
     void registerUser(Connection *client, UserInformation info);
+    void openChannel(Connection *client);
 
 private:
     // TCP server instance
     QTcpServer server;
     // User information by address map
     QMap<QString, UserInformation> users;
+    QMap<QString, Receiver *> channels;
 };
 
 #endif // SERVER_H
