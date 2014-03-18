@@ -5,6 +5,7 @@
 
 #include <server_information.h>
 #include <user_information.h>
+#include <channel_information.h>
 
 class Connector : public QObject
 {
@@ -14,17 +15,20 @@ public:
 
 signals:
     void connected();
-    void succesResponse();
-    void failureResponse(QString);
+    void successRegistration();
+    void successChannel(ChannelInformation);
+    void failureRegistration(QString);
+    void failureChannel(QString);
 
 public slots:
-    void setServer(ServerInformation &server);
-    void registerUser(UserInformation &user);
+    void setServer(ServerInformation server);
+    void registerUser(UserInformation user);
     void startTransmit();
 
     void sockConnected()
     {
-        emit connected();
+        UserInformation user("test user name");
+        registerUser(user);
     }
     void sockReadyRead();
 

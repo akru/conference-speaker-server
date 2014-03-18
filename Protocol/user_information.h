@@ -1,19 +1,20 @@
 #ifndef USER_INFORMATION_H
 #define USER_INFORMATION_H
 
-#include <QString>
+#include <QJsonObject>
 
 struct UserInformation
 {
-    UserInformation(QString userName = "")
+    UserInformation(QString userName = "Anonymous")
         : name(userName)
     {}
 
+    // Json serializer
+    QJsonObject toJson() const;
+    // Json deserializer
+    static UserInformation fromJson(const QJsonObject &json);
+
     QString name;
 };
-
-QDataStream &operator >>(QDataStream &ds, UserInformation &p);
-QDataStream &operator <<(QDataStream &ds, const UserInformation &p);
-
 
 #endif // USER_INFORMATION_H

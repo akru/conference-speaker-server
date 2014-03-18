@@ -1,5 +1,6 @@
 #include "broadcaster.h"
 #include <cs_packet.h>
+#include <QJsonDocument>
 
 Broadcaster::Broadcaster(QObject *parent)
     : QObject(parent)
@@ -11,12 +12,9 @@ Broadcaster::Broadcaster(QObject *parent)
 
 void Broadcaster::setServerInformation(ServerInformation &info)
 {
-    QByteArray buffer;
-    QDataStream ds(&buffer, QIODevice::WriteOnly);
-    // Serialisation
-    ds << PacketType::DISCOVER << info;
-    // Store serialized packet
-    serverPacket = buffer;
+    QJsonObject packet = info.toJson();
+    serverPacket = QJsonDocument(packet).toJson();
+    qDebug() << "New server info:" << QJsonDocument(packet).toJson();
 }
 
 void Broadcaster::sendInformation()

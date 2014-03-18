@@ -1,16 +1,17 @@
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "server.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(Server *server, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    server(server)
 {
     ui->setupUi(this);
 
-    s = new Server(QHostAddress::Any, 12345);
-    connect(s, SIGNAL(userConnected(QString,UserInformation)),
+    connect(server, SIGNAL(userConnected(QString,UserInformation)),
             SLOT(appendUser(QString,UserInformation)));
-    connect(s, SIGNAL(userDisconnected(QString,UserInformation)),
+    connect(server, SIGNAL(userDisconnected(QString,UserInformation)),
             SLOT(dropUser(QString,UserInformation)));
 }
 
@@ -28,4 +29,9 @@ void MainWindow::dropUser(QString address, UserInformation info)
 {
     Q_UNUSED(address)
     Q_UNUSED(info)
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    about.show();
 }

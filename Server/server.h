@@ -23,7 +23,7 @@ public slots:
 
 signals:
     void registrationRequest(Connection *, UserInformation);
-    void transmitRequest(Connection *);
+    void channelRequest(Connection *);
 
 private slots:
     void newConnection();

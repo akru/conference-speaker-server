@@ -1,13 +1,27 @@
 #include "server_information.h"
+#include "cs_packet.h"
 
-QDataStream &operator >>(QDataStream &ds, ServerInformation &p)
+// Json serializer
+QJsonObject ServerInformation::toJson() const
 {
-    QString signature; // TODO: signature checking
-    return ds >> p.name >> p.address >> p.port >> signature;
+    QJsonObject obj;
+    obj.insert("name", name);
+    obj.insert("address", address);
+    obj.insert("port", port);
+    return obj;
 }
 
-QDataStream &operator <<(QDataStream &ds, const ServerInformation &p)
+// Json deserializer
+ServerInformation ServerInformation::fromJson(const QJsonObject &json)
 {
-    return ds << p.name << p.address << p.port  // Packet info
-           << QString("SIGN");                  // Packet signature
+    QJsonValue name     = json["name"];
+    QJsonValue address  = json["address"];
+    QJsonValue port     = json["port"];
+
+    if (name.isUndefined() || address.isUndefined() || port.isUndefined())
+        throw(BadPacket());
+
+    return ServerInformation(name.toString(),
+                             address.toString(),
+                             (quint16)port.toDouble());
 }

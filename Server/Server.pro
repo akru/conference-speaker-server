@@ -17,16 +17,19 @@ SOURCES  += main.cpp \
     server.cpp \
     receiver.cpp \
     connection.cpp \
-    broadcaster.cpp
+    broadcaster.cpp \
+    about_dialog.cpp
 
 HEADERS  += \
     main_window.h \
     server.h \
     receiver.h \
     connection.h \
-    broadcaster.h
+    broadcaster.h \
+    about_dialog.h
 
-FORMS    += main_window.ui
+FORMS    += main_window.ui \
+    about_dialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -lProtocol
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol

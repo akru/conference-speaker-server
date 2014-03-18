@@ -1,11 +1,19 @@
 #include "user_information.h"
+#include "cs_packet.h"
 
-QDataStream &operator >>(QDataStream &ds, UserInformation &p)
+QJsonObject UserInformation::toJson() const
 {
-    return ds >> p.name;
+    QJsonObject obj;
+    obj.insert("name", name);
+    return obj;
 }
 
-QDataStream &operator <<(QDataStream &ds, const UserInformation &p)
+UserInformation UserInformation::fromJson(const QJsonObject &json)
 {
-    return ds << p.name; // Packet info
+    QJsonValue userName = json["name"];
+
+    if (userName.isUndefined())
+        throw(BadPacket());
+
+    return UserInformation(userName.toString());
 }

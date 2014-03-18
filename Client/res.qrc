@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>images/microphone.png</file>
-        <file>qml/main.qml</file>
-        <file>qml/ToggleButton.qml</file>
-    </qresource>
-</RCC>

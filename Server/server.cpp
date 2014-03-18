@@ -2,8 +2,12 @@
 #include "connection.h"
 #include <QTcpSocket>
 #include <QDataStream>
+#include <QJsonDocument>
 #include <cs_packet.h>
-#include <server_error.h>
+#include <request.h>
+#include <response.h>
+#include <registration_request.h>
+#include <user_information.h>
 
 Server::Server(QHostAddress address, quint16 port, QObject *parent)
     : QObject(parent)
@@ -53,61 +57,60 @@ void Server::connectionClose(Connection *client)
 
 void Server::connectionReadyRead(Connection *client)
 {
-    quint8 packetType;
-    UserInformation info;
+    Request req;
+    RegistrationRequest reg_req;
+    QJsonDocument packet;
 
     // Read data and create stream
     QByteArray buffer = client->readAll();
-    QDataStream ds(&buffer, QIODevice::ReadOnly);
 
     // Read packet type
-    ds >> packetType;
+    try {
+        packet = QJsonDocument::fromJson(buffer);
+        req = Request::fromJson(packet.object());
+    } catch (BadPacket) {
+        qDebug() << "Bad packet: " << buffer;
+        return;
+    } catch (...) {
+        qDebug() << "Unknown error in packet parser";
+        return;
+    }
 
-    switch (packetType)
+    switch (req.type)
     {
-    case PacketType::REGISTRATION:
-        // Parse user info
-        ds >> info;
+    case Request::REGISTRATION:
+        qDebug() << "New registration request from" << client->getAddress();
+        // Parse registration request
+        packet = QJsonDocument::fromJson(buffer);
+        reg_req = RegistrationRequest::fromJson(packet.object());
         // Emit signal
-        emit registrationRequest(client, info);
+        emit registrationRequest(client, reg_req.user);
         break;
-    case PacketType::TRANSMIT:
-        emit transmitRequest(client);
+    case Request::CHANNEL:
+        qDebug() << "New channel request from" << client->getAddress();
+        emit channelRequest(client);
         break;
-    default:
-        // Send failure(unknown request)
-        qDebug() << "Unknown request:" << packetType;
-        QByteArray res;
-        QDataStream ds(&res, QIODevice::WriteOnly);
-        QString message("Unknown request");
-        ServerError err(message);
-        ds << err;
-        client->write(res);
     }
 }
 
 void Server::registerUser(Connection *client, UserInformation info)
 {
-    QByteArray buffer;
-    QDataStream ds(&buffer, QIODevice::WriteOnly);
-    QString message("Double registration");
-    ServerError err(message);
-
+    Response res;
     if (!users.contains(client->getAddress()))
     {
         users.insert(client->getAddress(), info);
         qDebug() << "Success registered user:" << info.name;
-
-        ds << PacketType::RESPONSE_SUCCESS;
-        client->write(buffer);
-
+        res = Response(Request::REGISTRATION, Response::SUCCESS);;
         emit userConnected(client->getAddress(), info);
     }
     else
     {
         qDebug() << "Double registration:" << client->getAddress();
-
-        ds << PacketType::RESPONSE_FAILURE << err;
-        client->write(buffer);
+        res = Response(Request::REGISTRATION,
+                       Response::ERROR, "IP already registered");
     }
+
+    QJsonObject resJson = res.toJson();
+    QByteArray buffer = QJsonDocument(resJson).toJson();
+    client->write(buffer);
 }

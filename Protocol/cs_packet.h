@@ -8,14 +8,7 @@ class BadPacket
         : public std::exception
 {};
 
-// Packet types
-namespace PacketType
-{
-    const static quint8 DISCOVER           = 0x05;
-    const static quint8 REGISTRATION       = 0x10;
-    const static quint8 TRANSMIT           = 0x11;
-    const static quint8 RESPONSE_SUCCESS   = 0x12;
-    const static quint8 RESPONSE_FAILURE   = 0x13;
-};
+const quint16 SERVER_INFORMATION_PORT = 35000;
+const quint16 SERVER_CONNECTION_PORT  = 35001;
 
 #endif // CS_PACKET_H
