@@ -47,9 +47,11 @@ void Server::connectionClosed(Connection *client)
     QString address = client->getAddress();
     qDebug() << "Connection closed:" << address;
 
-    UserInformation user = users[address];
-    emit userDisconnected(address, user);
-
+    if (users.contains(address))
+    {
+        UserInformation user = users[address];
+        emit userDisconnected(address, user);
+    }
     // Drop user from map
     if (users.contains(address))
         users.remove(address);
@@ -121,6 +123,7 @@ void Server::registerUser(Connection *client, UserInformation info)
     QJsonObject resJson = res.toJson();
     QByteArray buffer = QJsonDocument(resJson).toJson();
     client->write(buffer);
+    qDebug() << buffer;
 }
 
 void Server::openChannel(Connection *client)
@@ -147,4 +150,5 @@ void Server::openChannel(Connection *client)
 
     QByteArray buffer = QJsonDocument(resJson).toJson();
     client->write(buffer);
+    qDebug() << buffer;
 }
