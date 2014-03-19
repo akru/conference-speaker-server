@@ -1,7 +1,7 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
 
-#include <QObject>
+#include <QTcpSocket>
 #include <channel_information.h>
 
 class Receiver : public QObject
@@ -17,6 +17,7 @@ public:
 
 private:
     ChannelInformation channel;
+    QTcpSocket sock;
 };
 
 #endif // RECEIVER_H

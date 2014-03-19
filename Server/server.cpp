@@ -139,13 +139,20 @@ void Server::openChannel(Connection *client)
     else
     {
         // Allocate receiver channel
-        Receiver *r = new Receiver();
-        // Append to channel map
-        channels.insert(client->getAddress(), r);
-        // Make success response
-        ChannelResponse res(r->getChannel());
-        resJson = res.toJson();
-        qDebug() << "Success channel open:" << r->getChannel().toJson();
+        try {
+            Receiver *r = new Receiver();
+            // Append to channel map
+            channels.insert(client->getAddress(), r);
+            // Make success response
+            ChannelResponse res(r->getChannel());
+            resJson = res.toJson();
+            qDebug() << "Success channel open:" << r->getChannel().toJson();
+        } catch(...) {
+            qDebug() << "Can not open the channel";
+            Response res(Request::CHANNEL,
+                           Response::ERROR, "Server fault");
+            resJson = res.toJson();
+        }
     }
 
     QByteArray buffer = QJsonDocument(resJson).toJson();

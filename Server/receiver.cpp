@@ -1,9 +1,14 @@
 #include "receiver.h"
-
+#include <QHostAddress>
 
 Receiver::Receiver(QObject *parent)
     : QObject(parent)
 {
-    // Test
-    channel = ChannelInformation(1000);
+    if (sock.bind())
+    {
+        qDebug() << "Open channel:" << channel.toJson();
+        channel = ChannelInformation(sock.localPort());
+    }
+    else
+        throw(std::exception());
 }
