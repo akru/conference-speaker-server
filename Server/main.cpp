@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
     // Create simple server information
     ServerInformation serv("Ъ-сервер",
-                           "127.0.0.1", SERVER_CONNECTION_PORT);
+                           "172.17.0.12", SERVER_CONNECTION_PORT);
 
     // Create server information broadcaster
     Broadcaster b;

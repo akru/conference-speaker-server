@@ -129,6 +129,7 @@ void Server::registerUser(Connection *client, UserInformation info)
 void Server::openChannel(Connection *client)
 {
     QJsonObject resJson;
+    // Unregistered user
     if (!users.contains(client->getAddress()))
     {
         qDebug() << "Unregistered:" << client->getAddress();
@@ -138,20 +139,31 @@ void Server::openChannel(Connection *client)
     }
     else
     {
-        // Allocate receiver channel
-        try {
-            Receiver *r = new Receiver();
-            // Append to channel map
-            channels.insert(client->getAddress(), r);
-            // Make success response
+        // Existed channel
+        if (channels.contains(client->getAddress()))
+        {
+            // Return existed channel info
+            Receiver *r = channels[client->getAddress()];
             ChannelResponse res(r->getChannel());
             resJson = res.toJson();
-            qDebug() << "Success channel open:" << r->getChannel().toJson();
-        } catch(...) {
-            qDebug() << "Can not open the channel";
-            Response res(Request::CHANNEL,
-                           Response::ERROR, "Server fault");
-            resJson = res.toJson();
+        }
+        // New channel
+        else
+        {
+            // Allocate voice receiver
+            try {
+                Receiver *r = new Receiver();
+                // Append to channel map
+                channels.insert(client->getAddress(), r);
+                // Make success response
+                ChannelResponse res(r->getChannel());
+                resJson = res.toJson();
+                qDebug() << "Success channel open:" << r->getChannel().toJson();
+            } catch(...) {
+                qDebug() << "Can not open the channel";
+                Response res(Request::CHANNEL, Response::ERROR, "Server fault");
+                resJson = res.toJson();
+            }
         }
     }
 
