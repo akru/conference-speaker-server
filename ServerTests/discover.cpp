@@ -27,8 +27,5 @@ void Discover::readPacket()
         qDebug() << "Discover :: Bad packet:" << readBuffer;
         return;
     }
-    qDebug() << "Discover packet:" << packet;
-    qDebug() << "Server info:" << server.name
-             << ">>" << server.address << ":" << server.port;
     emit discovered(server);
 }

@@ -12,7 +12,6 @@ class Server : public QObject
     Q_OBJECT
 public:
     explicit Server(QHostAddress address,
-                    quint16 port,
                     QObject *parent = 0);
 
 signals:
@@ -35,6 +34,7 @@ private slots:
 
 private:
     // TCP server instance
+    QHostAddress address;
     QTcpServer server;
     // User information by address map
     QMap<QString, UserInformation> users;

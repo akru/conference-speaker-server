@@ -1,4 +1,5 @@
 #include "connector.h"
+#include "transmitter.h"
 #include <cs_packet.h>
 #include <response.h>
 #include <channel_response.h>
@@ -52,6 +53,8 @@ void Connector::sockReadyRead()
                         QJsonDocument::fromJson(buffer).object();
                 ChannelInformation chan =
                         ChannelResponse::fromJson(packet).channel;
+                // Open transmitter
+                new Transmitter(chan, this);
                 qDebug() << "Success channel:" << chan.toJson();
             } catch (...) {
                 qDebug() << "Bad packet:" << buffer;

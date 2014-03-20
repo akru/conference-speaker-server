@@ -17,11 +17,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     discover.cpp \
-    connector.cpp
+    connector.cpp \
+    transmitter.cpp
 
 HEADERS += \
     discover.h \
-    connector.h
+    connector.h \
+    transmitter.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -lProtocol
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol

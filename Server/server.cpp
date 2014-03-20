@@ -10,14 +10,15 @@
 #include <registration_request.h>
 #include <user_information.h>
 
-Server::Server(QHostAddress address, quint16 port, QObject *parent)
-    : QObject(parent)
+Server::Server(QHostAddress address, QObject *parent)
+    : QObject(parent),
+      address(address)
 {
     connect(&server, SIGNAL(newConnection()), SLOT(newConnection()));
     connect(this, SIGNAL(registrationRequest(Connection*,UserInformation)),
             SLOT(registerUser(Connection*,UserInformation)));
 
-    server.listen(address, port);
+    server.listen(address, SERVER_CONNECTION_PORT);
 }
 
 void Server::newConnection()
@@ -123,7 +124,6 @@ void Server::registerUser(Connection *client, UserInformation info)
     QJsonObject resJson = res.toJson();
     QByteArray buffer = QJsonDocument(resJson).toJson();
     client->write(buffer);
-    qDebug() << buffer;
 }
 
 void Server::openChannel(Connection *client)
@@ -152,7 +152,7 @@ void Server::openChannel(Connection *client)
         {
             // Allocate voice receiver
             try {
-                Receiver *r = new Receiver();
+                Receiver *r = new Receiver(address);
                 // Append to channel map
                 channels.insert(client->getAddress(), r);
                 // Make success response
@@ -169,5 +169,4 @@ void Server::openChannel(Connection *client)
 
     QByteArray buffer = QJsonDocument(resJson).toJson();
     client->write(buffer);
-    qDebug() << buffer;
 }

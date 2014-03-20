@@ -5,6 +5,8 @@
 Broadcaster::Broadcaster(QObject *parent)
     : QObject(parent)
 {
+    sock.setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
+
     t.setInterval(BROADCASTER_TIME_INTERVAL);
     connect(&t, SIGNAL(timeout()), SLOT(sendInformation()));
     t.start();
@@ -19,7 +21,8 @@ void Broadcaster::setServerInformation(ServerInformation &info)
 
 void Broadcaster::sendInformation()
 {
+    QHostAddress addr = QHostAddress::Broadcast;
     if (serverPacket.size())
         sock.writeDatagram(serverPacket,
-                       QHostAddress::Broadcast, SERVER_INFORMATION_PORT);
+                       addr, SERVER_INFORMATION_PORT);
 }

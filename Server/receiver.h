@@ -2,7 +2,7 @@
 #define RECEIVER_H
 
 #include <QBuffer>
-#include <QTcpSocket>
+#include <QTcpServer>
 #include <QAudioOutput>
 #include <channel_information.h>
 
@@ -10,7 +10,7 @@ class Receiver : public QObject
 {
     Q_OBJECT
 public:
-    explicit Receiver(QObject *parent = 0);
+    explicit Receiver(QHostAddress &address, QObject *parent = 0);
 
     ChannelInformation getChannel() const
     {
@@ -19,14 +19,17 @@ public:
 
 public slots:
     void setVolume(qreal volume);
-    void audioStateChanged(QAudio::State state);
+    void setAudioDevice(QAudioDeviceInfo &device);
 
 private slots:
+    void newConnection();
     void sockReadyRead();
+    void audioStateChanged(QAudio::State state);
 
 private:
     ChannelInformation channel;
-    QTcpSocket sock;
+    QTcpSocket *client;
+    QTcpServer server;
 
     QBuffer buffer;
     QAudioFormat format;
