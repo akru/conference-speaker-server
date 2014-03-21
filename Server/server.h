@@ -15,26 +15,27 @@ public:
                     QObject *parent = 0);
 
 signals:
-    void userConnected(QString, UserInformation);
-    void userDisconnected(QString, UserInformation);
+    void userConnected(QString address, UserInformation info);
+    void userDisconnected(QString address);
+    void channelConnected(UserInformation user, Receiver *channel);
 
 public slots:
-
+    void denyChannel(Connection *client);
+    void openChannel(Connection *client);
+    void closeChannel(QString address);
 
 signals:
-    void registrationRequest(Connection *, UserInformation);
-    void channelRequest(Connection *);
+    void registrationRequest(Connection *client, UserInformation info);
+    void channelRequest(Connection *client, UserInformation info);
 
 private slots:
     void newConnection();
     void connectionReadyRead(Connection *client);
-    void connectionClosed(Connection *client);
+    void connectionClose(Connection *client);
     void registerUser(Connection *client, UserInformation info);
-    void openChannel(Connection *client);
 
 private:
     // TCP server instance
-    QHostAddress address;
     QTcpServer server;
     // User information by address map
     QMap<QString, UserInformation> users;

@@ -4,17 +4,16 @@
 #include <QAudioOutput>
 #include <QTcpSocket>
 
-Receiver::Receiver(QHostAddress &address, QObject *parent)
+Receiver::Receiver(QHostAddress address, QObject *parent)
     : QObject(parent)
 {
-    server.setMaxPendingConnections(1);
     if (server.listen(address))
     {
         channel = ChannelInformation(server.serverAddress().toString(),
                                      server.serverPort());
         qDebug() << "Init channel port:" << server.serverPort();
         connect(&server, SIGNAL(newConnection()), SLOT(newConnection()));
-        qDebug() << "Listening:" << server.isListening();
+        server.setMaxPendingConnections(1);
     }
     else
         throw(std::exception());
@@ -32,15 +31,12 @@ Receiver::Receiver(QHostAddress &address, QObject *parent)
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
         return;
     }
+    qDebug() << "Audio output:" << info.deviceName();
 
-    // Open buffer
-    buffer.open(QIODevice::ReadWrite);
-    qDebug() << "opened buffer, size:" << buffer.size();
-
+    // Open audio device
     audio = new QAudioOutput(info, format, this);
     connect(audio, SIGNAL(stateChanged(QAudio::State)),
             SLOT(audioStateChanged(QAudio::State)));
-    audio->start();
 }
 
 void Receiver::audioStateChanged(QAudio::State state)
@@ -50,32 +46,26 @@ void Receiver::audioStateChanged(QAudio::State state)
 
 void Receiver::newConnection()
 {
-    client = server.nextPendingConnection();
-    qDebug() << "New connection from" << client->peerAddress();
+    QTcpSocket *client = server.nextPendingConnection();
+    peerAddress = client->peerAddress();
+    qDebug() << "New connection from" << peerAddress.toString();
+
+    // Set low dealy option and connect disconneced handler
     client->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(client, SIGNAL(readyRead()), SLOT(sockReadyRead()));
+    connect(client, SIGNAL(disconnected()), SLOT(disconnected()));
+    emit connected(this);
+
+    // Start playing channel
+    audio->start(client);
 }
 
-void Receiver::sockReadyRead()
+void Receiver::disconnected()
 {
-    quint64 written = buffer.write(client->readAll());
-    qDebug() << "New data size:" << written << ", buffer size" << buffer.size();
-
-    if (audio->state() == QAudio::IdleState)
-        audio->start(&buffer);
+    emit disconnected(this);
 }
 
 void Receiver::setVolume(qreal volume)
 {
     qDebug() << "Set volume:" << volume;
     audio->setVolume(volume);
-}
-
-void Receiver::setAudioDevice(QAudioDeviceInfo &device)
-{
-    qDebug() << "Set audio device:" << device.deviceName();
-    delete audio;
-    audio = new QAudioOutput(device, format, this);
-    connect(audio, SIGNAL(stateChanged(QAudio::State)),
-            SLOT(audioStateChanged(QAudio::State)));
 }

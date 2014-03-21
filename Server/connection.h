@@ -1,7 +1,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <QString>
+#include <QJsonDocument>
 #include <QTcpSocket>
 #include <QHostAddress>
 #include "user_information.h"
@@ -22,8 +22,9 @@ public:
     {
         return sock->readAll();
     }
-    qint64 write(QByteArray &data)
+    qint64 write(QJsonObject json)
     {
+        QByteArray data = QJsonDocument(json).toJson();
         return sock->write(data);
     }
 

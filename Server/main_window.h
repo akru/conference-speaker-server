@@ -5,6 +5,8 @@
 #include <user_information.h>
 
 #include "about_dialog.h"
+#include "receiver.h"
+#include "server.h"
 
 class Server;
 
@@ -20,11 +22,17 @@ public:
     explicit MainWindow(Server *server, QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+    void channelRequestAccepted(Connection *);
+    void channelRequestDiscarded(Connection *);
+
 public slots:
-    void appendUser(QString address, UserInformation info);
-    void dropUser(QString address, UserInformation info);
 
 private slots:
+    void appendUser(QString address, UserInformation info);
+    void dropUser(QString address);
+    void appendChannel(UserInformation info, Receiver *channel);
+    void channelRequest(Connection *client, UserInformation info);
     void on_actionAbout_triggered();
 
 private:
