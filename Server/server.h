@@ -33,6 +33,7 @@ private slots:
     void connectionReadyRead(Connection *client);
     void connectionClose(Connection *client);
     void registerUser(Connection *client, UserInformation info);
+    void channelConnected(Receiver *channel);
 
 private:
     // TCP server instance

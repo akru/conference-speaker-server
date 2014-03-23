@@ -157,8 +157,8 @@ void Server::openChannel(Connection *client)
                 result = res.toJson();
                 qDebug() << "Success channel open:"
                          << r->getChannelInfo().toJson();
-                // Emit new channel notification
-                emit channelConnected(users[client->getAddress()], r);
+                connect(r, SIGNAL(connected(Receiver*)),
+                        SLOT(channelConnected(Receiver*)));
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::CHANNEL, Response::ERROR, "Server fault");
@@ -174,4 +174,11 @@ void Server::closeChannel(QString address)
     Q_ASSERT(channels.contains(address));
     delete channels[address];
     channels.remove(address);
+}
+
+void Server::channelConnected(Receiver *channel)
+{
+    QString address = channel->getPeerAddress().toString();
+    Q_ASSERT(users.contains(address));
+    emit channelConnected(users[address], channel);
 }

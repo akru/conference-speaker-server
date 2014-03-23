@@ -5,26 +5,16 @@
 #include <QTcpSocket>
 
 Receiver::Receiver(QHostAddress address, QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      client(0)
 {
-    if (server.listen(address))
-    {
-        channel = ChannelInformation(server.serverAddress().toString(),
-                                     server.serverPort());
-        qDebug() << "Init channel port:" << server.serverPort();
-        connect(&server, SIGNAL(newConnection()), SLOT(newConnection()));
-        server.setMaxPendingConnections(1);
-    }
-    else
-        throw(std::exception());
-
     // Set up the format, eg.
-    format.setSampleRate(8000);
+    format.setSampleSize(16);
     format.setChannelCount(1);
-    format.setSampleSize(8);
+    format.setSampleRate(8000);
     format.setCodec("audio/pcm");
+    format.setSampleType(QAudioFormat::SignedInt);
     format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::UnSignedInt);
 
     QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
     if (!info.isFormatSupported(format)) {
@@ -37,6 +27,18 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     audio = new QAudioOutput(info, format, this);
     connect(audio, SIGNAL(stateChanged(QAudio::State)),
             SLOT(audioStateChanged(QAudio::State)));
+    audio->setBufferSize(10000);
+
+    server.setMaxPendingConnections(1);
+    if (server.listen(address))
+    {
+        channel = ChannelInformation(server.serverAddress().toString(),
+                                     server.serverPort());
+        qDebug() << "Init channel port:" << server.serverPort();
+        connect(&server, SIGNAL(newConnection()), SLOT(newConnection()));
+    }
+    else
+        throw(std::exception());
 }
 
 void Receiver::audioStateChanged(QAudio::State state)
@@ -46,15 +48,13 @@ void Receiver::audioStateChanged(QAudio::State state)
 
 void Receiver::newConnection()
 {
-    QTcpSocket *client = server.nextPendingConnection();
-    peerAddress = client->peerAddress();
-    qDebug() << "New connection from" << peerAddress.toString();
+    client = server.nextPendingConnection();
+    qDebug() << "New connection from" << client->peerAddress().toString();
 
     // Set low dealy option and connect disconneced handler
     client->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(client, SIGNAL(disconnected()), SLOT(disconnected()));
     emit connected(this);
-
     // Start playing channel
     audio->start(client);
 }

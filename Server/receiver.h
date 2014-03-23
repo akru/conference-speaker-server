@@ -2,6 +2,7 @@
 #define RECEIVER_H
 
 #include <QTcpServer>
+#include <QTcpSocket>
 #include <QAudioOutput>
 #include <channel_information.h>
 
@@ -18,7 +19,8 @@ public:
 
     QHostAddress getPeerAddress() const
     {
-        return peerAddress;
+        Q_ASSERT(client);
+        return client->peerAddress();
     }
 
 signals:
@@ -35,9 +37,8 @@ private slots:
 
 private:
     QTcpServer  server;
+    QTcpSocket *client;
     ChannelInformation channel;
-
-    QHostAddress peerAddress;
 
     QAudioFormat format;
     QAudioOutput *audio;

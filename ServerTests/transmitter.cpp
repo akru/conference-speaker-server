@@ -13,12 +13,12 @@ void Transmitter::connected()
 {
     qDebug() << "Connected!";
     QAudioFormat desiredFormat;
+    desiredFormat.setSampleSize(16);
     desiredFormat.setChannelCount(1);
-    desiredFormat.setCodec("audio/x-raw");
-    desiredFormat.setSampleType(QAudioFormat::UnSignedInt);
-    desiredFormat.setByteOrder(QAudioFormat::LittleEndian);
     desiredFormat.setSampleRate(8000);
-    desiredFormat.setSampleSize(8);
+    desiredFormat.setCodec("audio/pcm");
+    desiredFormat.setSampleType(QAudioFormat::SignedInt);
+    desiredFormat.setByteOrder(QAudioFormat::LittleEndian);
 
     decoder = new QAudioDecoder(this);
     decoder->setAudioFormat(desiredFormat);
