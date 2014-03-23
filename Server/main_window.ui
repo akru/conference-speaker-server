@@ -42,8 +42,14 @@
     </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="channelsBox">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="title">
-       <string>Speakers</string>
+       <string>     Speakers</string>
       </property>
       <property name="flat">
        <bool>false</bool>
@@ -78,7 +84,7 @@
      <x>0</x>
      <y>0</y>
      <width>621</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -101,6 +107,12 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="floating">
     <bool>false</bool>
    </property>
@@ -111,7 +123,7 @@
     <set>Qt::AllDockWidgetAreas</set>
    </property>
    <property name="windowTitle">
-    <string>Clients</string>
+    <string>  Clients</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>

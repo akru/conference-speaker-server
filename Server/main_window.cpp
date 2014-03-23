@@ -33,7 +33,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::appendUser(QString address, UserInformation info)
 {
-    ui->userList->addItem(info.name + " (" + address + ")");
+    ui->userList->addItem(" " +info.name + " (" + address + ")");
 }
 
 void MainWindow::dropUser(QString address)
