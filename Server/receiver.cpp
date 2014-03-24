@@ -33,13 +33,21 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
         channel = ChannelInformation(sock.localAddress().toString(),
                                      sock.localPort());
         qDebug() << "Init channel port:" << sock.localPort();
-
-        emit connected(this);
+        connect(&sock, SIGNAL(readyRead()), SLOT(sockReadyRead()));
         // Start playing channel
-        audio->start(&sock);
+        buffer = audio->start();
     }
     else
         throw(std::exception());
+}
+
+void Receiver::sockReadyRead()
+{
+    QByteArray buf;
+    qDebug() << "New data size" << sock.pendingDatagramSize();
+    buf.resize(sock.pendingDatagramSize());
+    sock.readDatagram(buf.data(), buf.size());
+    buffer->write(buf);
 }
 
 void Receiver::audioStateChanged(QAudio::State state)

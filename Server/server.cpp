@@ -162,13 +162,11 @@ void Server::openChannel(Connection *client)
                 Receiver *r = new Receiver(server.serverAddress());
                 // Append to channel map
                 channels.insert(client->getAddress(), r);
-                // Connect channel connected signal
-                connect(r, SIGNAL(connected(Receiver*)),
-                        SLOT(channelConnected(Receiver*)));
                 // Make success response
                 ChannelResponse res(r->getChannelInfo());
                 result = res.toJson();
                 qDebug() << "Success channel open:" << r->getChannelInfo().toJson();
+                emit channelConnected(users[client->getAddress()], r);
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::CHANNEL, Response::ERROR, "Server fault");
@@ -186,12 +184,4 @@ void Server::closeChannel(QString address)
     delete channels[address];
     // Drop channel from map
     channels.remove(address);
-}
-
-void Server::channelConnected(Receiver *channel)
-{
-    Q_ASSERT(channel);
-    QString address = channel->getPeerAddress().toString();
-    Q_ASSERT(users.contains(address));
-    emit channelConnected(users[address], channel);
 }

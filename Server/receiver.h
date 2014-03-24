@@ -25,17 +25,16 @@ public:
         return sock.peerAddress();
     }
 
-signals:
-    void connected(Receiver *);
-
 public slots:
     void setVolume(qreal volume);
 
 private slots:
     void audioStateChanged(QAudio::State state);
+    void sockReadyRead();
 
 private:
     QUdpSocket sock;
+    QIODevice *buffer;
     ChannelInformation channel;
 
     QAudioFormat format;
