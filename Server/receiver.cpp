@@ -6,7 +6,8 @@
 
 Receiver::Receiver(QHostAddress address, QObject *parent)
     : QObject(parent),
-      client(0)
+      client(0),
+      audio(0)
 {
     // Set up the format, eg.
     format.setSampleSize(16);
@@ -19,7 +20,7 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
     if (!info.isFormatSupported(format)) {
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
-        return;
+        throw(std::exception());
     }
     qDebug() << "Audio output:" << info.deviceName();
 
@@ -28,7 +29,7 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     connect(audio, SIGNAL(stateChanged(QAudio::State)),
             SLOT(audioStateChanged(QAudio::State)));
 
-    server.setMaxPendingConnections(1);
+    server.setMaxPendingConnections(1); // Set max connentions to only one
     if (server.listen(address))
     {
         channel = ChannelInformation(server.serverAddress().toString(),
@@ -66,5 +67,6 @@ void Receiver::disconnected()
 void Receiver::setVolume(qreal volume)
 {
     qDebug() << "Set volume:" << volume;
+    Q_ASSERT(audio);
     audio->setVolume(volume);
 }

@@ -12,8 +12,6 @@ class Connection : public QObject
 public:
     explicit Connection(QTcpSocket *sock, QObject *parent = 0);
 
-    ~Connection();
-
     QString getAddress() const
     {
         return sock->peerAddress().toString();

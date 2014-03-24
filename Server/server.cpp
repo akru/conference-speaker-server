@@ -1,7 +1,6 @@
 #include "server.h"
 #include "connection.h"
 #include <QTcpSocket>
-#include <QDataStream>
 #include <QJsonDocument>
 #include <cs_packet.h>
 #include <request.h>
@@ -27,7 +26,7 @@ void Server::newConnection()
     QTcpSocket *sock = server.nextPendingConnection();
     while (sock)
     {
-        qDebug() << "New connection from:"
+        qDebug() << "New connection from"
                  << sock->peerAddress().toString();
         // Create connection instance
         Connection *c = new Connection(sock);
@@ -45,6 +44,8 @@ void Server::newConnection()
 
 void Server::connectionClose(Connection *client)
 {
+    Q_ASSERT(client);
+
     QString address = client->getAddress();
 
     // Close opened connections
@@ -53,34 +54,39 @@ void Server::connectionClose(Connection *client)
         emit userDisconnected(address);
 
         // Drop user connection and info from map
-        delete client;
         users.remove(address);
     }
     // Close opened channel
     if (channels.contains(address))
     {
-        // Drop channel from map
+        // Drop channel voice receiver
         delete channels[address];
+        // Drop channel from map
         channels.remove(address);
     }
+
+    // Drop connection
+    delete client;
     qDebug() << "Connection closed:" << address;
 }
 
 void Server::connectionReadyRead(Connection *client)
 {
+    Q_ASSERT(client);
+
     // Read data and create stream
     QByteArray buffer = client->readAll();
 
     // Read packet type
     try {
-        QJsonDocument packet = QJsonDocument::fromJson(buffer);
-        Request          req = Request::fromJson(packet.object());
+        QJsonObject   packet = QJsonDocument::fromJson(buffer).object();
+        Request          req = Request::fromJson(packet);
         switch (req.type)
         {
         case Request::REGISTRATION:
             qDebug() << "New registration request from" << client->getAddress();
             emit registrationRequest(client,
-                 RegistrationRequest::fromJson(packet.object()).user);
+                 RegistrationRequest::fromJson(packet).user);
             break;
         case Request::CHANNEL:
             qDebug() << "New channel request from" << client->getAddress();
@@ -98,13 +104,16 @@ void Server::connectionReadyRead(Connection *client)
 
 void Server::registerUser(Connection *client, UserInformation info)
 {
+    Q_ASSERT(client);
+
     Response res;
+    // When users not cointains user record
     if (!users.contains(client->getAddress()))
     {
         users.insert(client->getAddress(), info);
-        qDebug() << "Success registered user:" << info.name;
-        res = Response(Request::REGISTRATION, Response::SUCCESS);;
+        res = Response(Request::REGISTRATION, Response::SUCCESS);
         emit userConnected(client->getAddress(), info);
+        qDebug() << "Success registered user:" << info.name;
     }
     else
     {
@@ -125,13 +134,14 @@ void Server::denyChannel(Connection *client)
 
 void Server::openChannel(Connection *client)
 {
+    Q_ASSERT(client);
+
     QJsonObject result;
     // Unregistered user
     if (!users.contains(client->getAddress()))
     {
         qDebug() << "Unregistered:" << client->getAddress();
-        Response res(Request::REGISTRATION,
-                       Response::ERROR, "Please register first");
+        Response res(Request::CHANNEL, Response::ERROR, "Please register first");
         result = res.toJson();
     }
     else
@@ -152,13 +162,13 @@ void Server::openChannel(Connection *client)
                 Receiver *r = new Receiver(server.serverAddress());
                 // Append to channel map
                 channels.insert(client->getAddress(), r);
+                // Connect channel connected signal
+                connect(r, SIGNAL(connected(Receiver*)),
+                        SLOT(channelConnected(Receiver*)));
                 // Make success response
                 ChannelResponse res(r->getChannelInfo());
                 result = res.toJson();
-                qDebug() << "Success channel open:"
-                         << r->getChannelInfo().toJson();
-                connect(r, SIGNAL(connected(Receiver*)),
-                        SLOT(channelConnected(Receiver*)));
+                qDebug() << "Success channel open:" << r->getChannelInfo().toJson();
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::CHANNEL, Response::ERROR, "Server fault");
@@ -172,12 +182,15 @@ void Server::openChannel(Connection *client)
 void Server::closeChannel(QString address)
 {
     Q_ASSERT(channels.contains(address));
+    // Delete voice receiver instance
     delete channels[address];
+    // Drop channel from map
     channels.remove(address);
 }
 
 void Server::channelConnected(Receiver *channel)
 {
+    Q_ASSERT(channel);
     QString address = channel->getPeerAddress().toString();
     Q_ASSERT(users.contains(address));
     emit channelConnected(users[address], channel);

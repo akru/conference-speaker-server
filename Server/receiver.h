@@ -11,6 +11,10 @@ class Receiver : public QObject
     Q_OBJECT
 public:
     explicit Receiver(QHostAddress address, QObject *parent = 0);
+    ~Receiver()
+    {
+        delete audio;
+    }
 
     ChannelInformation getChannelInfo() const
     {

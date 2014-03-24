@@ -8,7 +8,3 @@ Connection::Connection(QTcpSocket *sock, QObject *parent)
     connect(sock, SIGNAL(readyRead()), SLOT(sockReadyRead()));
 }
 
-Connection::~Connection()
-{
-    delete sock;
-}

@@ -40,6 +40,7 @@ private:
     QTcpServer server;
     // User information by address map
     QMap<QString, UserInformation> users;
+    // Channel information by address map
     QMap<QString, Receiver *> channels;
 };
 
