@@ -6,7 +6,6 @@
 
 Receiver::Receiver(QHostAddress address, QObject *parent)
     : QObject(parent),
-      client(0),
       audio(0)
 {
     // Set up the format, eg.
@@ -29,13 +28,15 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     connect(audio, SIGNAL(stateChanged(QAudio::State)),
             SLOT(audioStateChanged(QAudio::State)));
 
-    server.setMaxPendingConnections(1); // Set max connentions to only one
-    if (server.listen(address))
+    if (sock.bind(address))
     {
-        channel = ChannelInformation(server.serverAddress().toString(),
-                                     server.serverPort());
-        qDebug() << "Init channel port:" << server.serverPort();
-        connect(&server, SIGNAL(newConnection()), SLOT(newConnection()));
+        channel = ChannelInformation(sock.localAddress().toString(),
+                                     sock.localPort());
+        qDebug() << "Init channel port:" << sock.localPort();
+
+        emit connected(this);
+        // Start playing channel
+        audio->start(&sock);
     }
     else
         throw(std::exception());
@@ -44,24 +45,6 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
 void Receiver::audioStateChanged(QAudio::State state)
 {
     qDebug() << "New audio state:" << state;
-}
-
-void Receiver::newConnection()
-{
-    client = server.nextPendingConnection();
-    qDebug() << "New connection from" << client->peerAddress().toString();
-
-    // Set low dealy option and connect disconneced handler
-    client->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(client, SIGNAL(disconnected()), SLOT(disconnected()));
-    emit connected(this);
-    // Start playing channel
-    audio->start(client);
-}
-
-void Receiver::disconnected()
-{
-    emit disconnected(this);
 }
 
 void Receiver::setVolume(qreal volume)

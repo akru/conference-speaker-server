@@ -1,8 +1,7 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
 
-#include <QTcpServer>
-#include <QTcpSocket>
+#include <QUdpSocket>
 #include <QAudioOutput>
 #include <channel_information.h>
 
@@ -23,25 +22,20 @@ public:
 
     QHostAddress getPeerAddress() const
     {
-        Q_ASSERT(client);
-        return client->peerAddress();
+        return sock.peerAddress();
     }
 
 signals:
     void connected(Receiver *);
-    void disconnected(Receiver *);
 
 public slots:
     void setVolume(qreal volume);
 
 private slots:
     void audioStateChanged(QAudio::State state);
-    void newConnection();
-    void disconnected();
 
 private:
-    QTcpServer  server;
-    QTcpSocket *client;
+    QUdpSocket sock;
     ChannelInformation channel;
 
     QAudioFormat format;

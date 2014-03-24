@@ -46,8 +46,6 @@ void MainWindow::appendChannel(UserInformation info, Receiver *channel)
     ChannelWidget *c = new ChannelWidget(info, channel, this);
     ui->channelsBox->layout()->addWidget(c);
     c->show();
-    connect(channel, SIGNAL(disconnected(Receiver*)),
-            c, SLOT(close()));
     connect(c, SIGNAL(closeChannelClicked(QString)),
             server, SLOT(closeChannel(QString)));
 }
