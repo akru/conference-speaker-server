@@ -25,6 +25,9 @@ public:
         return sock.peerAddress();
     }
 
+signals:
+    void audioAmpUpdated(int amplitude);
+
 public slots:
     void setVolume(qreal volume);
 
@@ -39,6 +42,8 @@ private:
 
     QAudioFormat format;
     QAudioOutput *audio;
+
+    void ampAnalyze(QByteArray &sample);
 };
 
 #endif // RECEIVER_H

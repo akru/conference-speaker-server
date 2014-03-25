@@ -44,9 +44,13 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
 void Receiver::sockReadyRead()
 {
     QByteArray buf;
+    // Receive audio sample
     qDebug() << "New data size" << sock.pendingDatagramSize();
     buf.resize(sock.pendingDatagramSize());
     sock.readDatagram(buf.data(), buf.size());
+    // Analyze sample amplitude
+    ampAnalyze(buf);
+    // Play buffer
     buffer->write(buf);
 }
 
@@ -60,4 +64,34 @@ void Receiver::setVolume(qreal volume)
     qDebug() << "Set volume:" << volume;
     Q_ASSERT(audio);
     audio->setVolume(volume);
+}
+
+/*
+ * Average amplitude analyzer.
+ * Formula:
+ *   A = (a1 + a2 + ... + aN) / N / 10000
+ * where A is normalized average amplitude,
+ * aN is custom amplutude from sample
+ * and N is count of amplitudes.
+ *
+ * Sample is a array of 16bit signed integers.
+ * PCM 16bit sample.
+ *
+ * This function returns number from 0 to 100.
+ * That shows current sample average amplitude.
+ */
+void Receiver::ampAnalyze(QByteArray &sample)
+{
+    Q_ASSERT(sample.size());
+    // Variable init
+    qint16 *dataPointer = (qint16 *) sample.data();
+    double avgAmp = 0;
+    int count = sample.size() / 2;
+    // Sum all amps from sample
+    while (dataPointer < (qint16 *) sample.data() + count)
+        avgAmp += abs(*dataPointer++);
+    // Divize sum by count and normalize it
+    avgAmp = avgAmp / count / 10000;
+    // Return average amplitude in percents
+    emit audioAmpUpdated(avgAmp * 100);
 }

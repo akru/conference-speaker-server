@@ -8,14 +8,15 @@ ChannelWidget::ChannelWidget(UserInformation info,
     receiver(channel)
 {
     ui->setupUi(this);
-    ui->label->setText(info.name + channel->getPeerAddress().toString());
+    ui->label->setText(info.name);
 
-    connect(ui->volumeDial, SIGNAL(valueChanged(int)), SLOT(changeVolume(int)));
-    connect(ui->volumeDial, SIGNAL(valueChanged(int)),
-            ui->volume, SLOT(display(int)));
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(changeVolume(int)));
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
+            ui->volumeIndicator, SLOT(display(int)));
     connect(this, SIGNAL(volumeChanged(qreal)), channel, SLOT(setVolume(qreal)));
+    connect(channel, SIGNAL(audioAmpUpdated(int)), ui->volumeBar, SLOT(setValue(int)));
 
-    ui->volumeDial->setValue(50);
+    ui->volumeSlider->setValue(50);
 }
 
 ChannelWidget::~ChannelWidget()

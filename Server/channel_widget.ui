@@ -75,13 +75,13 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
+       <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>187</width>
+          <width>40</width>
           <height>20</height>
          </size>
         </property>
@@ -100,7 +100,7 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
+       <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -113,17 +113,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLCDNumber" name="volume">
-        <property name="font">
-         <font>
-          <pointsize>16</pointsize>
-         </font>
-        </property>
+       <widget class="QLCDNumber" name="volumeIndicator">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="smallDecimalPoint">
-         <bool>false</bool>
         </property>
         <property name="digitCount">
          <number>3</number>
@@ -131,15 +123,25 @@
        </widget>
       </item>
       <item>
-       <widget class="QDial" name="volumeDial">
+       <widget class="QSlider" name="volumeSlider">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Vertical</enum>
         </property>
-        <property name="wrapping">
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="volumeBar">
+        <property name="value">
+         <number>24</number>
+        </property>
+        <property name="textVisible">
          <bool>false</bool>
         </property>
-        <property name="notchesVisible">
-         <bool>true</bool>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
