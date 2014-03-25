@@ -1,6 +1,5 @@
 #include "main_window.h"
 #include "ui_main_window.h"
-#include "channel_widget.h"
 #include <QMessageBox>
 
 MainWindow::MainWindow(Server *server, QWidget *parent) :
@@ -15,8 +14,10 @@ MainWindow::MainWindow(Server *server, QWidget *parent) :
     connect(server, SIGNAL(userDisconnected(QString)),
             SLOT(dropUser(QString)));
 
-    connect(server, SIGNAL(channelConnected(UserInformation,Receiver*)),
-                    SLOT(appendChannel(UserInformation,Receiver*)));
+    connect(server, SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
+            SLOT(appendChannel(QString,UserInformation,Receiver*)));
+    connect(server, SIGNAL(channelDisconnected(QString)),
+            SLOT(dropChannel(QString)));
 
     connect(server, SIGNAL(channelRequest(Connection*,UserInformation)),
             SLOT(channelRequest(Connection*,UserInformation)));
@@ -41,13 +42,26 @@ void MainWindow::dropUser(QString address)
     delete ui->userList->findItems(address, Qt::MatchContains)[0];
 }
 
-void MainWindow::appendChannel(UserInformation info, Receiver *channel)
+void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
 {
-    ChannelWidget *c = new ChannelWidget(info, channel, this);
+    ChannelWidget *c = new ChannelWidget(address, info, channel, this);
+    channels.insert(address, c);
+
     ui->channelsBox->layout()->addWidget(c);
     c->show();
+
     connect(c, SIGNAL(closeChannelClicked(QString)),
             server, SLOT(closeChannel(QString)));
+    connect(c, SIGNAL(closeChannelClicked(QString)),
+            SLOT(dropChannel(QString)));
+}
+
+void MainWindow::dropChannel(QString address)
+{
+    Q_ASSERT(channels.contains(address));
+    channels[address]->close();
+    delete channels[address];
+    channels.remove(address);
 }
 
 void MainWindow::channelRequest(Connection *client, UserInformation info)

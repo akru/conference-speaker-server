@@ -14,7 +14,7 @@ class ChannelWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChannelWidget(UserInformation info,
+    explicit ChannelWidget(QString clientAddress, UserInformation info,
                            Receiver *channel, QWidget *parent = 0);
     ~ChannelWidget();
 
@@ -33,6 +33,7 @@ private slots:
 private:
     Ui::ChannelWidget *ui;
     Receiver *receiver;
+    QString address;
 };
 
 #endif // CHANNEL_WIDGET_H

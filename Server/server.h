@@ -17,7 +17,8 @@ public:
 signals:
     void userConnected(QString address, UserInformation info);
     void userDisconnected(QString address);
-    void channelConnected(UserInformation user, Receiver *channel);
+    void channelConnected(QString address, UserInformation user, Receiver *channel);
+    void channelDisconnected(QString address);
 
 public slots:
     void denyChannel(Connection *client);

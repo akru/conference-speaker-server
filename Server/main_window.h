@@ -1,9 +1,11 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
+#include <QMap>
 #include <QMainWindow>
 #include <user_information.h>
 
+#include "channel_widget.h"
 #include "about_dialog.h"
 #include "receiver.h"
 #include "server.h"
@@ -31,7 +33,8 @@ public slots:
 private slots:
     void appendUser(QString address, UserInformation info);
     void dropUser(QString address);
-    void appendChannel(UserInformation info, Receiver *channel);
+    void appendChannel(QString address, UserInformation info, Receiver *channel);
+    void dropChannel(QString address);
     void channelRequest(Connection *client, UserInformation info);
     void on_actionAbout_triggered();
 
@@ -40,6 +43,7 @@ private:
     AboutDialog about;
 
     Server *server;
+    QMap<QString, ChannelWidget*> channels;
 };
 
 #endif // MAIN_WINDOW_H

@@ -59,6 +59,7 @@ void Server::connectionClose(Connection *client)
     // Close opened channel
     if (channels.contains(address))
     {
+        emit channelDisconnected(address);
         // Drop channel voice receiver
         delete channels[address];
         // Drop channel from map
@@ -166,7 +167,7 @@ void Server::openChannel(Connection *client)
                 ChannelResponse res(r->getChannelInfo());
                 result = res.toJson();
                 qDebug() << "Success channel open:" << r->getChannelInfo().toJson();
-                emit channelConnected(users[client->getAddress()], r);
+                emit channelConnected(client->getAddress(), users[client->getAddress()], r);
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::CHANNEL, Response::ERROR, "Server fault");
