@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     // Create simple server information
     QHostAddress ip;
     foreach (QHostAddress addr, QNetworkInterface::allAddresses()) {
-        if (!addr.isLoopback() &&
+        if (!addr.isLoopback() && !addr.toString().contains("169.254") &&
                 addr.protocol() == QAbstractSocket::IPv4Protocol)
             ip = addr;
         qDebug() << addr;

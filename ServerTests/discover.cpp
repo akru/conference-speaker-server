@@ -6,7 +6,7 @@ Discover::Discover(QObject *parent)
     : QObject(parent)
 {
     qDebug() << "sock bind:"
-             << sock.bind(QHostAddress::Broadcast, SERVER_INFORMATION_PORT);
+             << sock.bind(SERVER_INFORMATION_PORT);
     connect(&sock, SIGNAL(readyRead()), SLOT(readPacket()));
 }
 
