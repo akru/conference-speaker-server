@@ -9,21 +9,30 @@
 #include <registration_request.h>
 #include <user_information.h>
 
-Server::Server(QHostAddress address, QObject *parent)
-    : QObject(parent)
+Server::Server(QString &address, QObject *parent)
+    : QObject(parent), server(new QTcpServer)
 {
-    connect(&server, SIGNAL(newConnection()), SLOT(newConnection()));
+    connect(server, SIGNAL(newConnection()), SLOT(newConnection()));
     connect(this, SIGNAL(registrationRequest(Connection*,UserInformation)),
                   SLOT(registerUser(Connection*,UserInformation)));
+    connect(this, SIGNAL(channelCloseRequest(QString)), SLOT(closeChannel(QString)));
 
+    QHostAddress hostAddress = QHostAddress(address);
     // Listening port
-    server.listen(address, SERVER_CONNECTION_PORT);
+    qDebug() << "Listening" << address << SERVER_CONNECTION_PORT <<
+    server->listen(hostAddress, SERVER_CONNECTION_PORT);
+}
+
+Server::~Server()
+{
+    server->close();
+    delete server;
 }
 
 void Server::newConnection()
 {
     // Get first connection
-    QTcpSocket *sock = server.nextPendingConnection();
+    QTcpSocket *sock = server->nextPendingConnection();
     while (sock)
     {
         qDebug() << "New connection from"
@@ -38,7 +47,7 @@ void Server::newConnection()
                    SLOT(connectionClose(Connection*)));
 
         // Get new connection
-        sock = server.nextPendingConnection();
+        sock = server->nextPendingConnection();
     }
 }
 
@@ -92,6 +101,10 @@ void Server::connectionReadyRead(Connection *client)
         case Request::CHANNEL:
             qDebug() << "New channel request from" << client->getAddress();
             emit channelRequest(client, users[client->getAddress()]);
+            break;
+        case Request::CHANNEL_CLOSE:
+            qDebug() << "New channel close request from" << client->getAddress();
+            emit channelCloseRequest(client->getAddress());
             break;
         }
     } catch (BadPacket) {
@@ -160,7 +173,7 @@ void Server::openChannel(Connection *client)
         {
             // Allocate voice receiver
             try {
-                Receiver *r = new Receiver(server.serverAddress());
+                Receiver *r = new Receiver(server->serverAddress());
                 // Append to channel map
                 channels.insert(client->getAddress(), r);
                 // Make success response
@@ -185,4 +198,6 @@ void Server::closeChannel(QString address)
     delete channels[address];
     // Drop channel from map
     channels.remove(address);
+    // Emit disconnected signal
+    emit channelDisconnected(address);
 }

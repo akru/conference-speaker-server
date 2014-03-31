@@ -16,11 +16,12 @@ public:
 signals:
 
 public slots:
-    void setServerInformation(ServerInformation &info);
+    void setServerInformation(ServerInformation info);
 
     void sendInformation();
 
 private:
+    QList<QHostAddress> addreses;
     QByteArray serverPacket;
     QUdpSocket sock;
     QTimer t;

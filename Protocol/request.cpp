@@ -11,6 +11,9 @@ QJsonObject Request::toJson() const
     case CHANNEL:
         obj.insert("request", QString("channel"));
         break;
+    case CHANNEL_CLOSE:
+        obj.insert("request", QString("channel_close"));
+        break;
     }
     return obj;
 }
@@ -25,6 +28,8 @@ Request Request::fromJson(const QJsonObject &json)
         return Request(REGISTRATION);
     if (type.toString() == "channel")
         return Request(CHANNEL);
+    if (type.toString() == "channel_close")
+        return Request(CHANNEL_CLOSE);
 
     throw(BadPacket());
 }

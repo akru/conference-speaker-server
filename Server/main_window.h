@@ -5,9 +5,11 @@
 #include <QMainWindow>
 #include <user_information.h>
 
+#include "settings_dialog.h"
 #include "channel_widget.h"
 #include "about_dialog.h"
 #include "receiver.h"
+#include "broadcaster.h"
 #include "server.h"
 
 class Server;
@@ -21,7 +23,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Server *server, QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 signals:
@@ -37,12 +39,17 @@ private slots:
     void dropChannel(QString address);
     void channelRequest(Connection *client, UserInformation info);
     void on_actionAbout_triggered();
+    void on_actionSettings_triggered();
+
+    void updateServerInfo(ServerInformation info);
 
 private:
     Ui::MainWindow *ui;
+    SettingsDialog settings;
     AboutDialog about;
 
     Server *server;
+    Broadcaster broadcaster;
     QMap<QString, ChannelWidget*> channels;
 };
 

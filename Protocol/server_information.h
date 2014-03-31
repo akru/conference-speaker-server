@@ -1,6 +1,7 @@
 #ifndef SERVERINFORMATION_H
 #define SERVERINFORMATION_H
 
+#include "cs_packet.h"
 #include <QJsonObject>
 
 struct ServerInformation
@@ -8,7 +9,7 @@ struct ServerInformation
     // Constructor by params
     ServerInformation(QString serverName ="",
                       QString serverAddr = "",
-                      quint16 port = 0)
+                      quint16 port = SERVER_CONNECTION_PORT)
         : name(serverName),
           address(serverAddr),
           port(port)

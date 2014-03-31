@@ -19,7 +19,8 @@ SOURCES  += main.cpp \
     connection.cpp \
     broadcaster.cpp \
     about_dialog.cpp \
-    channel_widget.cpp
+    channel_widget.cpp \
+    settings_dialog.cpp
 
 HEADERS  += \
     main_window.h \
@@ -28,11 +29,13 @@ HEADERS  += \
     connection.h \
     broadcaster.h \
     about_dialog.h \
-    channel_widget.h
+    channel_widget.h \
+    settings_dialog.h
 
 FORMS    += main_window.ui \
     about_dialog.ui \
-    channel_widget.ui
+    channel_widget.ui \
+    settings_dialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -lProtocol
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol

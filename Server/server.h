@@ -11,8 +11,9 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(QHostAddress address,
+    explicit Server(QString &address,
                     QObject *parent = 0);
+    ~Server();
 
 signals:
     void userConnected(QString address, UserInformation info);
@@ -28,6 +29,7 @@ public slots:
 signals:
     void registrationRequest(Connection *client, UserInformation info);
     void channelRequest(Connection *client, UserInformation info);
+    void channelCloseRequest(QString address);
 
 private slots:
     void newConnection();
@@ -37,7 +39,7 @@ private slots:
 
 private:
     // TCP server instance
-    QTcpServer server;
+    QTcpServer *server;
     // User information by address map
     QMap<QString, UserInformation> users;
     // Channel information by address map

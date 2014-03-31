@@ -1,12 +1,15 @@
 #include "discover.h"
 #include <cs_packet.h>
 #include <QJsonDocument>
+#include <QNetworkInterface>
 
 Discover::Discover(QObject *parent)
     : QObject(parent)
 {
+    QHostAddress addr = QNetworkInterface::allInterfaces()[0]
+            .addressEntries()[0].broadcast();
     qDebug() << "sock bind:"
-             << sock.bind(SERVER_INFORMATION_PORT);
+             << sock.bind(addr, SERVER_INFORMATION_PORT);
     connect(&sock, SIGNAL(readyRead()), SLOT(readPacket()));
 }
 
