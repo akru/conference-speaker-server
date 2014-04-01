@@ -11,7 +11,7 @@ ChannelWidget::ChannelWidget(QString clientAddress,
       address(clientAddress)
 {
     ui->setupUi(this);
-    ui->label->setText(info.name + "::" + address);
+    ui->label->setText(info.name + " : " + info.company + " > " + info.title);
 
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(changeVolume(int)));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)),

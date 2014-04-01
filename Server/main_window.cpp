@@ -24,7 +24,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::appendUser(QString address, UserInformation info)
 {
-    ui->userList->addItem(" " +info.name + " (" + address + ")");
+    QString userDescription = info.name + " : " + info.company + " : "
+            + info.title + " (" + address + ")";
+    ui->userList->addItem(userDescription);
 }
 
 void MainWindow::dropUser(QString address)
@@ -57,8 +59,8 @@ void MainWindow::dropChannel(QString address)
 void MainWindow::channelRequest(Connection *client, UserInformation info)
 {
     QMessageBox msgBox;
-    msgBox.setText("Speaker <b>" + info.name + "</b> want to tell.");
-    msgBox.setInformativeText("Do you want to permit?");
+    msgBox.setText(tr("Speaker <b>") + info.name + tr("</b> want to tell."));
+    msgBox.setInformativeText(tr("Do you want to permit?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     int ret = msgBox.exec();
