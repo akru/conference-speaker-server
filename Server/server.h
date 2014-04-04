@@ -25,11 +25,14 @@ public slots:
     void denyChannel(Connection *client);
     void openChannel(Connection *client);
     void closeChannel(QString address);
+    void denyVote(Connection *client);
+    void acceptVote(Connection *client);
 
 signals:
     void registrationRequest(Connection *client, UserInformation info);
     void channelRequest(Connection *client, UserInformation info);
     void channelCloseRequest(QString address);
+    void voteRequest(Connection *client, bool type);
 
 private slots:
     void newConnection();

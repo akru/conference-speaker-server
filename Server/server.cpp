@@ -106,6 +106,17 @@ void Server::connectionReadyRead(Connection *client)
             qDebug() << "New channel close request from" << client->getAddress();
             emit channelCloseRequest(client->getAddress());
             break;
+        case Request::VOTE_YES:
+            qDebug() << "New vote yes request from" << client->getAddress();
+            if (users.contains(client->getAddress()))
+                emit voteRequest(client, true);
+            else
+                denyVote(client);
+            break;
+        case Request::VOTE_NO:
+            qDebug() << "New vote no request from" << client->getAddress();
+            emit voteRequest(client, false);
+            break;
         }
     } catch (BadPacket) {
         qDebug() << "Bad packet: " << buffer;
@@ -200,4 +211,20 @@ void Server::closeChannel(QString address)
     channels.remove(address);
     // Emit disconnected signal
     emit channelDisconnected(address);
+}
+
+void Server::acceptVote(Connection *client)
+{
+    qDebug() << "Channel request accepted";
+    Response res(Request::VOTE_YES, Response::SUCCESS); // TODO: Vote request
+    QJsonObject result = res.toJson();
+    client->write(result);
+}
+
+void Server::denyVote(Connection *client)
+{
+    qDebug() << "Vote request denied";
+    Response res(Request::VOTE_YES, Response::ERROR, "Access denied");
+    QJsonObject result = res.toJson();
+    client->write(result);
 }

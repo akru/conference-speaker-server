@@ -8,7 +8,9 @@ struct Request
     enum Type {
         REGISTRATION,
         CHANNEL,
-        CHANNEL_CLOSE
+        CHANNEL_CLOSE,
+        VOTE_YES,
+        VOTE_NO
     };
     Request(Type type = REGISTRATION)
         : type(type)

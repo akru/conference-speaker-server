@@ -90,6 +90,13 @@ void MainWindow::updateServerInfo(ServerInformation info)
     connect(server, SIGNAL(channelDisconnected(QString)),
             SLOT(dropChannel(QString)));
 
+    connect(server, SIGNAL(voteRequest(Connection*,bool)),
+            &voting, SLOT(vote(Connection*,bool)));
+    connect(&voting, SIGNAL(voteAccepted(Connection*)),
+            server, SLOT(acceptVote(Connection*)));
+    connect(&voting, SIGNAL(voteDenied(Connection*)),
+            server, SLOT(denyVote(Connection*)));
+
     connect(server, SIGNAL(channelRequest(Connection*,UserInformation)),
             SLOT(channelRequest(Connection*,UserInformation)));
     connect(this, SIGNAL(channelRequestAccepted(Connection*)),
@@ -106,4 +113,10 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     settings.show();
+}
+
+void MainWindow::on_voteButton_clicked()
+{
+    voting.newVote(ui->userList->count());
+    voting.show();
 }

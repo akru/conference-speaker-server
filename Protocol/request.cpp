@@ -14,6 +14,12 @@ QJsonObject Request::toJson() const
     case CHANNEL_CLOSE:
         obj.insert("request", QString("channel_close"));
         break;
+    case VOTE_YES:
+        obj.insert("request", QString("vote_yes"));
+        break;
+    case VOTE_NO:
+        obj.insert("request", QString("vote_no"));
+        break;
     }
     return obj;
 }
@@ -30,6 +36,10 @@ Request Request::fromJson(const QJsonObject &json)
         return Request(CHANNEL);
     if (type.toString() == "channel_close")
         return Request(CHANNEL_CLOSE);
+    if (type.toString() == "vote_yes")
+        return Request(VOTE_YES);
+    if (type.toString() == "vote_no")
+        return Request(VOTE_NO);
 
     throw(BadPacket());
 }

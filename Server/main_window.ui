@@ -136,7 +136,7 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="clientWidgetContent">
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
      <property name="leftMargin">
       <number>8</number>
      </property>
@@ -170,6 +170,13 @@
        </property>
        <property name="selectionRectVisible">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="voteButton">
+       <property name="text">
+        <string>Start vote</string>
        </property>
       </widget>
      </item>

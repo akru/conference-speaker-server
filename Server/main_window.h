@@ -8,8 +8,9 @@
 #include "settings_dialog.h"
 #include "channel_widget.h"
 #include "about_dialog.h"
-#include "receiver.h"
+#include "vote_dialog.h"
 #include "broadcaster.h"
+#include "receiver.h"
 #include "server.h"
 
 class Server;
@@ -43,10 +44,13 @@ private slots:
 
     void updateServerInfo(ServerInformation info);
 
+    void on_voteButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     SettingsDialog settings;
     AboutDialog about;
+    VoteDialog voting;
 
     Server *server;
     Broadcaster broadcaster;
