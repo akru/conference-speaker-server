@@ -50,8 +50,10 @@ void Receiver::sockReadyRead()
     sock.readDatagram(buf.data(), buf.size());
     // Analyze sample amplitude
     ampAnalyze(buf);
+    // Filtering & echo cancellation
+    QByteArray echoLess = aecFilter.process(buf);
     // Play buffer
-    buffer->write(buf);
+    buffer->write(echoLess);
 }
 
 void Receiver::audioStateChanged(QAudio::State state)

@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
 
-SUBDIRS += \
+SUBDIRS += AEC \
     Protocol \
     Server \
     ServerTests

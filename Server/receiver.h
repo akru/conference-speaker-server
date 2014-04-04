@@ -4,6 +4,7 @@
 #include <QUdpSocket>
 #include <QAudioOutput>
 #include <channel_information.h>
+#include <aec.h>
 
 class Receiver : public QObject
 {
@@ -40,6 +41,7 @@ private:
     QIODevice *buffer;
     ChannelInformation channel;
 
+    AEC aecFilter;
     QAudioFormat format;
     QAudioOutput *audio;
 
