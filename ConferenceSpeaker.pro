@@ -1,7 +1,10 @@
 TEMPLATE = subdirs
 
 
-SUBDIRS += AEC \
+SUBDIRS += \
+    Filters \
     Protocol \
     Server \
-    ServerTests
+    ServerTests \
+    FiltersTests
+

@@ -51,7 +51,7 @@ void Receiver::sockReadyRead()
     // Analyze sample amplitude
     ampAnalyze(buf);
     // Filtering & echo cancellation
-    QByteArray echoLess = aecFilter.process(buf);
+    QByteArray echoLess = filter.process(buf);
     // Play buffer
     buffer->write(echoLess);
 }

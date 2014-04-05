@@ -1,19 +1,23 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2014-04-04T22:13:16
+# Project created by QtCreator 2014-04-05T03:58:04
 #
 #-------------------------------------------------
 
 QT       -= gui
 
-TARGET = AEC
+TARGET = Filters
 TEMPLATE = lib
 CONFIG += staticlib
 
-SOURCES += aec.cpp
+SOURCES += \
+    bandpass_filter.cpp
 
-HEADERS += aec.h
+HEADERS += filter.h \
+    bandpass_filter.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+INCLUDEPATH += $$PWD/../third-party/tspl_3_0/include
