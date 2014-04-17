@@ -21,7 +21,8 @@ SOURCES  += main.cpp \
     about_dialog.cpp \
     channel_widget.cpp \
     settings_dialog.cpp \
-    vote_dialog.cpp
+    vote_dialog.cpp \
+    request_widget.cpp
 
 HEADERS  += \
     main_window.h \
@@ -32,13 +33,15 @@ HEADERS  += \
     about_dialog.h \
     channel_widget.h \
     settings_dialog.h \
-    vote_dialog.h
+    vote_dialog.h \
+    request_widget.h
 
 FORMS    += main_window.ui \
     about_dialog.ui \
     channel_widget.ui \
     settings_dialog.ui \
-    vote_dialog.ui
+    vote_dialog.ui \
+    request_widget.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -lProtocol
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol

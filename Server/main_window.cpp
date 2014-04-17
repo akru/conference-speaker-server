@@ -32,11 +32,15 @@ void MainWindow::appendUser(QString address, UserInformation info)
 void MainWindow::dropUser(QString address)
 {
     delete ui->userList->findItems(address, Qt::MatchContains)[0];
+    if (requests.contains(address))
+    {
+        dropRequest(address);
+    }
 }
 
 void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
 {
-    ChannelWidget *c = new ChannelWidget(address, info, channel, this);
+    ChannelWidget *c = new ChannelWidget(address, info, channel, ui->channelsBox);
     channels.insert(address, c);
 
     ui->channelsBox->layout()->addWidget(c);
@@ -58,20 +62,31 @@ void MainWindow::dropChannel(QString address)
 
 void MainWindow::channelRequest(Connection *client, UserInformation info)
 {
-    QMessageBox msgBox;
-    msgBox.setText(tr("Speaker <b>") + info.name + tr("</b> want to tell."));
-    msgBox.setInformativeText(tr("Do you want to permit?"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
-    int ret = msgBox.exec();
-    switch (ret)
+    if(requests.contains(client->getAddress()))
+        return;
+
+    RequestWidget *reqWidget = new RequestWidget(info, client, ui->requestBox);
+    requests[client->getAddress()] = reqWidget;
+    connect(reqWidget, SIGNAL(accepted(Connection*)),
+            server, SLOT(openChannel(Connection*)));
+    connect(reqWidget, SIGNAL(discarded(Connection*)),
+            server, SLOT(denyChannel(Connection*)));
+    connect(reqWidget, SIGNAL(accepted(Connection*)),
+            SLOT(dropRequest(Connection*)));
+    connect(reqWidget, SIGNAL(discarded(Connection*)),
+            SLOT(dropRequest(Connection*)));
+
+    ui->requestBox->layout()->addWidget(reqWidget);
+    reqWidget->show();
+}
+
+void MainWindow::dropRequest(QString address)
+{
+    if (requests.contains(address))
     {
-    case QMessageBox::Ok:
-        emit channelRequestAccepted(client);
-        break;
-    case QMessageBox::Cancel:
-        emit channelRequestDiscarded(client);
-        break;
+        requests[address]->close();
+        delete requests[address];
+        requests.remove(address);
     }
 }
 
@@ -87,6 +102,8 @@ void MainWindow::updateServerInfo(ServerInformation info)
 
     connect(server, SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
             SLOT(appendChannel(QString,UserInformation,Receiver*)));
+    connect(server, SIGNAL(channelCloseRequest(QString)),
+            SLOT(dropRequest(QString)));
     connect(server, SIGNAL(channelDisconnected(QString)),
             SLOT(dropChannel(QString)));
 

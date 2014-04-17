@@ -204,13 +204,15 @@ void Server::openChannel(Connection *client)
 
 void Server::closeChannel(QString address)
 {
-    Q_ASSERT(channels.contains(address));
-    // Delete voice receiver instance
-    delete channels[address];
-    // Drop channel from map
-    channels.remove(address);
-    // Emit disconnected signal
-    emit channelDisconnected(address);
+    if(channels.contains(address))
+    {
+        // Delete voice receiver instance
+        delete channels[address];
+        // Drop channel from map
+        channels.remove(address);
+        // Emit disconnected signal
+        emit channelDisconnected(address);
+    }
 }
 
 void Server::acceptVote(Connection *client)
