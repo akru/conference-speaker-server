@@ -11,17 +11,22 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     // Set up the format, eg.
     format.setSampleSize(16);
     format.setChannelCount(1);
+#ifdef MACOSX
+    format.setSampleRate(48000);
+#else
     format.setSampleRate(8000);
+#endif
     format.setCodec("audio/pcm");
     format.setSampleType(QAudioFormat::SignedInt);
     format.setByteOrder(QAudioFormat::LittleEndian);
 
     QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
+    qDebug() << "Audio output:" << info.deviceName();
+
     if (!info.isFormatSupported(format)) {
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
         throw(std::exception());
     }
-    qDebug() << "Audio output:" << info.deviceName();
 
     // Open audio device
     audio = new QAudioOutput(info, format, this);
@@ -53,6 +58,9 @@ void Receiver::sockReadyRead()
     // Filtering & echo cancellation
     QByteArray echoLess = filter.process(buf);
     // Play buffer
+#ifdef MACOSX
+    echoLess = convertAudio(echoLess);
+#endif
     buffer->write(echoLess);
 }
 
@@ -97,3 +105,26 @@ void Receiver::ampAnalyze(QByteArray &sample)
     // Return average amplitude in percents
     emit audioAmpUpdated(avgAmp * 100);
 }
+
+#ifdef MACOSX
+QByteArray convertAudio(QByteArray &buffer)
+{
+    QByteArray output;
+    QDataStream ds(&output, QIODevice::WriteOnly);
+    qint8 *dataPointer = (qint8 *) buffer.data();
+    while (dataPointer < (qint8 *) buffer.data() + buffer.size())
+    {
+        // One wave is 8kHz
+        qint8 wave1 = *dataPointer++;
+        qint8 wave2 = *dataPointer++;
+        // x6 waves give 48kHz
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+    }
+    return output;
+}
+#endif

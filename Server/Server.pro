@@ -43,6 +43,10 @@ FORMS    += main_window.ui \
     vote_dialog.ui \
     request_widget.ui
 
+macx {
+    DEFINES += MACOSX
+}
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -lProtocol
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol
 else:unix: LIBS += -L$$OUT_PWD/../Protocol/ -lProtocol
