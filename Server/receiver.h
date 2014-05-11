@@ -4,7 +4,7 @@
 #include <QUdpSocket>
 #include <QAudioOutput>
 #include <channel_information.h>
-#include <bandpass_filter.h>
+#include <suppressor.h>
 
 class Receiver : public QObject
 {
@@ -41,7 +41,7 @@ private:
     QIODevice *buffer;
     ChannelInformation channel;
 
-    BandpassFilter filter;
+    Suppressor filter;
     QAudioFormat format;
     QAudioOutput *audio;
 

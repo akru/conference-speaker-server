@@ -11,11 +11,10 @@ ChannelWidget::ChannelWidget(QString clientAddress,
       address(clientAddress)
 {
     ui->setupUi(this);
-    ui->label->setText(info.name + " : " + info.company + " > " + info.title);
+    ui->nameLabel->setText(info.name);
+    ui->companyLabel->setText(info.company);
 
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(changeVolume(int)));
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
-            ui->volumeIndicator, SLOT(display(int)));
     connect(this, SIGNAL(volumeChanged(qreal)), channel, SLOT(setVolume(qreal)));
     connect(channel, SIGNAL(audioAmpUpdated(int)), ui->volumeBar, SLOT(setValue(int)));
 

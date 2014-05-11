@@ -21,8 +21,9 @@ SOURCES  += main.cpp \
     about_dialog.cpp \
     channel_widget.cpp \
     settings_dialog.cpp \
-    vote_dialog.cpp \
-    request_widget.cpp
+    request_widget.cpp \
+    vote_widget.cpp \
+    client_widget.cpp
 
 HEADERS  += \
     main_window.h \
@@ -33,15 +34,17 @@ HEADERS  += \
     about_dialog.h \
     channel_widget.h \
     settings_dialog.h \
-    vote_dialog.h \
-    request_widget.h
+    request_widget.h \
+    vote_widget.h \
+    client_widget.h
 
 FORMS    += main_window.ui \
     about_dialog.ui \
     channel_widget.ui \
     settings_dialog.ui \
-    vote_dialog.ui \
-    request_widget.ui
+    request_widget.ui \
+    vote_widget.ui \
+    client_widget.ui
 
 macx {
     DEFINES += MACOSX
@@ -67,3 +70,6 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filt
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filters/release/Filters.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filters/debug/Filters.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Filters/libFilters.a
+
+RESOURCES += \
+    resource.qrc

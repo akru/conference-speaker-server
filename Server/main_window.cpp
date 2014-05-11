@@ -2,19 +2,41 @@
 #include "ui_main_window.h"
 #include <QMessageBox>
 #include <QHostAddress>
+#include <QFontDatabase>
+#include <QFile>
+
+const QString clientsHeader = "Clients: <b style=\"color: #00A0E3\">(%1)</b>";
+const QString wantsHeader = "Wants to ask: <b style=\"color: #00A0E3\">(%1)</b>";
+const QString chatHeader = "Chat: <b style=\"color: #00A0E3\">(%1)</b>";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     server(0)
 {
+    // Loading fonts
+    QFontDatabase::addApplicationFont(":/res/fonts/BauhausC-Demibold.ttf");
+    //QFontDatabase::addApplicationFont(":/res/fonts/Gothic.ttf");
+    QFontDatabase::addApplicationFont(":/res/fonts/GothicBold.ttf");
+    // Setup UI
     ui->setupUi(this);
+    // Setup voting
+    ui->voteBox->layout()->addWidget(&voting);
+    voting.show();
     // Restart server with new info
     connect(&settings, SIGNAL(newServerInfo(ServerInformation)),
             SLOT(updateServerInfo(ServerInformation)));
     // Reload broadcaster server information
     connect(&settings, SIGNAL(newServerInfo(ServerInformation)),
             &broadcaster, SLOT(setServerInformation(ServerInformation)));
+    // Set scroll boxes alignments
+    ui->channelBox->setAlignment(Qt::AlignTop);
+    ui->wantsBox->layout()->setAlignment(Qt::AlignTop);
+    ui->clientBox->layout()->setAlignment(Qt::AlignTop);
+    // Update headers
+    ui->clientLabel->setText(clientsHeader.arg(0));
+    ui->wantsLabel->setText(wantsHeader.arg(0));
+    ui->chatLabel->setText(chatHeader.arg(0));
 }
 
 MainWindow::~MainWindow()
@@ -22,34 +44,53 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::appendUser(QString address, UserInformation info)
+void MainWindow::appendClient(QString address, UserInformation info)
 {
-    QString userDescription = info.name + " : " + info.company + " : "
-            + info.title + " (" + address + ")";
-    ui->userList->addItem(userDescription);
+    Q_ASSERT(!clients.contains(address));
+
+    ClientWidget *w = new ClientWidget(info, address, this);
+    ui->clientBox->layout()->addWidget(w);
+    clients.insert(address, w);
+    w->show();
+    // Update vote info
+    voting.appendClient();
+    // Update header
+    ui->clientLabel->setText(
+                clientsHeader.arg(ui->clientBox->layout()->count()));
 }
 
-void MainWindow::dropUser(QString address)
+void MainWindow::dropClient(QString address)
 {
-    delete ui->userList->findItems(address, Qt::MatchContains)[0];
+    Q_ASSERT(clients.contains(address));
+    delete clients[address];
+    clients.remove(address);
+
     if (requests.contains(address))
     {
         dropRequest(address);
     }
+    // Update vote info
+    voting.dropClient();
+    // Update header
+    ui->clientLabel->setText(
+                clientsHeader.arg(ui->clientBox->layout()->count()));
 }
 
 void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
 {
-    ChannelWidget *c = new ChannelWidget(address, info, channel, ui->channelsBox);
+    ChannelWidget *c = new ChannelWidget(address, info, channel, this);
     channels.insert(address, c);
 
-    ui->channelsBox->layout()->addWidget(c);
+    ui->channelBox->addWidget(c);
     c->show();
 
     connect(c, SIGNAL(closeChannelClicked(QString)),
             server, SLOT(closeChannel(QString)));
     connect(c, SIGNAL(closeChannelClicked(QString)),
             SLOT(dropChannel(QString)));
+    // Update header
+    ui->chatLabel->setText(
+                chatHeader.arg(ui->channelBox->count()));
 }
 
 void MainWindow::dropChannel(QString address)
@@ -58,6 +99,9 @@ void MainWindow::dropChannel(QString address)
     channels[address]->close();
     delete channels[address];
     channels.remove(address);
+    // Update header
+    ui->chatLabel->setText(
+                chatHeader.arg(ui->channelBox->count()));
 }
 
 void MainWindow::channelRequest(Connection *client, UserInformation info)
@@ -65,7 +109,7 @@ void MainWindow::channelRequest(Connection *client, UserInformation info)
     if(requests.contains(client->getAddress()))
         return;
 
-    RequestWidget *reqWidget = new RequestWidget(info, client, ui->requestBox);
+    RequestWidget *reqWidget = new RequestWidget(info, client, this);
     requests[client->getAddress()] = reqWidget;
     connect(reqWidget, SIGNAL(accepted(Connection*)),
             server, SLOT(openChannel(Connection*)));
@@ -76,8 +120,11 @@ void MainWindow::channelRequest(Connection *client, UserInformation info)
     connect(reqWidget, SIGNAL(discarded(Connection*)),
             SLOT(dropRequest(Connection*)));
 
-    ui->requestBox->layout()->addWidget(reqWidget);
+    ui->wantsBox->layout()->addWidget(reqWidget);
     reqWidget->show();
+    // Update header
+    ui->wantsLabel->setText(
+                wantsHeader.arg(ui->wantsBox->layout()->count()));
 }
 
 void MainWindow::dropRequest(QString address)
@@ -87,6 +134,9 @@ void MainWindow::dropRequest(QString address)
         requests[address]->close();
         delete requests[address];
         requests.remove(address);
+        // Update header
+        ui->wantsLabel->setText(
+                    wantsHeader.arg(ui->wantsBox->layout()->count()));
     }
 }
 
@@ -96,9 +146,9 @@ void MainWindow::updateServerInfo(ServerInformation info)
     server = new Server(info.address);
 
     connect(server, SIGNAL(userConnected(QString,UserInformation)),
-            SLOT(appendUser(QString,UserInformation)));
+            SLOT(appendClient(QString,UserInformation)));
     connect(server, SIGNAL(userDisconnected(QString)),
-            SLOT(dropUser(QString)));
+            SLOT(dropClient(QString)));
 
     connect(server, SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
             SLOT(appendChannel(QString,UserInformation,Receiver*)));
@@ -120,6 +170,8 @@ void MainWindow::updateServerInfo(ServerInformation info)
             server, SLOT(openChannel(Connection*)));
     connect(this, SIGNAL(channelRequestDiscarded(Connection*)),
             server, SLOT(denyChannel(Connection*)));
+
+    ui->labelName->setText(info.name);
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -130,10 +182,4 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     settings.show();
-}
-
-void MainWindow::on_voteButton_clicked()
-{
-    voting.newVote(ui->userList->count());
-    voting.show();
 }

@@ -11,10 +11,12 @@ TEMPLATE = lib
 CONFIG += staticlib
 
 SOURCES += \
-    bandpass_filter.cpp
+    bandpass_filter.cpp \
+    suppressor.cpp
 
 HEADERS += filter.h \
-    bandpass_filter.h
+    bandpass_filter.h \
+    suppressor.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

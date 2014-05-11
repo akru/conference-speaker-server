@@ -8,8 +8,9 @@
 #include "settings_dialog.h"
 #include "channel_widget.h"
 #include "request_widget.h"
+#include "client_widget.h"
 #include "about_dialog.h"
-#include "vote_dialog.h"
+#include "vote_widget.h"
 #include "broadcaster.h"
 #include "receiver.h"
 #include "server.h"
@@ -35,8 +36,8 @@ signals:
 public slots:
 
 private slots:
-    void appendUser(QString address, UserInformation info);
-    void dropUser(QString address);
+    void appendClient(QString address, UserInformation info);
+    void dropClient(QString address);
     void appendChannel(QString address, UserInformation info, Receiver *channel);
     void dropChannel(QString address);
     void channelRequest(Connection *client, UserInformation info);
@@ -47,16 +48,16 @@ private slots:
 
     void updateServerInfo(ServerInformation info);
 
-    void on_voteButton_clicked();
-
 private:
     Ui::MainWindow *ui;
     SettingsDialog settings;
     AboutDialog about;
-    VoteDialog voting;
+    VoteWidget voting;
 
     Server *server;
     Broadcaster broadcaster;
+
+    QMap<QString, ClientWidget*>  clients;
     QMap<QString, RequestWidget*> requests;
     QMap<QString, ChannelWidget*> channels;
 };

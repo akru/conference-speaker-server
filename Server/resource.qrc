@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/fonts/BauhausC-Demibold.ttf</file>
+        <file>res/fonts/Gothic.ttf</file>
+        <file>res/fonts/GothicBold.ttf</file>
+        <file>res/images/background.png</file>
+        <file>res/images/cross.png</file>
+        <file>res/images/ok.png</file>
+        <file>res/images/avatar.png</file>
+        <file>res/images/hear.png</file>
+        <file>res/images/face.png</file>
+    </qresource>
+</RCC>

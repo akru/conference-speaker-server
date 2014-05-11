@@ -1,31 +1,35 @@
-#ifndef VOTE_DIALOG_H
-#define VOTE_DIALOG_H
+#ifndef VOTE_WIDGET_H
+#define VOTE_WIDGET_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QList>
 #include "connection.h"
 
 namespace Ui {
-class VoteDialog;
+class VoteWidget;
 }
 
-class VoteDialog : public QDialog
+class VoteWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit VoteDialog(QWidget *parent = 0);
-    ~VoteDialog();
+    explicit VoteWidget(QWidget *parent = 0);
+    ~VoteWidget();
 
 signals:
     void voteDenied(Connection *client);
     void voteAccepted(Connection *client);
 
 public slots:
-    void newVote(int userCount);
+    void appendClient();
+    void dropClient();
     void vote(Connection *client, bool type);
 
 private slots:
+    void setCount(int count);
+    void updateYesL(int count);
+    void updateNoL(int count);
     void on_voteButton_clicked();
 
 private:
@@ -33,8 +37,9 @@ private:
     void appendNo();
 
 private:
-    Ui::VoteDialog *ui;
+    Ui::VoteWidget *ui;
     QList<QString> voters;
+    int count;
 };
 
-#endif // VOTE_DIALOG_H
+#endif // VOTE_WIDGET_H
