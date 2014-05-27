@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <user_information.h>
-#include "receiver.h"
+#include <receiver.h>
 
 namespace Ui {
 class ChannelWidget;

@@ -1,8 +1,31 @@
 #include "receiver.h"
 
 #include <QHostAddress>
-#include <QAudioOutput>
-#include <QTcpSocket>
+#include <suppressor.h>
+#include <lms_filter.h>
+
+#ifdef MACOSX
+QByteArray convertAudio(QByteArray &buffer)
+{
+    QByteArray output;
+    QDataStream ds(&output, QIODevice::WriteOnly);
+    qint8 *dataPointer = (qint8 *) buffer.data();
+    while (dataPointer < (qint8 *) buffer.data() + buffer.size())
+    {
+        // One wave is 8kHz
+        qint8 wave1 = *dataPointer++;
+        qint8 wave2 = *dataPointer++;
+        // x6 waves give 48kHz
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+        ds << wave1 << wave2;
+    }
+    return output;
+}
+#endif
 
 Receiver::Receiver(QHostAddress address, QObject *parent)
     : QObject(parent),
@@ -44,6 +67,14 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     }
     else
         throw(std::exception());
+
+    // Setup filters
+    filters.append(new Suppressor);
+    filters.append(new LMSFilter);
+
+    connect(this,     SIGNAL(sampleReceived(QByteArray)),
+            &filters, SLOT(process(QByteArray)));
+    connect(&filters, SIGNAL(ready(QByteArray)), SLOT(play(QByteArray)));
 }
 
 void Receiver::sockReadyRead()
@@ -53,15 +84,19 @@ void Receiver::sockReadyRead()
     qDebug() << "New data size" << sock.pendingDatagramSize();
     buf.resize(sock.pendingDatagramSize());
     sock.readDatagram(buf.data(), buf.size());
-    // Analyze sample amplitude
-    ampAnalyze(buf);
     // Filtering & echo cancellation
-    QByteArray echoLess = filter.process(buf);
+    emit sampleReceived(buf);
+}
+
+void Receiver::play(QByteArray data)
+{
+    // Analyze sample amplitude
+    ampAnalyze(data);
     // Play buffer
 #ifdef MACOSX
-    echoLess = convertAudio(echoLess);
+    data = convertAudio(data);
 #endif
-    buffer->write(echoLess);
+    buffer->write(data);
 }
 
 void Receiver::audioStateChanged(QAudio::State state)
@@ -105,26 +140,3 @@ void Receiver::ampAnalyze(QByteArray &sample)
     // Return average amplitude in percents
     emit audioAmpUpdated(avgAmp * 100);
 }
-
-#ifdef MACOSX
-QByteArray convertAudio(QByteArray &buffer)
-{
-    QByteArray output;
-    QDataStream ds(&output, QIODevice::WriteOnly);
-    qint8 *dataPointer = (qint8 *) buffer.data();
-    while (dataPointer < (qint8 *) buffer.data() + buffer.size())
-    {
-        // One wave is 8kHz
-        qint8 wave1 = *dataPointer++;
-        qint8 wave2 = *dataPointer++;
-        // x6 waves give 48kHz
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-    }
-    return output;
-}
-#endif

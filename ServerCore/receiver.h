@@ -4,7 +4,7 @@
 #include <QUdpSocket>
 #include <QAudioOutput>
 #include <channel_information.h>
-#include <suppressor.h>
+#include <filter_thread.h>
 
 class Receiver : public QObject
 {
@@ -28,6 +28,7 @@ public:
 
 signals:
     void audioAmpUpdated(int amplitude);
+    void sampleReceived(QByteArray data);
 
 public slots:
     void setVolume(qreal volume);
@@ -35,15 +36,17 @@ public slots:
 private slots:
     void audioStateChanged(QAudio::State state);
     void sockReadyRead();
+    void play(QByteArray data);
 
 private:
     QUdpSocket sock;
     QIODevice *buffer;
     ChannelInformation channel;
 
-    Suppressor filter;
     QAudioFormat format;
     QAudioOutput *audio;
+
+    FIlterThread filters;
 
     void ampAnalyze(QByteArray &sample);
 };

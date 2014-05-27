@@ -4,7 +4,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
     Filters \
     Protocol \
-    Server \
+    ServerCore \
+    ServerGui \
     ServerTests \
     FiltersTests
 
