@@ -7,13 +7,13 @@
 class Suppressor : public Filter
 {
 public:
-    Suppressor(uint trashold = 10);
+    Suppressor(int trashold = 10);
 
     QByteArray process(QByteArray &data);
     QString name() { return "Suppressor"; }
 
 private:
-    uint trashold;
+    int trashold;
 };
 
 #endif // SUPPRESSOR_H

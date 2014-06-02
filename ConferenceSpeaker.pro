@@ -2,10 +2,9 @@ TEMPLATE = subdirs
 
 
 SUBDIRS += \
-    Filters \
-    Protocol \
-    ServerCore \
-    ServerGui \
-    ServerTests \
-    FiltersTests
+    Protocol    \
+    Speaker     \
+    ServerCore  \
+    ServerGui   \
+    ServerTests
 

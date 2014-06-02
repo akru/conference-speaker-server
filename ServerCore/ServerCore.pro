@@ -1,4 +1,4 @@
-QT     = core network multimedia
+QT     = core network
 
 TARGET = ServerCore
 TEMPLATE = lib
@@ -33,15 +33,15 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PW
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Protocol/debug/Protocol.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Filters/release/ -lFilters
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Filters/debug/ -lFilters
-else:unix: LIBS += -L$$OUT_PWD/../Filters/ -lFilters
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Speaker/release/ -lSpeaker
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Speaker/debug/ -lSpeaker
+else:unix: LIBS += -L$$OUT_PWD/../Speaker/ -lSpeaker
 
-INCLUDEPATH += $$PWD/../Filters
-DEPENDPATH += $$PWD/../Filters
+INCLUDEPATH += $$PWD/../Speaker
+DEPENDPATH += $$PWD/../Speaker
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filters/release/libFilters.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filters/debug/libFilters.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filters/release/Filters.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Filters/debug/Filters.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Filters/libFilters.a
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Speaker/release/libSpeaker.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Speaker/debug/libSpeaker.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Speaker/release/Speaker.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Speaker/debug/Speaker.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Speaker/libSpeaker.a

@@ -2,19 +2,14 @@
 #define RECEIVER_H
 
 #include <QUdpSocket>
-#include <QAudioOutput>
 #include <channel_information.h>
-#include <filter_thread.h>
+#include <speaker.h>
 
 class Receiver : public QObject
 {
     Q_OBJECT
 public:
     explicit Receiver(QHostAddress address, QObject *parent = 0);
-    ~Receiver()
-    {
-        delete audio;
-    }
 
     ChannelInformation getChannelInfo() const
     {
@@ -28,27 +23,25 @@ public:
 
 signals:
     void audioAmpUpdated(int amplitude);
-    void sampleReceived(QByteArray data);
 
 public slots:
-    void setVolume(qreal volume);
+    void setVolume(qreal volume)
+    {
+        speaker.setVolume(volume);
+    }
 
 private slots:
-    void audioStateChanged(QAudio::State state);
     void sockReadyRead();
-    void play(QByteArray data);
+    void updateAmp(int amplitude)
+    {
+        emit audioAmpUpdated(amplitude);
+    }
 
 private:
     QUdpSocket sock;
     QIODevice *buffer;
+    Speaker speaker;
     ChannelInformation channel;
-
-    QAudioFormat format;
-    QAudioOutput *audio;
-
-    FIlterThread filters;
-
-    void ampAnalyze(QByteArray &sample);
 };
 
 #endif // RECEIVER_H
