@@ -9,6 +9,10 @@ const QString clientsHeader = "Clients: <b style=\"color: #00A0E3\">(%1)</b>";
 const QString wantsHeader = "Wants to ask: <b style=\"color: #00A0E3\">(%1)</b>";
 const QString chatHeader = "Chat: <b style=\"color: #00A0E3\">(%1)</b>";
 
+const QString statusBarNonConfig = "Not configured, please set a settings by settings dialog";
+const QString statusBarConfigured = "Configured, waiting for clients...";
+const QString statusBarConnected = "Working, connected %1 clients";
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -38,7 +42,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->wantsLabel->setText(wantsHeader.arg(0));
     ui->chatLabel->setText(chatHeader.arg(0));
     if (settings.isConfigured())
+    {
         ui->labelName->setText(settings.serverInfo().name);
+        ui->statusBar->showMessage(statusBarConfigured);
+    }
+    else
+        ui->statusBar->showMessage(statusBarNonConfig);
 }
 
 MainWindow::~MainWindow()
@@ -57,8 +66,9 @@ void MainWindow::appendClient(QString address, UserInformation info)
     // Update vote info
     voting.appendClient();
     // Update header
-    ui->clientLabel->setText(
-                clientsHeader.arg(ui->clientBox->layout()->count()));
+    int countClients = ui->clientBox->layout()->count();
+    ui->clientLabel->setText(clientsHeader.arg(countClients));
+    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
 }
 
 void MainWindow::dropClient(QString address)
@@ -74,8 +84,9 @@ void MainWindow::dropClient(QString address)
     // Update vote info
     voting.dropClient();
     // Update header
-    ui->clientLabel->setText(
-                clientsHeader.arg(ui->clientBox->layout()->count()));
+    int countClients = ui->clientBox->layout()->count();
+    ui->clientLabel->setText(clientsHeader.arg(countClients));
+    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
 }
 
 void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
@@ -173,7 +184,9 @@ void MainWindow::updateServerInfo(ServerInformation info)
     connect(this, SIGNAL(channelRequestDiscarded(Connection*)),
             server, SLOT(denyChannel(Connection*)));
 
+    // Update headers
     ui->labelName->setText(info.name);
+    ui->statusBar->showMessage(statusBarConfigured);
 }
 
 void MainWindow::on_actionAbout_triggered()
