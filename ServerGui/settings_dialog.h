@@ -17,14 +17,24 @@ public:
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
 
+    bool isConfigured() const { return configured; }
+    ServerInformation serverInfo() const { return info; }
+
 signals:
     void newServerInfo(ServerInformation info);
 
 private slots:
     void genServerInfo();
 
+protected:
+    void loadSettings();
+
 private:
     Ui::SettingsDialog *ui;
+    bool configured;
+    QString settingsFileName;
+    ServerInformation info;
+
     QList<QHostAddress> addrList;
 };
 

@@ -220,7 +220,7 @@ font: 14pt;
          <x>0</x>
          <y>0</y>
          <width>284</width>
-         <height>156</height>
+         <height>160</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -272,7 +272,7 @@ font: 14pt;
          <x>0</x>
          <y>0</y>
          <width>284</width>
-         <height>312</height>
+         <height>315</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">

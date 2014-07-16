@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->clientLabel->setText(clientsHeader.arg(0));
     ui->wantsLabel->setText(wantsHeader.arg(0));
     ui->chatLabel->setText(chatHeader.arg(0));
+    if (settings.isConfigured())
+        ui->labelName->setText(settings.serverInfo().name);
 }
 
 MainWindow::~MainWindow()
