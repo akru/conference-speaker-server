@@ -1,17 +1,23 @@
 #include "speaker.h"
+#include "sample.h"
+
 #include <QAudioOutput>
 #include <QAudioFormat>
-#include <suppressor.h>
+
+#include <ns_filter.h>
+#include <hs_filter.h>
 
 #include <QDebug>
 
+const int SAMPLE_RATE = 8000;
+
 #ifdef MACOSX
-QByteArray convertAudio(QByteArray &buffer)
+Sample convertAudio(Sample &sample)
 {
     QByteArray output;
     QDataStream ds(&output, QIODevice::WriteOnly);
-    qint8 *dataPointer = (qint8 *) buffer.data();
-    while (dataPointer < (qint8 *) buffer.data() + buffer.size())
+    qint8 *dataPointer = (qint8 *) sample.data();
+    while (dataPointer < (qint8 *) sample.data() + sample.length())
     {
         // One wave is 8kHz
         qint8 wave1 = *dataPointer++;
@@ -24,7 +30,7 @@ QByteArray convertAudio(QByteArray &buffer)
         ds << wave1 << wave2;
         ds << wave1 << wave2;
     }
-    return output;
+    return Sample(output);
 }
 #endif
 
@@ -33,14 +39,14 @@ Speaker::Speaker(QObject *parent) :
     disabled(false),
     format(new QAudioFormat),
     audio(0)
-{
+{   
     // Set up the format, eg.
     format->setSampleSize(16);
     format->setChannelCount(1);
 #ifdef MACOSX
     format->setSampleRate(48000);
 #else
-    format->setSampleRate(8000);
+    format->setSampleRate(SAMPLE_RATE);
 #endif
     format->setCodec("audio/pcm");
     format->setSampleType(QAudioFormat::SignedInt);
@@ -59,11 +65,14 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new Suppressor);
+    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
+    filters.append(new HSFilter(SAMPLE_RATE));
 }
 
 Speaker::~Speaker()
 {
+    audio->stop();
+
     delete format;
     delete audio;
     foreach (Filter *f, filters) {
@@ -81,9 +90,11 @@ void Speaker::setVolume(qreal volume)
     audio->setVolume(volume);
 }
 
-void Speaker::play(QByteArray sample)
+void Speaker::play(const QByteArray &packet)
 {
     Q_ASSERT(audio_buffer);
+    // Prepare sample
+    Sample sample(packet);
     // Apply filters
     foreach (Filter *f, filters) {
         qDebug() << "Applying:" << f->name();
@@ -95,7 +106,7 @@ void Speaker::play(QByteArray sample)
 #ifdef MACOSX
     data = convertAudio(data);
 #endif
-    audio_buffer->write(sample);
+    audio_buffer->write((const char *)sample.data(), sample.length());
 }
 
 /*
@@ -112,15 +123,15 @@ void Speaker::play(QByteArray sample)
  * This function returns number from 0 to 100.
  * That shows current sample average amplitude.
  */
-void Speaker::ampAnalyze(QByteArray &sample)
+void Speaker::ampAnalyze(const Sample &sample)
 {
-    Q_ASSERT(sample.size());
+    Q_ASSERT(sample.length());
     // Variable init
-    qint16 *dataPointer = (qint16 *) sample.data();
+    const qint16 *dataPointer = sample.data();
     double avgAmp = 0;
-    int count = sample.size() / 2;
+    int count = sample.length() / 2;
     // Sum all amps from sample
-    while (dataPointer < (qint16 *) sample.data() + count)
+    while (dataPointer < sample.data() + count)
         avgAmp += abs(*dataPointer++);
     // Divize sum by count and normalize it
     avgAmp = avgAmp / count / 10000;

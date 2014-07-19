@@ -26,12 +26,12 @@ signals:
 
 public slots:
     void setVolume(qreal volume);
-    void play(QByteArray sample);
+    void play(const QByteArray &packet);
 
 private slots:
 
 private:
-    void ampAnalyze(QByteArray &sample);
+    void ampAnalyze(const Sample &sample);
 
     bool            disabled;
     QAudioFormat    *format;

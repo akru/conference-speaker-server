@@ -1,10 +1,10 @@
 QT       -= gui
 
-TARGET = Protocol
-TEMPLATE = lib
-CONFIG += staticlib
+TARGET    = Protocol
+TEMPLATE  = lib
+CONFIG   += staticlib
 
-SOURCES += \
+SOURCES  += \
     user_information.cpp \
     server_information.cpp \
     request.cpp \
@@ -13,7 +13,7 @@ SOURCES += \
     channel_information.cpp \
     channel_response.cpp
 
-HEADERS += \
+HEADERS  += \
     user_information.h \
     server_information.h \
     cs_packet.h \
@@ -22,8 +22,3 @@ HEADERS += \
     registration_request.h \
     channel_information.h \
     channel_response.h
-
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}

@@ -1,10 +1,12 @@
 TEMPLATE = subdirs
 
-
 SUBDIRS += \
-    Protocol    \
-    Speaker     \
-    ServerCore  \
-    ServerGui   \
-    ServerTests
+    Protocol     \
+    Suppression  \
+    Speaker      \
+    ServerCore   \
+    ServerGui    \
+    ServerTests  \
+    SpeakerTests \
+    SuppressionTests
 

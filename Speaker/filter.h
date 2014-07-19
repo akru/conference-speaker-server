@@ -1,14 +1,15 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include <QByteArray>
+#include "sample.h"
+#include <QString>
 
 // Audio filter interface
 class Filter
 {
 public:
-    virtual ~Filter();
-    virtual QByteArray process(QByteArray &data) = 0;
+    virtual ~Filter() {}
+    virtual Sample process(const Sample &sample) = 0;
     virtual QString name() = 0;
 };
 

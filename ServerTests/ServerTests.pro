@@ -1,21 +1,16 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-03-18T17:06:31
-#
-#-------------------------------------------------
-
 QT       += core network multimedia
 
 QT       -= gui
 
-TARGET = ServerTests
+TARGET    = ServerTests
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TEMPLATE = app
+TEMPLATE  = app
 
 
-SOURCES += main.cpp \
+SOURCES  += \
+    main.cpp \
     discover.cpp \
     connector.cpp \
     transmitter.cpp
