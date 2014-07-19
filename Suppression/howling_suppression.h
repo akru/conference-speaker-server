@@ -5,6 +5,7 @@
 #define HS_IP_LENGTH (HS_BLOCKL_MAX >> 1) // must be at least ceil(2 + sqrt(ANAL_BLOCKL_MAX/2))
 #define HS_W_LENGTH (HS_BLOCKL_MAX >> 1)
 #define HS_BIQUAD_COUNT 20
+#define HS_FREQ_DEVIATION 50 // Howling ignor area in Hz
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +26,7 @@ typedef struct
           dataBuf[HS_BLOCKL_MAX];
     // Frame data
     int   blockLen;
+    int   howlingFreq[HS_BIQUAD_COUNT];
     // Filters data
     HsBiquadParams filter[HS_BIQUAD_COUNT];
 } HsHandle;

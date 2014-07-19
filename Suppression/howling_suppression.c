@@ -9,16 +9,56 @@
 
 #include <stdio.h>
 
-inline float quad(float a) { return a * a; }
+#define PI_F 3.1415926535897932384626433832795f
 
-inline float Hs_BiquadProcess(HsBiquadParams *inst, float in) {
+float quad(float a) { return a * a; }
+// Max value index
+int   maxId(float *arr, int len) {
+    float  mVal = arr[0];
+    int    mId  = 0;
+    for (int i = 1; i < len; ++i)
+        if (arr[i] > mVal)
+        {
+            mVal = arr[i];
+            mId = i;
+        }
+    return mId;
+}
+// Deviation checker returns 1 when deviation above th
+float deviationCheck(int val, int *arr, int len)
+{
+    for (int i = 0; i < len; ++i)
+        if (abs(val - arr[i]) > HS_FREQ_DEVIATION)
+            return 1;
+    return 0;
+}
+
+/*
+ * Process IIR filter
+ */
+float Hs_BiquadProcess(HsBiquadParams *inst, float in)
+{
     float out = in * inst->a0 + inst->z1;
     inst->z1  = in * inst->a1 + inst->z2 - inst->b1 * out;
     inst->z2  = in * inst->a2 - inst->b2 * out;
     return out;
 }
 
-inline void Hs_BiquadInit(HsBiquadParams *inst) {
+/*
+ * Cascade filter applying
+ */
+float Hs_BiquadCascade(HsBiquadParams *filter, int count, float in)
+{
+    while (count--)
+        in = Hs_BiquadProcess(filter++, in);
+    return in;
+}
+
+/*
+ * Init IIR filter
+ */
+void Hs_BiquadInit(HsBiquadParams *inst)
+{
     inst->Q = 1;
     inst->peakGain = -30.0;
     inst->a0 = 1.0;
@@ -32,7 +72,7 @@ inline void Hs_BiquadInit(HsBiquadParams *inst) {
 void Hs_BiquadCalc(HsBiquadParams *inst, int Fc)
 {
     float V    = powf(10, fabsf(inst->peakGain) / 20.0),
-          K    = tanf(M_PI * Fc),
+          K    = tanf(PI_F * Fc),
           norm;
     // peak
     if (inst->peakGain >= 0) {    // boost
@@ -55,16 +95,15 @@ void Hs_BiquadCalc(HsBiquadParams *inst, int Fc)
 
 /*
  * Find howling freques and write into instance array
- * returns: found freq
+ * returns: count of found freq
  */
 int Hs_AnalyzeHowling(HsHandle *inst, const short *input)
 {
-    short i;
     float fin[BLOCKL_MAX];
     float tmpBuf[HS_BLOCKL_MAX];
 
     // Convert input data to float
-    for (i = 0; i < inst->blockLen; ++i)
+    for (short i = 0; i < inst->blockLen; ++i)
         fin[i] = (float) input[i];
 
     // Update buffers
@@ -94,22 +133,38 @@ int Hs_AnalyzeHowling(HsHandle *inst, const short *input)
         energy += quad(*tmpBuf_p++);
     energy /= HS_BLOCKL_MAX;
 
-    // Find howling freq
-    float papr = 0,
-          paprMax = 0;
-    int foundFreq = 0;
-    for (i = 0; i < HS_BLOCKL_MAX; ++i)
+    // Calc PAPR
+    float papr[HS_BLOCKL_MAX],
+         *papr_p = papr;
+    tmpBuf_p     = tmpBuf;
+    while (tmpBuf_p != tmpBuf + HS_BLOCKL_MAX)
+        *papr_p++ = 10 * log10f(quad(*tmpBuf_p++) / energy);
+
+    // Evaluate howling freq
+    int   hFreqCount = 0,
+          maxValId;
+    float freq;
+    for (short i = 0; i < HS_BIQUAD_COUNT; ++i)
     {
-        papr = 10 * log10f(quad(tmpBuf[i]) / energy);
-        // TH Filter check
-        if(papr > trashold && papr > paprMax)
+        maxValId = maxId(papr, HS_BLOCKL_MAX);
+        // TH check
+        if (papr[maxValId] > trashold)
         {
-            paprMax = papr;
-            foundFreq = // Some magic freq converter from index
-                    inst->blockLen * 100 * i / HS_BLOCKL_MAX / 2;
+            freq = // Some magic freq converter from index
+                    inst->blockLen * 100 * maxValId / HS_BLOCKL_MAX / 2;
+            // Down maximum
+            papr[maxValId] = 0;
+            // Skip freq when deviation is small
+            if (!hFreqCount || deviationCheck(freq, inst->howlingFreq, hFreqCount))
+            {
+                inst->howlingFreq[hFreqCount] = freq;
+                ++hFreqCount;
+            }
         }
+        else
+            break;
     }
-    return foundFreq;
+    return hFreqCount;
 }
 
 int Hs_Create(HsHandle **inst)
@@ -135,8 +190,8 @@ int Hs_Init(HsHandle *inst, int fs)
     memset(inst->dataBuf, 0, sizeof(float) * HS_BLOCKL_MAX);
 
     // Set filter params
-    HsBiquadParams *f = inst->filter;
-    Hs_BiquadInit(f);
+    for (short i = 0; i < HS_BIQUAD_COUNT; ++i)
+        Hs_BiquadInit(inst->filter + i);
 
     return 0;
 }
@@ -148,21 +203,26 @@ void Hs_Free(HsHandle *inst)
 
 void Hs_Process(HsHandle *inst, const short *input, short *output)
 {
-    int freq = Hs_AnalyzeHowling(inst, input);
-    if (!freq)
+    int freqCount = Hs_AnalyzeHowling(inst, input);
+    if (!freqCount)
     {
         // Howling not found
         memcpy(output, input, inst->blockLen);
         return;
     }
 
-    fprintf(stderr, "Detected hoOowling on %d Hz\n", freq);
+    // Print information
+    fprintf(stderr, "Detected %d hoOowling:\n", freqCount);
+    for (short i = 0; i < freqCount; ++i)
+        fprintf(stderr, "%d. %d Hz\n", i, inst->howlingFreq[i]);
 
     // Calc IIR filter
-    Hs_BiquadCalc(inst->filter, freq / 100.0 / inst->blockLen);
+    for (short i = 0; i < freqCount; ++i)
+        Hs_BiquadCalc(inst->filter + i,
+                      inst->howlingFreq[i] / 100.0 / inst->blockLen);
 
     // Apply IIR filter
     const short *input_p = input;
     while (input_p < input + inst->blockLen)
-        *output++ = Hs_BiquadProcess(inst->filter, *input_p++);
+        *output++ = Hs_BiquadCascade(inst->filter, freqCount, *input_p++);
 }
