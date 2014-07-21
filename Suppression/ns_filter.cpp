@@ -24,13 +24,13 @@ NSFilter::~NSFilter()
     WebRtcNs_Free(ns_ptr);
 }
 
-Sample NSFilter::process(const Sample &sample)
+QByteArray NSFilter::process(const QByteArray &sample)
 {
     const short num_iter = sample.length() / 2 / len10ms;
     QByteArray out(num_iter * len10ms * 2, 0);
     qDebug() << "num_iter:" << num_iter << "out buf size:" << out.length();
 
-    const qint16 *in_ptr = sample.data();
+    const qint16 *in_ptr = (const qint16 *) sample.data();
     qint16 *out_ptr = (qint16 *) out.data();
     for (short i = 0; i < num_iter; ++i)
     {
@@ -39,5 +39,5 @@ Sample NSFilter::process(const Sample &sample)
         in_ptr  += len10ms;
         out_ptr += len10ms;
     }
-    return Sample(sample.meta(), out);
+    return out;
 }

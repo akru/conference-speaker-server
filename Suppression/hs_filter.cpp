@@ -22,20 +22,13 @@ HSFilter::~HSFilter()
     Hs_Free(hs_ptr);
 }
 
-Sample HSFilter::process(const Sample &sample)
+QByteArray HSFilter::process(const QByteArray &sample)
 {
-    const short len10ms = 80;
-    const short num_iter = sample.length() / 2 / len10ms;
-    QByteArray out(num_iter * len10ms * 2, 0);
-    qDebug() << "num_iter:" << num_iter << "out buf size:" << out.length();
+    Q_ASSERT(sample.length() == 512);
 
-    const qint16 *in_ptr = sample.data();
-    qint16 *out_ptr = (qint16 *) out.data();
-    for (short i = 0; i < num_iter; ++i)
-    {
-        Hs_Process(hs_ptr, in_ptr, out_ptr);
-        in_ptr  += len10ms;
-        out_ptr += len10ms;
-    }
-    return Sample(sample.meta(), out);
+    QByteArray out;
+    out.resize(sample.length());
+
+    Hs_Process(hs_ptr, (qint16 *) sample.data(), (qint16 *) out.data());
+    return out;
 }

@@ -8,12 +8,12 @@ CONFIG   += staticlib
 
 SOURCES  += \
     speaker.cpp \
-    sample.cpp \
+#    sample.cpp \
 
 HEADERS += \
     speaker.h \
     filter.h \
-    sample.h
+#    sample.h
 
 
 INCLUDEPATH += $$PWD/../Suppression

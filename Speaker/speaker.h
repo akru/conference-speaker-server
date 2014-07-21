@@ -31,7 +31,7 @@ public slots:
 private slots:
 
 private:
-    void ampAnalyze(const Sample &sample);
+    void ampAnalyze(const QByteArray &sample);
 
     bool            disabled;
     QAudioFormat    *format;

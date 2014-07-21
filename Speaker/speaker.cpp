@@ -65,7 +65,7 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
+    //filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
     filters.append(new HSFilter(SAMPLE_RATE));
 }
 
@@ -94,7 +94,8 @@ void Speaker::play(const QByteArray &packet)
 {
     Q_ASSERT(audio_buffer);
     // Prepare sample
-    Sample sample(packet);
+//    Sample sample(packet);
+    QByteArray sample(packet);
     // Apply filters
     foreach (Filter *f, filters) {
         qDebug() << "Applying:" << f->name();
@@ -104,9 +105,9 @@ void Speaker::play(const QByteArray &packet)
     ampAnalyze(sample);
     // Play buffer
 #ifdef MACOSX
-    data = convertAudio(data);
+    sample = convertAudio(sample);
 #endif
-    audio_buffer->write((const char *)sample.data(), sample.length());
+    audio_buffer->write(sample);
 }
 
 /*
@@ -123,15 +124,15 @@ void Speaker::play(const QByteArray &packet)
  * This function returns number from 0 to 100.
  * That shows current sample average amplitude.
  */
-void Speaker::ampAnalyze(const Sample &sample)
+void Speaker::ampAnalyze(const QByteArray &sample)
 {
     Q_ASSERT(sample.length());
     // Variable init
-    const qint16 *dataPointer = sample.data();
+    const qint16 *dataPointer = (const qint16 *) sample.data();
     double avgAmp = 0;
     int count = sample.length() / 2;
     // Sum all amps from sample
-    while (dataPointer < sample.data() + count)
+    while ((char *) dataPointer < sample.data() + count)
         avgAmp += abs(*dataPointer++);
     // Divize sum by count and normalize it
     avgAmp = avgAmp / count / 10000;

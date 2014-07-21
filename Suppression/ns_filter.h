@@ -2,7 +2,7 @@
 #define NS_FILTER_H
 
 #include "../Speaker/filter.h"
-#include "../Speaker/sample.h"
+//#include "../Speaker/sample.h"
 #include "noise_suppression.h"
 
 class NSFilter : public Filter
@@ -18,7 +18,7 @@ public:
     NSFilter(quint32 sample_rate, Level level);
     ~NSFilter();
 
-    Sample process(const Sample &sample);
+    QByteArray process(const QByteArray &sample);
     QString name() { return "Noise suppression"; }
 
 private:
