@@ -30,7 +30,7 @@ int Hs_Create(HsHandle **);
 /*
  * Init handle
  */
-int Hs_Init(HsHandle *, int, char debug, float PAPR_TH, float PHPR_TH, float PNPR_TH);
+int Hs_Init(HsHandle *, int, float PAPR_TH, float PHPR_TH, float PNPR_TH);
 
 /*
  * Howling suppression handle free function

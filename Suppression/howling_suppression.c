@@ -90,19 +90,18 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
         }
     }
     // Print group information
-    if (inst->debug)
+#ifndef QT_NO_DEBUG
+    fprintf(stderr, "Founded %d freq groups:\n", groupCount);
+    for (short i = 0; i < groupCount; ++i)
     {
-        fprintf(stderr, "Founded %d freq groups:\n", groupCount);
-        for (short i = 0; i < groupCount; ++i)
-        {
-            fprintf(stderr, "%d. center %d Hz, gain %f dB, contain %d freq's:\n", i + 1,
-                    group[i].center,
-                    group[i].gain,
-                    group[i].freqCount);
-            for (short j = 0; j < group[i].freqCount; ++j)
-                fprintf(stderr, "\t%d. %d Hz\n", j + 1, group[i].freq[j]);
-        }
+        fprintf(stderr, "%d. center %d Hz, gain %f dB, contain %d freq's:\n", i + 1,
+                group[i].center,
+                group[i].gain,
+                group[i].freqCount);
+        for (short j = 0; j < group[i].freqCount; ++j)
+            fprintf(stderr, "\t%d. %d Hz\n", j + 1, group[i].freq[j]);
     }
+#endif
     // Create filters
     for (short i = 0; i < groupCount; ++i)
         Hs_BiquadCalc(inst->filter + i, group + i);
@@ -235,13 +234,11 @@ int Hs_Create(HsHandle **inst)
     }
 }
 
-int Hs_Init(HsHandle *inst, int fs, char debug,
+int Hs_Init(HsHandle *inst, int fs,
             float PAPR_TH, float PHPR_TH, float PNPR_TH)
 {
     if (fs != 8000)
         return -1;
-
-    inst->debug = debug;
 
     // Initialize fft work arrays.
     inst->ip[0] = 0; // Setting this triggers initialization.
@@ -264,10 +261,10 @@ int Hs_Init(HsHandle *inst, int fs, char debug,
     else
         inst->PNPR_TH = PNPR_TH;
 
-    if (inst->debug)
-        fprintf(stderr, "HS_INIT: PAPR_TH = %f, PHPR_TH = %f, PNPR_TH = %f",
+#ifndef QT_NO_DEBUG
+        fprintf(stderr, "HS_INIT: PAPR_TH = %f, PHPR_TH = %f, PNPR_TH = %f\n",
                 PAPR_TH, PHPR_TH, PNPR_TH);
-
+#endif
     return 0;
 }
 
@@ -278,9 +275,6 @@ void Hs_Free(HsHandle *inst)
 
 void Hs_Process(HsHandle *inst, const short *input, short *output)
 {
-    if (inst->debug)
-        fprintf(stderr, "HsProcess started\n");
-
     short howlingFreq[HS_BIQUAD_COUNT];
     int freqCount = Hs_AnalyzeHowling(inst, howlingFreq, input);
     if (!freqCount && !inst->filterCount)
@@ -291,32 +285,25 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
     }
 
     // Print freq information
-    if (inst->debug)
-    {
-        fprintf(stderr, "Detected %d hoOowling:\n", freqCount);
-        for (short i = 0; i < freqCount; ++i)
-            fprintf(stderr, "%d. %d Hz\n", i + 1, howlingFreq[i]);
-    }
-
+#ifndef QT_NO_DEBUG
+    fprintf(stderr, "Detected %d hoOowling:\n", freqCount);
+    for (short i = 0; i < freqCount; ++i)
+        fprintf(stderr, "%d. %d Hz\n", i + 1, howlingFreq[i]);
+#endif
     // Calc IIR filters
     Hs_BiquadUpdate(inst, howlingFreq, freqCount);
 
     // Print filter information
-    if (inst->debug)
-    {
-        fprintf(stderr, "Enabled %d filters:\n", inst->filterCount);
-        for (short i = 0; i < inst->filterCount; ++i)
-            fprintf(stderr, "%d. freq %f Hz, gain %f dB, Q %f\n", i + 1,
-                    inst->filter[i].freq,
-                    inst->filter[i].peakGain,
-                    inst->filter[i].Q);
-    }
-
+#ifndef QT_NO_DEBUG
+    fprintf(stderr, "Enabled %d filters:\n", inst->filterCount);
+    for (short i = 0; i < inst->filterCount; ++i)
+        fprintf(stderr, "%d. freq %f Hz, gain %f dB, Q %f\n", i + 1,
+                inst->filter[i].freq,
+                inst->filter[i].peakGain,
+                inst->filter[i].Q);
+#endif
     // Apply IIR filter
     const short *input_p = input;
     while (input_p < input + HS_BLOCKL)
         *output++ = Hs_BiquadCascade(inst, *input_p++);
-
-    if (inst->debug)
-        fprintf(stderr, "HsProcess ended\n");
 }
