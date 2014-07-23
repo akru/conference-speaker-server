@@ -45,8 +45,11 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
         for (short j = 0; j  < groupCount; ++j)
             if (abs(howlingFreq[i] - group[j].center) < HS_FREQ_DEVIATION)
             {
-                group[j].freq[group[j].freqCount++] = howlingFreq[i];
-                group[j].center = Hs_FreqGroupCenter(group + j);
+                if (group[j].freqCount < HS_GROUP_FREQ_MAX)
+                {
+                    group[j].freq[group[j].freqCount++] = howlingFreq[i];
+                    group[j].center = Hs_FreqGroupCenter(group + j);
+                }
                 // Down freq
                 howlingFreq[i] = 0;
                 break;
@@ -69,8 +72,11 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
         {
             if (abs(inst->filter[i].freq - group[j].center) < HS_FREQ_DEVIATION)
             {
-                group[j].freq[group[j].freqCount++] = inst->filter[i].freq;
-                group[j].center = Hs_FreqGroupCenter(group + j);
+                if (group[j].freqCount < HS_GROUP_FREQ_MAX)
+                {
+                    group[j].freq[group[j].freqCount++] = inst->filter[i].freq;
+                    group[j].center = Hs_FreqGroupCenter(group + j);
+                }
 
                 if (inst->filter[i].peakGain > HS_GAIN_MIN)
                     group[j].gain = inst->filter[i].peakGain - HS_GAIN_DOWN_STEP;
@@ -80,7 +86,7 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
                 founded = 1;
             }
         }
-        if (!founded)
+        if (!founded && inst->filter[i].peakGain + HS_GAIN_UP_STEP < 0)
         {
             group[groupCount].freqCount = 1;
             group[groupCount].freq[0] = inst->filter[i].freq;
@@ -116,13 +122,13 @@ void Hs_EvaluatePAPR(float Y[], float PAPR[])
     // -- Energy
     float energy = 0,
           *Y_p = Y;
-    while (Y_p < Y + HS_BLOCKL_MAX)
+    while (Y_p < Y + HS_BLOCKL)
         energy += quad(*Y_p++);
-    energy /= HS_BLOCKL_MAX;
+    energy /= HS_BLOCKL;
     // -- Elements
     Y_p           = Y;
     float *PAPR_p = PAPR;
-    while (Y_p < Y + HS_BLOCKL_MAX)
+    while (Y_p < Y + HS_BLOCKL)
         *PAPR_p++ = 10 * log10f(quad(*Y_p++) / energy);
 }
 
@@ -131,15 +137,15 @@ void Hs_EvaluatePAPR(float Y[], float PAPR[])
  */
 void Hs_EvaluatePHPR(float Y[], float PHPR[])
 {
-    for (short i = 0, i2; i < HS_BLOCKL_MAX; ++i)
+    for (short i = 0, i2; i < HS_BLOCKL; ++i)
     {
         PHPR[i] = 0;
         i2 = 2 * i; // m = 2
-        if (i2 < HS_BLOCKL_MAX)
+        if (i2 < HS_BLOCKL)
             PHPR[i] = 10 * log10f(quad(Y[i]) / quad(Y[i2]));
 
         i2 = 3 * i; // m = 3
-        if (i2 < HS_BLOCKL_MAX)
+        if (i2 < HS_BLOCKL)
         {
             float phprc = 10 * log10f(quad(Y[i]) / quad(Y[i2]));
             if (phprc > PHPR[i])
@@ -154,13 +160,13 @@ void Hs_EvaluatePHPR(float Y[], float PHPR[])
 void Hs_EvaluatePNPR(float Y[], float PNPR[])
 {
     static const int m[10] = {1, -1, 2, -2, 3, -3, 4, -4, 5, -5};
-    for (short i = 0; i < HS_BLOCKL_MAX; ++i)
+    for (short i = 0; i < HS_BLOCKL; ++i)
     {
         PNPR[i] = 0;
         for (short j = 0, i2; j < 10; ++j)
         {
             i2 = HS_RAD_TO_INDEX * (HS_INDEX_TO_RAD * i + 2 * PI_F * m[j] / HS_M);
-            if (i2 < HS_BLOCKL_MAX)
+            if (i2 < HS_BLOCKL)
                 PNPR[i] += 10 * log10f(quad(Y[i]) / quad(Y[i2]));
         }
     }
@@ -184,25 +190,41 @@ int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const short *input)
            sizeof(float) * HS_BLOCKL);                       // Copy new data
 
     // Apply window to new buffer
-    float tmpBuf[HS_BLOCKL_MAX];
-    for (short i = 0; i < HS_BLOCKL_MAX; ++i)
-        tmpBuf[i] = inst->dataBuf[i] * kBlocks480w1024[i];
+    for (short i = 0; i < HS_BLOCKL; ++i)
+        fin[i] *= kBlocks160w256[i];
 
     // Apply FFT
-    rdft(HS_BLOCKL_MAX, 1, tmpBuf, inst->ip, inst->wfft);
+    rdft(HS_BLOCKL, 1, fin, inst->ip, inst->wfft);
 
     // Calc criteries
-    float papr[HS_BLOCKL_MAX],
-          phpr[HS_BLOCKL_MAX],
-          pnpr[HS_BLOCKL_MAX];
-    Hs_EvaluatePAPR(tmpBuf, papr);
-    Hs_EvaluatePHPR(tmpBuf, phpr);
-    Hs_EvaluatePNPR(tmpBuf, pnpr);
+    float papr[HS_BLOCKL],
+          phpr[HS_BLOCKL],
+          pnpr[HS_BLOCKL];
+    Hs_EvaluatePAPR(fin, papr);
+    Hs_EvaluatePHPR(fin, phpr);
+    Hs_EvaluatePNPR(fin, pnpr);
 
     // Evaluate howling freq
     int   hFreqCount = 0, freq;
-    for (short i = 0; i < HS_BLOCKL_MAX; ++i)
+    for (short i = 0; i < HS_BLOCKL; ++i)
     {
+#ifndef QT_NO_DEBUG
+        const char *out;
+        // Some magic freq converter from index
+        freq = HS_INDEX_TO_HZ * i;
+        fprintf(stderr, "Freq %d Hz >>\t", freq);
+        out = papr[i] > inst->PAPR_TH ? "PASS" : "NOT";
+        fprintf(stderr, "PAPR : %.2f ^ %s;\t", papr[i], out);
+        out = phpr[i] > inst->PHPR_TH ? "PASS" : "NOT";
+        fprintf(stderr, "PHPR : %.2f ^ %s;\t", phpr[i], out);
+        out = pnpr[i] > inst->PNPR_TH ? "PASS" : "NOT";
+        fprintf(stderr, "PNPR : %.2f ^ %s;\t", pnpr[i], out);
+        if ( papr[i] > inst->PAPR_TH &&
+             phpr[i] > inst->PHPR_TH &&
+             pnpr[i] > inst->PNPR_TH )
+            fprintf(stderr, " << FOUND >> ");
+        fprintf(stderr, "\n");
+#endif
         // TH check
         if ( papr[i] > inst->PAPR_TH &&
              phpr[i] > inst->PHPR_TH &&
@@ -243,7 +265,7 @@ int Hs_Init(HsHandle *inst, int fs,
     // Initialize fft work arrays.
     inst->ip[0] = 0; // Setting this triggers initialization.
     memset(inst->dataBuf, 0, sizeof(float) * HS_BLOCKL_MAX);
-    rdft(HS_BLOCKL_MAX, 1, inst->dataBuf, inst->ip, inst->wfft);
+    rdft(HS_BLOCKL, 1, inst->dataBuf, inst->ip, inst->wfft);
     memset(inst->dataBuf, 0, sizeof(float) * HS_BLOCKL_MAX);
 
     if (!PAPR_TH)

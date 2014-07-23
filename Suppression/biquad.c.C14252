@@ -14,7 +14,8 @@ short Hs_FreqGroupCenter(HsFreqGroup *inst)
 
 float Hs_FreqGroupQ(HsFreqGroup *inst)
 {
-    return 60;
+    inst;
+    return 1;
 }
 
 /*
