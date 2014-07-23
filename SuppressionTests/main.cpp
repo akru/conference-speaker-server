@@ -15,7 +15,7 @@ int main()
     Hs_BiquadInit(&f);
     f.freq = 600;
     f.peakGain = -10;
-    Hs_BiquadCalc(&f);
+    Hs_BiquadCalc(&f, 0);
 #endif
 
     QFile audio("in.wav");

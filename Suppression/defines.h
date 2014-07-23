@@ -11,6 +11,28 @@
 #ifndef WEBRTC_MODULES_AUDIO_PROCESSING_NS_MAIN_SOURCE_DEFINES_H_
 #define WEBRTC_MODULES_AUDIO_PROCESSING_NS_MAIN_SOURCE_DEFINES_H_
 
+#define PI_F 3.1415926535897932384626433832795f
+
+#define HS_BLOCKL_MAX       1024  // In bins
+#define HS_IP_LENGTH        (HS_BLOCKL_MAX >> 1) // must be at least ceil(2 + sqrt(ANAL_BLOCKL_MAX/2))
+#define HS_W_LENGTH         (HS_BLOCKL_MAX >> 1)
+#define HS_BIQUAD_COUNT     20
+#define HS_FREQ_DEVIATION   50 // Howling ignor area in Hz
+#define HS_FREQ_MIN         10
+#define HS_FREQ_MAX         10000
+#define HS_GAIN_UP_STEP     1     // Gain raise step in dB
+#define HS_GAIN_DOWN_STEP   3     // Gain raise step in dB
+#define HS_GAIN_MIN         -60   // Gain minimal value
+#define HS_SAMPLE_RATE      8000.0
+#define HS_BLOCKL           256   // In bins
+#define HS_M                HS_BLOCKL_MAX / 2.0
+#define HS_INDEX_TO_HZ      HS_SAMPLE_RATE / HS_M
+#define HS_INDEX_TO_RAD     2 * PI_F * HS_SAMPLE_RATE / HS_M
+#define HS_HZ_TO_INDEX      HS_M / HS_SAMPLE_RATE
+#define HS_RAD_TO_INDEX     HS_M / 2 / PI_F / HS_SAMPLE_RATE
+#define HS_DEVIATION_TO_Q   1
+#define HS_GROUP_FREQ_MAX   50
+
 //#define PROCESS_FLOW_0    // Use the traditional method.
 //#define PROCESS_FLOW_1    // Use traditional with DD estimate of prior SNR.
 #define PROCESS_FLOW_2    // Use the new method of speech/noise classification.

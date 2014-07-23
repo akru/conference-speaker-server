@@ -3,7 +3,8 @@
 
 #include <QDebug>
 
-HSFilter::HSFilter(quint32 sample_rate)
+HSFilter::HSFilter(quint32 sample_rate, bool debug,
+                   float PAPR_TH, float PHPR_TH, float PNPR_TH)
 {
     Q_ASSERT(sample_rate == 8000);
 
@@ -11,7 +12,7 @@ HSFilter::HSFilter(quint32 sample_rate)
 
     if (!Hs_Create(&hs_ptr))
     {
-        Hs_Init(hs_ptr, sample_rate);
+        Hs_Init(hs_ptr, sample_rate, debug, PAPR_TH, PHPR_TH, PNPR_TH);
     }
     else
         qWarning() << "Unable to create howling supression filter";

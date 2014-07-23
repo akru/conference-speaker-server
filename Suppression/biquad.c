@@ -2,6 +2,22 @@
 #include <math.h>
 
 /*
+ * FreqGroup center evaluation
+ */
+short Hs_FreqGroupCenter(HsFreqGroup *inst)
+{
+    short sum = 0, *freq = inst->freq;
+    while (freq < inst->freq + inst->freqCount)
+        sum += *freq++;
+    return sum / inst->freqCount;
+}
+
+float Hs_FreqGroupQ(HsFreqGroup *inst)
+{
+    return 1;
+}
+
+/*
  * Init IIR filter
  */
 void Hs_BiquadInit(HsBiquadParams *inst)
@@ -16,8 +32,15 @@ void Hs_BiquadInit(HsBiquadParams *inst)
 /*
  * Calc biquad IIR coefs
  */
-void Hs_BiquadCalc(HsBiquadParams *inst)
+void Hs_BiquadCalc(HsBiquadParams *inst, HsFreqGroup *group)
 {
+    if (group)
+    {
+        inst->Q = Hs_FreqGroupQ(group);
+        inst->freq = group->center;
+        inst->peakGain = group->gain;
+    }
+
     float V    = powf(10, fabsf(inst->peakGain) / 20.0),
           Fc   = inst->freq / 8000.0,
           K    = tanf(PI_F * Fc),

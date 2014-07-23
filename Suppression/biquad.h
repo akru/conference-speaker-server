@@ -4,11 +4,16 @@
  * Biquad filter header file.
  */
 
+#include "defines.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define PI_F 3.1415926535897932384626433832795f
+typedef struct {
+    short freq[HS_GROUP_FREQ_MAX], freqCount, center;
+    float gain;
+} HsFreqGroup;
 
 typedef struct
 {
@@ -18,6 +23,11 @@ typedef struct
 } HsBiquadParams;
 
 /*
+ *Evaluate center of group
+ */
+short Hs_FreqGroupCenter(HsFreqGroup *);
+
+/*
  * Init IIR filter
  */
 void Hs_BiquadInit(HsBiquadParams *);
@@ -25,7 +35,7 @@ void Hs_BiquadInit(HsBiquadParams *);
 /*
  * Calc biquad IIR coefs
  */
-void Hs_BiquadCalc(HsBiquadParams *);
+void Hs_BiquadCalc(HsBiquadParams *, HsFreqGroup *group);
 
 /*
  * Process IIR filter
