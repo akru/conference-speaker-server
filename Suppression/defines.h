@@ -14,10 +14,12 @@
 #define PI_F 3.1415926535897932384626433832795f
 
 
-#define HS_BLOCKL           256              // In bins
-#define HS_BLOCKL_MAX       HS_BLOCKL * 4    // Buffer length
-#define HS_IP_LENGTH        (HS_BLOCKL >> 1) // Must be at least ceil(2 + sqrt(HS_BLOCKL/2))
-#define HS_W_LENGTH         (HS_BLOCKL >> 1)
+#define HS_BUF_COUNT        20
+#define HS_BLOCKL_INP       256
+#define HS_BLOCKL           512                         // In bins
+#define HS_BLOCKL_MAX       HS_BLOCKL * HS_BUF_COUNT    // Buffer length
+#define HS_IP_LENGTH        (HS_BLOCKL * 2 >> 1) // Must be at least ceil(2 + sqrt(HS_BLOCKL/2))
+#define HS_W_LENGTH         (HS_BLOCKL * 2 >> 1)
 #define HS_BIQUAD_COUNT     20
 #define HS_FREQ_DEVIATION   30    // Howling freq interpolation range in Hz
 #define HS_FREQ_MIN         10    // Minimal freq

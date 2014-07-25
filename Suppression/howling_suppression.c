@@ -9,15 +9,8 @@
 
 #include <stdio.h>
 
-float quad(float a) { return a * a; }
-// Deviation checker returns index of element
-int deviationCheck(int val, int *arr, int len)
-{
-    for (int i = 0; i < len; ++i)
-        if (abs(val - arr[i]) < HS_FREQ_DEVIATION)
-            return i;
-    return -1;
-}
+inline float quad(float a) { return a * a; }
+inline float mod(float a[], int i) { return sqrtf(a[i] * a[i] + a[i+1] * a[i+1]); }
 
 /*
  * Cascade filter applying
@@ -120,16 +113,14 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
 void Hs_EvaluatePAPR(float Y[], float PAPR[])
 {
     // -- Energy
-    float energy = 0,
-          *Y_p = Y;
-    while (Y_p < Y + HS_BLOCKL)
-        energy += quad(*Y_p++);
+    float energy = 0;
+    for (short i = 0; i < HS_BLOCKL; ++i)
+        energy += quad(Y[i]);
     energy /= HS_BLOCKL;
     // -- Elements
-    Y_p           = Y;
     float *PAPR_p = PAPR;
-    while (Y_p < Y + HS_BLOCKL)
-        *PAPR_p++ = 10 * log10f(quad(*Y_p++) / energy);
+    for (short i = 0; i < HS_BLOCKL; ++i)
+        *PAPR_p++ = 10 * log10f(quad(Y[i]) / energy);
 }
 
 /*
@@ -173,36 +164,75 @@ void Hs_EvaluatePNPR(float Y[], float PNPR[])
 }
 
 /*
+ * Calculate IMSD
+ */
+void Hs_EvaluateIMSD(float Y[], float IMSD[])
+{
+    const short Q_m = 16,
+                P   = 1,
+                t   = HS_BUF_COUNT - 1;
+    float fst_sum, snd_sum;
+    for (short i = 0; i < HS_BLOCKL; ++i)
+    {
+        IMSD[i] = 0;
+        fst_sum = 0;
+        for (short j = 0; j < Q_m; ++j)
+            fst_sum += 20 * (log10f(Y[(t - j*P) * HS_BLOCKL + i])
+                    - log10f(Y[(t - Q_m*P)*HS_BLOCKL + i])) / (Q_m - j);
+        for (short m = 1; m < Q_m; ++m)
+        {
+            snd_sum = 0;
+            for (short j = 0; j < m; ++j)
+                snd_sum += 20 * (log10f(Y[(t - j*P) * HS_BLOCKL + i])
+                                - log10f(Y[(t - m*P)*HS_BLOCKL + i])) / (m - j);
+            IMSD[i] += fst_sum / Q_m - snd_sum / m;
+        }
+    }
+}
+
+/*
  * Find howling freques and write into instance array
  * returns: count of found freq
  */
 int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const short *input)
 {
-    float fin[HS_BLOCKL];
+    float fin[HS_BLOCKL * 2];
     // Convert input data to float
-    for (short i = 0; i < HS_BLOCKL; ++i)
+    for (short i = 0; i < HS_BLOCKL_INP; ++i)
         fin[i] = (float) input[i];
 
     // Shift buffer
-    memcpy(inst->dataBuf, inst->dataBuf + HS_BLOCKL,
-           sizeof(float) * (HS_BLOCKL_MAX - HS_BLOCKL));     // Shift
-    memcpy(inst->dataBuf + HS_BLOCKL_MAX - HS_BLOCKL, fin,
-           sizeof(float) * HS_BLOCKL);                       // Copy new data
+    memcpy(inst->dataBuf, inst->dataBuf + HS_BLOCKL_INP,
+           sizeof(float) * (HS_BLOCKL_MAX - HS_BLOCKL_INP));     // Shift
+    memcpy(inst->dataBuf + HS_BLOCKL_MAX - HS_BLOCKL_INP, fin,
+           sizeof(float) * HS_BLOCKL_INP);                       // Copy new data
 
     // Apply window to new buffer
-    for (short i = 0; i < HS_BLOCKL; ++i)
-        fin[i] *= kBlocks160w256[i];
+    for (short i = 0; i < HS_BLOCKL * 2; ++i)
+        fin[i] = inst->dataBuf[HS_BLOCKL_MAX - HS_BLOCKL * 2 + i] * kBlocks480w1024[i];
 
-    // Apply FFT
-    rdft(HS_BLOCKL, 1, fin, inst->ip, inst->wfft);
+    // Apply RDFT
+    rdft(HS_BLOCKL * 2, 1, fin, inst->ip, inst->wfft);
+
+    // Calc modulo
+    for (short i = 0; i < HS_BLOCKL * 2; i += 2)
+        fin[i / 2] = mod(fin, i);
+
+    // Shift RDFT buffer
+    memcpy(inst->rdftBuf, inst->rdftBuf + HS_BLOCKL,
+           sizeof(float) * (HS_BLOCKL_MAX - HS_BLOCKL));     // Shift
+    memcpy(inst->rdftBuf + HS_BLOCKL_MAX - HS_BLOCKL, fin,
+           sizeof(float) * HS_BLOCKL);                       // Copy new data
 
     // Calc criteries
     float papr[HS_BLOCKL],
           phpr[HS_BLOCKL],
-          pnpr[HS_BLOCKL];
+          pnpr[HS_BLOCKL],
+          imsd[HS_BLOCKL];
     Hs_EvaluatePAPR(fin, papr);
     Hs_EvaluatePHPR(fin, phpr);
     Hs_EvaluatePNPR(fin, pnpr);
+    Hs_EvaluateIMSD(inst->rdftBuf, imsd);
 
     // Evaluate howling freq
     int   hFreqCount = 0, freq;
@@ -212,23 +242,27 @@ int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const short *input)
         const char *out;
         // Some magic freq converter from index
         freq = HS_INDEX_TO_HZ * i;
-        fprintf(stderr, "Freq %d Hz >>\t", freq);
-        out = papr[i] > inst->PAPR_TH ? "PASS" : "NOT";
-        fprintf(stderr, "PAPR : %.2f ^ %s;\t", papr[i], out);
-        out = phpr[i] > inst->PHPR_TH ? "PASS" : "NOT";
-        fprintf(stderr, "PHPR : %.2f ^ %s;\t", phpr[i], out);
-        out = pnpr[i] > inst->PNPR_TH ? "PASS" : "NOT";
-        fprintf(stderr, "PNPR : %.2f ^ %s;\t", pnpr[i], out);
+        fprintf(stderr, "Freq %d Hz >\t", freq);
+        out = papr[i] > inst->PAPR_TH ? "+" : "";
+        fprintf(stderr, "PAPR : %.1f %s\t", papr[i], out);
+        out = phpr[i] > inst->PHPR_TH ? "+" : "";
+        fprintf(stderr, "PHPR : %.1f %s\t", phpr[i], out);
+        out = pnpr[i] > inst->PNPR_TH ? "+" : "";
+        fprintf(stderr, "PNPR : %.1f %s\t", pnpr[i], out);
+        out = fabsf(imsd[i]) < inst->IMSD_TH ? "+" : "";
+        fprintf(stderr, "IMSD : %.1f %s\t", imsd[i], out);
         if ( papr[i] > inst->PAPR_TH &&
              phpr[i] > inst->PHPR_TH &&
-             pnpr[i] > inst->PNPR_TH )
+             pnpr[i] > inst->PNPR_TH &&
+             fabsf(imsd[i]) < inst->IMSD_TH)
             fprintf(stderr, " << FOUND >> ");
         fprintf(stderr, "\n");
 #endif
         // TH check
         if ( papr[i] > inst->PAPR_TH &&
              phpr[i] > inst->PHPR_TH &&
-             pnpr[i] > inst->PNPR_TH )
+             pnpr[i] > inst->PNPR_TH &&
+             imsd[i] < inst->IMSD_TH)
         {
             // Some magic freq converter from index
             freq = HS_INDEX_TO_HZ * i;
@@ -257,7 +291,7 @@ int Hs_Create(HsHandle **inst)
 }
 
 int Hs_Init(HsHandle *inst, int fs,
-            float PAPR_TH, float PHPR_TH, float PNPR_TH)
+            float PAPR_TH, float PHPR_TH, float PNPR_TH, float IMSD_TH)
 {
     if (fs != 8000)
         return -1;
@@ -283,9 +317,14 @@ int Hs_Init(HsHandle *inst, int fs,
     else
         inst->PNPR_TH = PNPR_TH;
 
+    if (!IMSD_TH)
+        inst->IMSD_TH = 0.5;
+    else
+        inst->IMSD_TH = IMSD_TH;
+
 #ifndef QT_NO_DEBUG
-        fprintf(stderr, "HS_INIT: PAPR_TH = %f, PHPR_TH = %f, PNPR_TH = %f\n",
-                PAPR_TH, PHPR_TH, PNPR_TH);
+        fprintf(stderr, "HS_INIT: PAPR_TH = %f, PHPR_TH = %f, PNPR_TH = %f, IMSD = %f\n",
+                PAPR_TH, PHPR_TH, PNPR_TH, IMSD_TH);
 #endif
     return 0;
 }
@@ -302,7 +341,7 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
     if (!freqCount && !inst->filterCount)
     {
         // Howling not found
-        memcpy(output, input, HS_BLOCKL * sizeof(short));
+        memcpy(output, input, HS_BLOCKL_INP * sizeof(short));
         return;
     }
 
@@ -326,6 +365,6 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
 #endif
     // Apply IIR filter
     const short *input_p = input;
-    while (input_p < input + HS_BLOCKL)
+    while (input_p < input + HS_BLOCKL_INP)
         *output++ = Hs_BiquadCascade(inst, *input_p++);
 }

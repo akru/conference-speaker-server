@@ -15,8 +15,9 @@ typedef struct
     int   ip[HS_IP_LENGTH];
     float wfft[HS_W_LENGTH],
           dataBuf[HS_BLOCKL_MAX],
+          rdftBuf[HS_BLOCKL_MAX],
     // Trasholds
-          PAPR_TH, PHPR_TH, PNPR_TH;
+          PAPR_TH, PHPR_TH, PNPR_TH, IMSD_TH;
     // Filters data
     HsBiquadParams filter[HS_BIQUAD_COUNT];
     int            filterCount;
@@ -30,7 +31,7 @@ int Hs_Create(HsHandle **);
 /*
  * Init handle
  */
-int Hs_Init(HsHandle *, int, float PAPR_TH, float PHPR_TH, float PNPR_TH);
+int Hs_Init(HsHandle *, int, float PAPR_TH, float PHPR_TH, float PNPR_TH, float IMSD_TH);
 
 /*
  * Howling suppression handle free function

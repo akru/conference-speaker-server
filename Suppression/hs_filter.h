@@ -9,7 +9,8 @@ class HSFilter : public Filter
 {
 public:
     HSFilter(quint32 sample_rate,
-             float PAPR_TH = 0, float PHPR_TH = 0, float PNPR_TH = 0);
+             float PAPR_TH = 0, float PHPR_TH = 0,
+             float PNPR_TH = 0, float ISMD_TH = 0);
     ~HSFilter();
 
     QByteArray process(const QByteArray &sample);
