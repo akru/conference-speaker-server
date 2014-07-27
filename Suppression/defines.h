@@ -13,7 +13,7 @@
 
 #define PI_F 3.1415926535897932384626433832795f
 
-
+//#define HS_DEBUG
 #define HS_BUF_COUNT        20
 #define HS_BLOCKL_INP       256
 #define HS_BLOCKL           512                         // In bins
@@ -39,7 +39,7 @@
 //#define PROCESS_FLOW_1    // Use traditional with DD estimate of prior SNR.
 #define PROCESS_FLOW_2    // Use the new method of speech/noise classification.
 
-#define BLOCKL_MAX          160 // max processing block length: 160
+#define BLOCKL_MAX          256 // max processing block length: 160
 #define ANAL_BLOCKL_MAX     256 // max analysis block length: 256
 #define HALF_ANAL_BLOCKL    129 // half max analysis block length + 1
 

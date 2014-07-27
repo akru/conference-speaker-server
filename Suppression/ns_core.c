@@ -78,30 +78,16 @@ int WebRtcNs_InitCore(NSinst_t* inst, WebRtc_UWord32 fs) {
   }
 
   // Initialization of struct
-  if (fs == 8000 || fs == 16000 || fs == 32000) {
+  if (fs == 8000) {
     inst->fs = fs;
   } else {
     return -1;
   }
   inst->windShift = 0;
   if (fs == 8000) {
-    // We only support 10ms frames
-    inst->blockLen = 80;
-    inst->blockLen10ms = 80;
-    inst->anaLen = 128;
-    inst->window = kBlocks80w128;
-    inst->outLen = 0;
-  } else if (fs == 16000) {
-    // We only support 10ms frames
-    inst->blockLen = 160;
-    inst->blockLen10ms = 160;
-    inst->anaLen = 256;
-    inst->window = kBlocks160w256;
-    inst->outLen = 0;
-  } else if (fs == 32000) {
-    // We only support 10ms frames
-    inst->blockLen = 160;
-    inst->blockLen10ms = 160;
+    // We only support 256 point frames
+    inst->blockLen = 256;
+    inst->blockLen10ms = 256;
     inst->anaLen = 256;
     inst->window = kBlocks160w256;
     inst->outLen = 0;

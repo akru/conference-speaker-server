@@ -7,7 +7,8 @@
 #include <hs_filter.h>
 
 #ifdef QT_DEBUG
-#include <QListWidget>
+#include <QTextBrowser>
+#include <QTimer>
 #endif
 
 #include <QDebug>
@@ -68,13 +69,18 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    //filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
+    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
 //    filters.append(new HSFilter(SAMPLE_RATE));
 #ifdef QT_DEBUG
     hs_filter = new HSFilter(SAMPLE_RATE);
     connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),
             SLOT(setTrashHolds(qreal,qreal,qreal,qreal)));
     debug_dialog.show();
+    filters.append(hs_filter);
+    QTimer *t = new QTimer;
+    t->setInterval(500);
+    connect(t, SIGNAL(timeout()), SLOT(showDebug()));
+    t->start();
 #endif
 }
 
@@ -106,27 +112,25 @@ void Speaker::setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal ISMD)
     hs_filter = new HSFilter(SAMPLE_RATE, PAPR, PHPR, PNPR, ISMD);
 }
 
-void Speaker::showDebug(Filter *f)
+void Speaker::showDebug()
 {
-    HsHandle *hs = ((HSFilter *) f)->handle();
-    QListWidget *groupList  = debug_dialog.groupList(),
-                *filterList = debug_dialog.filterList();
-
-    QString groupTempl = "%1. center %2 Hz; gain %3 dB; count %4:",
-            groupFreqTempl = "\t%1. %2 Hz";
+    HsHandle *hs = ((HSFilter *) hs_filter)->handle();
+    QString groupTempl = "%1. center <b>%2 Hz</b>; gain <b>%3 dB</b>; count <b>%4</b>:<br>",
+            groupFreqTempl = "<span style=\"margin-right: 15px\">%1. <b>%2 Hz</b></span><br>",
+            groupText = "";
     for (short i = 0; i < hs->filterCount; ++i)
     {
-        groupList->addItem(groupTempl.arg(i)
-                                     .arg(hs->group[i].center)
-                                     .arg(hs->group[i].gain)
-                                     .arg(hs->group[i].freqCount));
+        groupText += groupTempl.arg(i).arg(hs->group[i].center)
+                                      .arg(hs->group[i].gain)
+                                      .arg(hs->group[i].freqCount);
         for (short j = 0; j < hs->group[i].freqCount; ++j)
-            groupList->addItem(groupFreqTempl.arg(j, hs->group[i].freq[j]));
+            groupText += groupFreqTempl.arg(j, hs->group[i].freq[j]);
     }
-
-    QString filterTempl = "%1. freq %2 Hz; gain %3 dB";
-    for (short i = 0; i < hs->filterCount; ++i)
-        filterList->addItem(filterTempl.arg(i, hs->filter[i].freq, hs->filter[i].peakGain));
+    if (hs->filterCount)
+    {
+        QTextBrowser *groupList  = debug_dialog.textBrowser();
+        groupList->setText(groupText);
+    }
 }
 #endif
 
@@ -134,17 +138,12 @@ void Speaker::play(const QByteArray &packet)
 {
     Q_ASSERT(audio_buffer);
     // Prepare sample
-//    Sample sample(packet);
     QByteArray sample(packet);
     // Apply filters
-#ifdef QT_DEBUG
-    sample = hs_filter->process(sample);
-    showDebug(hs_filter);
-#endif
-//    foreach (Filter *f, filters) {
-//        qDebug() << "Applying:" << f->name();
-//        sample = f->process(sample);
-//    }
+    foreach (Filter *f, filters) {
+        qDebug() << "Applying:" << f->name();
+        sample = f->process(sample);
+    }
     // Analyze sample amplitude
     ampAnalyze(sample);
     // Play buffer

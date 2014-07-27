@@ -21,9 +21,6 @@ public:
     {
         return disabled;
     }
-#ifdef QT_DEBUG
-    void showDebug(Filter *f);
-#endif
 
 signals:
     void audioAmpUpdated(int amplitude);
@@ -32,6 +29,7 @@ public slots:
     void setVolume(qreal volume);
 #ifdef QT_DEBUG
     void setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal ISMD);
+    void showDebug();
 #endif
     void play(const QByteArray &packet);
 

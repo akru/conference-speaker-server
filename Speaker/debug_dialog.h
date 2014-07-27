@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-class QListWidget;
+class QTextBrowser;
 
 namespace Ui {
 class DebugDialog;
@@ -16,8 +16,7 @@ class DebugDialog : public QDialog
 public:
     explicit DebugDialog(QWidget *parent = 0);
     ~DebugDialog();
-    QListWidget * filterList() const;
-    QListWidget * groupList() const;
+    QTextBrowser * textBrowser() const;
 
 signals:
     void trasholdes(qreal, qreal, qreal, qreal);

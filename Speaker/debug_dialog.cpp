@@ -13,15 +13,9 @@ DebugDialog::~DebugDialog()
     delete ui;
 }
 
-QListWidget * DebugDialog::filterList() const
+QTextBrowser * DebugDialog::textBrowser() const
 {
-    return ui->filterList;
-}
-
-
-QListWidget * DebugDialog::groupList() const
-{
-    return ui->groupList;
+    return ui->textBrowser;
 }
 
 void DebugDialog::on_pushButton_clicked()
