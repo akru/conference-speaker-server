@@ -21,6 +21,7 @@ typedef struct
     // Filters data
     HsBiquadParams filter[HS_BIQUAD_COUNT];
     int            filterCount;
+    HsFreqGroup    group[HS_BIQUAD_COUNT];
 } HsHandle;
 
 /*

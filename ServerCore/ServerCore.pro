@@ -20,5 +20,11 @@ macx {
     DEFINES += MACOSX
 }
 
+
+CONFIG(debug): {
+    QT      += gui
+    greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+}
+
 INCLUDEPATH += $$PWD/../Protocol $$PWD/../Speaker
 DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker

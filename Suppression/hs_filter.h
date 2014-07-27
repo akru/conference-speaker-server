@@ -16,6 +16,10 @@ public:
     QByteArray process(const QByteArray &sample);
     QString name() { return "Howling suppression"; }
 
+#ifdef QT_DEBUG
+    HsHandle *handle() const;
+#endif
+
 private:
     HsHandle *hs_ptr;
 };

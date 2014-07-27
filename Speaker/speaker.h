@@ -4,6 +4,7 @@
 #include <QList>
 #include <QObject>
 #include "filter.h"
+#include "debug_dialog.h"
 
 class QAudioOutput;
 class QAudioFormat;
@@ -20,15 +21,19 @@ public:
     {
         return disabled;
     }
+#ifdef QT_DEBUG
+    void showDebug(Filter *f);
+#endif
 
 signals:
     void audioAmpUpdated(int amplitude);
 
 public slots:
     void setVolume(qreal volume);
+#ifdef QT_DEBUG
+    void setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal ISMD);
+#endif
     void play(const QByteArray &packet);
-
-private slots:
 
 private:
     void ampAnalyze(const QByteArray &sample);
@@ -38,6 +43,10 @@ private:
     QAudioOutput    *audio;
     QIODevice       *audio_buffer;
     QList<Filter *> filters;
+#ifdef QT_DEBUG
+    Filter          *hs_filter;
+    DebugDialog     debug_dialog;
+#endif
 };
 
 #endif // SPEAKER_H

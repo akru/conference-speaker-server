@@ -29,14 +29,14 @@ float Hs_BiquadCascade(HsHandle *inst, float in)
  */
 void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
 {
-    HsFreqGroup group[HS_BIQUAD_COUNT];
+    HsFreqGroup *group = inst->group;
     memset(group, 0, sizeof(HsFreqGroup) * HS_BIQUAD_COUNT);
-    short       groupCount = 0;
+    int groupCount = 0;
     // Enumerate howling freq's
     for (short i = 0; i < freqCount && groupCount < HS_BIQUAD_COUNT; ++i)
     {
         for (short j = 0; j  < groupCount; ++j)
-            if (abs(howlingFreq[i] - group[j].center) < HS_FREQ_DEVIATION)
+            if (abs(howlingFreq[i] - inst->group[j].center) < HS_FREQ_DEVIATION)
             {
                 if (group[j].freqCount < HS_GROUP_FREQ_MAX)
                 {
@@ -89,7 +89,7 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
         }
     }
     // Print group information
-#ifndef QT_NO_DEBUG
+#ifdef QT_DEBUG
     fprintf(stderr, "Founded %d freq groups:\n", groupCount);
     for (short i = 0; i < groupCount; ++i)
     {
@@ -346,7 +346,7 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
     }
 
     // Print freq information
-#ifndef QT_NO_DEBUG
+#ifdef QT_DEBUG
     fprintf(stderr, "Detected %d hoOowling:\n", freqCount);
     for (short i = 0; i < freqCount; ++i)
         fprintf(stderr, "%d. %d Hz\n", i + 1, howlingFreq[i]);
@@ -355,7 +355,7 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
     Hs_BiquadUpdate(inst, howlingFreq, freqCount);
 
     // Print filter information
-#ifndef QT_NO_DEBUG
+#ifdef QT_DEBUG
     fprintf(stderr, "Enabled %d filters:\n", inst->filterCount);
     for (short i = 0; i < inst->filterCount; ++i)
         fprintf(stderr, "%d. freq %f Hz, gain %f dB, Q %f\n", i + 1,

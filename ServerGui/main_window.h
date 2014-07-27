@@ -5,6 +5,9 @@
 #include <QMainWindow>
 #include <user_information.h>
 
+#ifdef QT_DEBUG
+#include "debug_dialog.h"
+#endif
 #include "settings_dialog.h"
 #include "channel_widget.h"
 #include "request_widget.h"

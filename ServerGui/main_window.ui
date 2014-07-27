@@ -43,16 +43,7 @@ QListWidget::item {
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0" columnstretch="0,0,0">
-    <property name="leftMargin">
-     <number>16</number>
-    </property>
-    <property name="topMargin">
-     <number>16</number>
-    </property>
-    <property name="rightMargin">
-     <number>16</number>
-    </property>
-    <property name="bottomMargin">
+    <property name="margin">
      <number>16</number>
     </property>
     <item row="2" column="0" colspan="3">
@@ -208,9 +199,6 @@ font: 14pt;
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustIgnored</enum>
-      </property>
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -219,24 +207,15 @@ font: 14pt;
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>284</width>
-         <height>160</height>
+         <width>280</width>
+         <height>139</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>0</number>
         </property>
        </layout>
@@ -271,24 +250,15 @@ font: 14pt;
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>284</width>
-         <height>315</height>
+         <width>280</width>
+         <height>300</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>0</number>
         </property>
        </layout>
@@ -303,7 +273,7 @@ font: 14pt;
      <x>0</x>
      <y>0</y>
      <width>944</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

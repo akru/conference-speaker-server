@@ -35,3 +35,10 @@ QByteArray HSFilter::process(const QByteArray &sample)
     Hs_Process(hs_ptr, (qint16 *) sample.data(), (qint16 *) out.data());
     return out;
 }
+
+#ifdef QT_DEBUG
+HsHandle * HSFilter::handle() const
+{
+    return hs_ptr;
+}
+#endif
