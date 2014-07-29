@@ -20,7 +20,7 @@ float Hs_FreqGroupQ(HsFreqGroup *inst)
 /*
  * Init IIR filter
  */
-void Hs_BiquadInit(HsBiquadParams *inst)
+void BiquadInit(BiquadParams *inst)
 {
     inst->Q = 1;
     inst->peakGain = -3.0;
@@ -30,9 +30,9 @@ void Hs_BiquadInit(HsBiquadParams *inst)
 }
 
 /*
- * Calc biquad IIR coefs
+ * Calc notch biquad IIR coefs
  */
-void Hs_BiquadCalc(HsBiquadParams *inst, HsFreqGroup *group)
+void BiquadCalcNotch(BiquadParams *inst, HsFreqGroup *group)
 {
     if (group)
     {
@@ -65,9 +65,24 @@ void Hs_BiquadCalc(HsBiquadParams *inst, HsFreqGroup *group)
 }
 
 /*
+ * Calc bandpass biquad IIR coefs
+ */
+void BiquadCalcBandpass(BiquadParams *inst)
+{
+    float Fc   = inst->freq / 8000.0,
+          K    = tanf(PI_F * Fc),
+          norm = 1 / (1 + K / inst->Q + K * K);
+    inst->a0 = K / inst->Q * norm;
+    inst->a1 = 0;
+    inst->a2 = -inst->a0;
+    inst->b1 = 2 * (K * K - 1) * norm;
+    inst->b2 = (1 - K / inst->Q + K * K) * norm;
+}
+
+/*
  * Process IIR filter
  */
-float Hs_BiquadProcess(HsBiquadParams *inst, float in)
+float BiquadProcess(BiquadParams *inst, float in)
 {
     float out = in * inst->a0 + inst->z1;
     inst->z1  = in * inst->a1 + inst->z2 - inst->b1 * out;

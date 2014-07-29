@@ -14,12 +14,11 @@ typedef struct
     // Analyzer data
     int   ip[HS_IP_LENGTH];
     float wfft[HS_W_LENGTH],
-          dataBuf[HS_BLOCKL_MAX],
-          rdftBuf[HS_BLOCKL_MAX],
+          rdftBuf[HS_BLOCKL_A_MAX],
     // Trasholds
           PAPR_TH, PHPR_TH, PNPR_TH, IMSD_TH;
     // Filters data
-    HsBiquadParams filter[HS_BIQUAD_COUNT];
+    BiquadParams   filter[HS_BIQUAD_COUNT];
     int            filterCount;
     HsFreqGroup    group[HS_BIQUAD_COUNT];
 } HsHandle;

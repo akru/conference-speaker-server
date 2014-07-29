@@ -1,15 +1,19 @@
 #include <hs_filter.h>
+#include <bandswitch_filter.h>
 #include <biquad.h>
 #include <QDebug>
 #include <QFile>
 #include <QTime>
 
 #define HOWLING_SUPPRESSION
+//#define BANDSWITCH
 
 int main()
 {
 #ifdef HOWLING_SUPPRESSION
     HSFilter f(8000);
+#elif defined(BANDSWITCH)
+    BandswitchFilter f(8000);
 #else
     HsBiquadParams f;
     Hs_BiquadInit(&f);
@@ -34,7 +38,7 @@ int main()
         if (sam.length() == 512)
         {
             t = QTime::currentTime();
-#ifdef HOWLING_SUPPRESSION
+#if defined(HOWLING_SUPPRESSION) || defined(BANDSWITCH)
             res = f.process(sam);
 #else
             qint16 *output = (qint16 *) res.data();

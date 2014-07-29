@@ -13,7 +13,8 @@ SOURCES  += \
     howling_suppression.c \
     ns_filter.cpp \
     hs_filter.cpp \
-    biquad.c
+    biquad.c \
+    bandswitch_filter.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -26,4 +27,5 @@ HEADERS  += \
     howling_suppression.h \
     ns_filter.h \
     hs_filter.h \
-    biquad.h
+    biquad.h \
+    bandswitch_filter.h

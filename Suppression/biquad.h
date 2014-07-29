@@ -20,7 +20,7 @@ typedef struct
     float a0, a1, a2, b1, b2,
           Q, peakGain, freq,
           z1, z2;
-} HsBiquadParams;
+} BiquadParams;
 
 /*
  *Evaluate center of group
@@ -30,17 +30,22 @@ short Hs_FreqGroupCenter(HsFreqGroup *);
 /*
  * Init IIR filter
  */
-void Hs_BiquadInit(HsBiquadParams *);
+void BiquadInit(BiquadParams *);
 
 /*
- * Calc biquad IIR coefs
+ * Calc notch biquad IIR coefs
  */
-void Hs_BiquadCalc(HsBiquadParams *, HsFreqGroup *group);
+void BiquadCalcNotch(BiquadParams *, HsFreqGroup *group);
+
+/*
+ * Calc bandpass biquad IIR coefs
+ */
+void BiquadCalcBandpass(BiquadParams *);
 
 /*
  * Process IIR filter
  */
-float Hs_BiquadProcess(HsBiquadParams *, float);
+float BiquadProcess(BiquadParams *, float);
 
 #ifdef __cplusplus
 }

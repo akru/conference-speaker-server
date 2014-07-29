@@ -18,9 +18,9 @@ inline float mod(float a[], int i) { return sqrtf(a[i] * a[i] + a[i+1] * a[i+1])
 float Hs_BiquadCascade(HsHandle *inst, float in)
 {
     int count              = inst->filterCount;
-    HsBiquadParams *filter = inst->filter;
+    BiquadParams *filter   = inst->filter;
     while (count--)
-        in = Hs_BiquadProcess(filter++, in);
+        in = BiquadProcess(filter++, in);
     return in;
 }
 
@@ -103,7 +103,7 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
 #endif
     // Create filters
     for (short i = 0; i < groupCount; ++i)
-        Hs_BiquadCalc(inst->filter + i, group + i);
+        BiquadCalcNotch(inst->filter + i, group + i);
     inst->filterCount = groupCount;
 }
 
@@ -114,12 +114,12 @@ void Hs_EvaluatePAPR(float Y[], float PAPR[])
 {
     // -- Energy
     float energy = 0;
-    for (short i = 0; i < HS_BLOCKL; ++i)
+    for (short i = 0; i < HS_BLOCKL_A; ++i)
         energy += quad(Y[i]);
     energy /= HS_BLOCKL;
     // -- Elements
     float *PAPR_p = PAPR;
-    for (short i = 0; i < HS_BLOCKL; ++i)
+    for (short i = 0; i < HS_BLOCKL_A; ++i)
         *PAPR_p++ = 10 * log10f(quad(Y[i]) / energy);
 }
 
@@ -128,15 +128,15 @@ void Hs_EvaluatePAPR(float Y[], float PAPR[])
  */
 void Hs_EvaluatePHPR(float Y[], float PHPR[])
 {
-    for (short i = 0, i2; i < HS_BLOCKL; ++i)
+    for (short i = 0, i2; i < HS_BLOCKL_A; ++i)
     {
-        PHPR[i] = 0;
+        PHPR[i] = HS_PHPR_UNDEF;
         i2 = 2 * i; // m = 2
-        if (i2 < HS_BLOCKL)
+        if (i2 < HS_BLOCKL_A)
             PHPR[i] = 10 * log10f(quad(Y[i]) / quad(Y[i2]));
 
         i2 = 3 * i; // m = 3
-        if (i2 < HS_BLOCKL)
+        if (i2 < HS_BLOCKL_A)
         {
             float phprc = 10 * log10f(quad(Y[i]) / quad(Y[i2]));
             if (phprc > PHPR[i])
@@ -151,14 +151,18 @@ void Hs_EvaluatePHPR(float Y[], float PHPR[])
 void Hs_EvaluatePNPR(float Y[], float PNPR[])
 {
     static const int m[10] = {1, -1, 2, -2, 3, -3, 4, -4, 5, -5};
-    for (short i = 0; i < HS_BLOCKL; ++i)
+    for (short i = 0; i < HS_BLOCKL_A; ++i)
     {
         PNPR[i] = 0;
         for (short j = 0, i2; j < 10; ++j)
         {
             i2 = HS_RAD_TO_INDEX * (HS_INDEX_TO_RAD * i + 2 * PI_F * m[j] / HS_M);
-            if (i2 < HS_BLOCKL)
+            if (i2 < HS_BLOCKL_A)
                 PNPR[i] += 10 * log10f(quad(Y[i]) / quad(Y[i2]));
+#ifdef HS_DEBUG
+            else
+                fprintf(stderr, "PNPR out of RANGE on %d\n", HS_INDEX_TO_HZ * i);
+#endif
         }
     }
 }
@@ -172,19 +176,19 @@ void Hs_EvaluateIMSD(float Y[], float IMSD[])
                 P   = 1,
                 t   = HS_BUF_COUNT - 1;
     float fst_sum, snd_sum;
-    for (short i = 0; i < HS_BLOCKL; ++i)
+    for (short i = 0; i < HS_BLOCKL_A; ++i)
     {
         IMSD[i] = 0;
         fst_sum = 0;
         for (short j = 0; j < Q_m; ++j)
-            fst_sum += 20 * (log10f(Y[(t - j*P) * HS_BLOCKL + i])
-                    - log10f(Y[(t - Q_m*P)*HS_BLOCKL + i])) / (Q_m - j);
+            fst_sum += 20 * (log10f(Y[(t - j*P) * HS_BLOCKL_A + i])
+                    - log10f(Y[(t - Q_m*P)*HS_BLOCKL_A + i])) / (Q_m - j);
         for (short m = 1; m < Q_m; ++m)
         {
             snd_sum = 0;
             for (short j = 0; j < m; ++j)
-                snd_sum += 20 * (log10f(Y[(t - j*P) * HS_BLOCKL + i])
-                                - log10f(Y[(t - m*P)*HS_BLOCKL + i])) / (m - j);
+                snd_sum += 20 * (log10f(Y[(t - j*P) * HS_BLOCKL_A + i])
+                                - log10f(Y[(t - m*P)*HS_BLOCKL_A + i])) / (m - j);
             IMSD[i] += fst_sum / Q_m - snd_sum / m;
         }
     }
@@ -196,47 +200,42 @@ void Hs_EvaluateIMSD(float Y[], float IMSD[])
  */
 int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const short *input)
 {
-    float fin[HS_BLOCKL * 2];
-    // Convert input data to float
-    for (short i = 0; i < HS_BLOCKL_INP; ++i)
-        fin[i] = (float) input[i];
-
-    // Shift buffer
-    memcpy(inst->dataBuf, inst->dataBuf + HS_BLOCKL_INP,
-           sizeof(float) * (HS_BLOCKL_MAX - HS_BLOCKL_INP));     // Shift
-    memcpy(inst->dataBuf + HS_BLOCKL_MAX - HS_BLOCKL_INP, fin,
-           sizeof(float) * HS_BLOCKL_INP);                       // Copy new data
-
-    // Apply window to new buffer
-    for (short i = 0; i < HS_BLOCKL * 2; ++i)
-        fin[i] = inst->dataBuf[HS_BLOCKL_MAX - HS_BLOCKL * 2 + i] * kBlocks480w1024[i];
+    float fin[HS_BLOCKL];
+    // Convert input data to float and apply window
+    for (short i = 0; i < HS_BLOCKL; ++i)
+        fin[i] = (float) input[i] * kBlackmanWindow256[i];
 
     // Apply RDFT
-    rdft(HS_BLOCKL * 2, 1, fin, inst->ip, inst->wfft);
+    rdft(HS_BLOCKL, 1, fin, inst->ip, inst->wfft);
 
     // Calc modulo
-    for (short i = 0; i < HS_BLOCKL * 2; i += 2)
+    for (short i = 0; i < HS_BLOCKL; i += 2)
         fin[i / 2] = mod(fin, i);
 
     // Shift RDFT buffer
-    memcpy(inst->rdftBuf, inst->rdftBuf + HS_BLOCKL,
-           sizeof(float) * (HS_BLOCKL_MAX - HS_BLOCKL));     // Shift
-    memcpy(inst->rdftBuf + HS_BLOCKL_MAX - HS_BLOCKL, fin,
-           sizeof(float) * HS_BLOCKL);                       // Copy new data
+    memcpy(inst->rdftBuf, inst->rdftBuf + HS_BLOCKL_A,
+           sizeof(float) * (HS_BLOCKL_A_MAX - HS_BLOCKL_A));     // Shift
+    memcpy(inst->rdftBuf + HS_BLOCKL_A_MAX - HS_BLOCKL_A, fin,
+           sizeof(float) * HS_BLOCKL_A);                       // Copy new data
 
     // Calc criteries
-    float papr[HS_BLOCKL],
-          phpr[HS_BLOCKL],
-          pnpr[HS_BLOCKL],
-          imsd[HS_BLOCKL];
+    float papr[HS_BLOCKL_A],
+          phpr[HS_BLOCKL_A],
+          pnpr[HS_BLOCKL_A],
+          imsd[HS_BLOCKL_A];
     Hs_EvaluatePAPR(fin, papr);
     Hs_EvaluatePHPR(fin, phpr);
     Hs_EvaluatePNPR(fin, pnpr);
     Hs_EvaluateIMSD(inst->rdftBuf, imsd);
 
+#ifdef HS_DEBUG
+    fprintf(stderr, "HS_TRASH: PAPR_TH = %f, PHPR_TH = %f, PNPR_TH = %f, IMSD = %f\n",
+            inst->PAPR_TH, inst->PHPR_TH, inst->PNPR_TH, inst->IMSD_TH);
+#endif
+
     // Evaluate howling freq
     int   hFreqCount = 0, freq;
-    for (short i = 0; i < HS_BLOCKL; ++i)
+    for (short i = 0; i < HS_BLOCKL_A; ++i)
     {
 #ifdef HS_DEBUG
         const char *out;
@@ -298,12 +297,11 @@ int Hs_Init(HsHandle *inst, int fs,
 
     // Initialize fft work arrays.
     inst->ip[0] = 0; // Setting this triggers initialization.
-    memset(inst->dataBuf, 0, sizeof(float) * HS_BLOCKL_MAX);
-    rdft(HS_BLOCKL, 1, inst->dataBuf, inst->ip, inst->wfft);
-    memset(inst->dataBuf, 0, sizeof(float) * HS_BLOCKL_MAX);
+    memset(inst->rdftBuf, 0, sizeof(float) * HS_BLOCKL_A_MAX);
+    rdft(HS_BLOCKL, 1, inst->rdftBuf, inst->ip, inst->wfft);
 
     if (!PAPR_TH)
-        inst->PAPR_TH = 10 * log10f(quad(HS_BLOCKL_MAX / 150));
+        inst->PAPR_TH = 10 * log10f(quad(HS_BLOCKL_A_MAX / 150));
     else
         inst->PAPR_TH = PAPR_TH;
 
@@ -322,7 +320,7 @@ int Hs_Init(HsHandle *inst, int fs,
     else
         inst->IMSD_TH = IMSD_TH;
 
-#ifndef HS_DEBUG
+#ifdef HS_DEBUG
         fprintf(stderr, "HS_INIT: PAPR_TH = %f, PHPR_TH = %f, PNPR_TH = %f, IMSD = %f\n",
                 PAPR_TH, PHPR_TH, PNPR_TH, IMSD_TH);
 #endif
@@ -341,7 +339,7 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
     if (!freqCount && !inst->filterCount)
     {
         // Howling not found
-        memcpy(output, input, HS_BLOCKL_INP * sizeof(short));
+        memcpy(output, input, HS_BLOCKL * sizeof(short));
         return;
     }
 
@@ -365,6 +363,6 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
 #endif
     // Apply IIR filter
     const short *input_p = input;
-    while (input_p < input + HS_BLOCKL_INP)
+    while (input_p < input + HS_BLOCKL)
         *output++ = Hs_BiquadCascade(inst, *input_p++);
 }

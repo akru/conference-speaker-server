@@ -11,8 +11,15 @@
 #ifndef WEBRTC_MODULES_AUDIO_PROCESSING_UTILITY_FFT4G_H_
 #define WEBRTC_MODULES_AUDIO_PROCESSING_UTILITY_FFT4G_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void rdft(int, int, float *, int *, float *);
 void cdft(int, int, float *, int *, float *);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
