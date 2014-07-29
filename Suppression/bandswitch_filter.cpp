@@ -51,6 +51,9 @@ QByteArray BandswitchFilter::process(const QByteArray &sample)
     }
     // IFFT
     rdft(HS_BLOCKL, -1, outVect[0], ip, wfft);
+    for (short j = 0; j <= HS_BLOCKL - 1; j++) {
+        outVect[0][j] *= 2.0 / HS_BLOCKL;
+    }
     // Gen output
     QByteArray out; out.resize(sample.length());
     qint16 *out_p = (qint16 *) out.data();
