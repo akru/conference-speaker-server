@@ -1,0 +1,20 @@
+<!doctype HTML>
+<html>
+
+    <script>
+        var current = 0;
+        function next() {
+            var img = document.getElementById('frame_img');
+            current = current + 1;
+            img.src = 'img/frame_' + current + '.svg';
+        }
+        function back() {
+            var img = document.getElementById('frame_img');
+            current = current - 1;
+            img.src = 'img/frame_' + current + '.svg';
+        }
+    </script>
+    <button id=back_button onclick="back()">Back</button>
+    <img id=frame_img src="img/frame_0.svg" onclick="next()" />
+
+</html>
