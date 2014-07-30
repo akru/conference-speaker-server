@@ -18,7 +18,7 @@ def main():
 
     count = 0
     for f in frame:
-        line_chart = pygal.Bar(width=1080)
+        line_chart = pygal.Line(show_dots=False, width=1080, interpolate='hermite', interpolation_parameters={'type': 'cardinal', 'c': .75})
         line_chart.title = 'Frame {0}ms'.format(count*32) 
         line_chart.x_labels = map(lambda (a,b,c,d,e): a, f['data'])
         line_chart.add('PAPR', map(lambda (a,b,c,d,e): float(b), f['data']))
