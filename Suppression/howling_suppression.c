@@ -242,13 +242,13 @@ int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const short *input)
         // Some magic freq converter from index
         freq = HS_INDEX_TO_HZ * i;
         fprintf(stderr, "Freq %d Hz >\t", freq);
-        out = papr[i] > inst->PAPR_TH ? "+" : "";
+        out = papr[i] > inst->PAPR_TH ? "+" : " ";
         fprintf(stderr, "PAPR : %.1f %s\t", papr[i], out);
-        out = phpr[i] > inst->PHPR_TH ? "+" : "";
+        out = phpr[i] > inst->PHPR_TH ? "+" : " ";
         fprintf(stderr, "PHPR : %.1f %s\t", phpr[i], out);
-        out = pnpr[i] > inst->PNPR_TH ? "+" : "";
+        out = pnpr[i] > inst->PNPR_TH ? "+" : " ";
         fprintf(stderr, "PNPR : %.1f %s\t", pnpr[i], out);
-        out = fabsf(imsd[i]) < inst->IMSD_TH ? "+" : "";
+        out = fabsf(imsd[i]) < inst->IMSD_TH ? "+" : " ";
         fprintf(stderr, "IMSD : %.1f %s\t", imsd[i], out);
         if ( papr[i] > inst->PAPR_TH &&
              phpr[i] > inst->PHPR_TH &&

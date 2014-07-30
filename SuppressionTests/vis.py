@@ -2,19 +2,19 @@
 
 import pygal, sys, re
 
-FLOAT = '[-+]?\d+\.\d*?|\.\d+?'
+FLOAT = '[-+]?\d+\.\d*?'
 TH_TRASH = re.compile('^HS_TRASH: PAPR_TH = ('+FLOAT+'), PHPR_TH = ('+FLOAT+'), PNPR_TH = ('+FLOAT+'), IMSD = ('+FLOAT+')')
-FREQ = re.compile('^Freq (\d+) Hz >\tPAPR : ('+FLOAT+') [\+ ]\tPHPR : ('+FLOAT+') [\+ ]\tPNPR : ('+FLOAT+') [\+ ]\tIMSD : ('+FLOAT+') [\+ ]\t')
+FREQ = re.compile('^Freq (\d+) Hz >\tPAPR : ('+FLOAT+') [+ ]\tPHPR : ('+FLOAT+') [+ ]\tPNPR : ('+FLOAT+') [+ ]\t?IMSD : ('+FLOAT+') [+ ]\t')
 
 def main():
     frame = []
     for line in sys.stdin.readlines():
         res = TH_TRASH.match(line)
         if res:
-            frame.append({'th' : res.group(1,2,3,4), 'data' : []})
+            frame.append({'th' : res.groups(), 'data' : []})
         res = FREQ.match(line)
         if res:
-            frame[len(frame)-1]['data'].append(res.group(1,2,3,4,5))
+            frame[len(frame)-1]['data'].append(res.groups())
 
     count = 0
     for f in frame:
