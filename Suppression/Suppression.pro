@@ -14,7 +14,8 @@ SOURCES  += \
     ns_filter.cpp \
     hs_filter.cpp \
     biquad.c \
-    bandswitch_filter.cpp
+    bandswitch_filter.cpp \
+    hightpass_filter.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -28,4 +29,5 @@ HEADERS  += \
     ns_filter.h \
     hs_filter.h \
     biquad.h \
-    bandswitch_filter.h
+    bandswitch_filter.h \
+    hightpass_filter.h

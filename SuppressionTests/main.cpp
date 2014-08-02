@@ -1,26 +1,15 @@
 #include <hs_filter.h>
 #include <bandswitch_filter.h>
-#include <biquad.h>
+#include <hightpass_filter.h>
 #include <QDebug>
 #include <QFile>
 #include <QTime>
 
-#define HOWLING_SUPPRESSION
-//#define BANDSWITCH
-
 int main()
 {
-#ifdef HOWLING_SUPPRESSION
-    HSFilter f(8000);
-#elif defined(BANDSWITCH)
-    BandswitchFilter f(8000);
-#else
-    HsBiquadParams f;
-    Hs_BiquadInit(&f);
-    f.freq = 600;
-    f.peakGain = -10;
-    Hs_BiquadCalc(&f, 0);
-#endif
+    HightPassFilter hpf;
+    HSFilter hsf(8000);
+    BandswitchFilter bsf(8000);
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);
@@ -30,24 +19,20 @@ int main()
 
     QTime t;
     QByteArray sam, res;
-    res.resize(512);
+    res.resize(512);  short tm = 0;
     while (!audio.atEnd())
     {
         sam = audio.read(512);
-        qDebug() << "len" << sam.length();
         if (sam.length() == 512)
         {
             t = QTime::currentTime();
-#if defined(HOWLING_SUPPRESSION) || defined(BANDSWITCH)
-            res = f.process(sam);
-#else
-            qint16 *output = (qint16 *) res.data();
-            const qint16 *input_p = (qint16 *) sam.data();
-            while ((char *)input_p < sam.data() + 512)
-                *output++ = Hs_BiquadProcess(&f, *input_p++);
-#endif
+
+            res = bsf.process(
+                        hsf.process(
+                            hpf.process(sam)));
+
             phones.write(res);
-            qDebug() << t.elapsed();
+            qDebug() << t.elapsed() << "passed" << tm++ * 32 << "ms";
         }
     }
 

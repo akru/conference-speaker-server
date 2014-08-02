@@ -35,7 +35,7 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
     // Enumerate howling freq's
     for (short i = 0; i < freqCount && groupCount < HS_BIQUAD_COUNT; ++i)
     {
-        for (short j = 0; j  < groupCount; ++j)
+        for (short j = 0; j  < groupCount && howlingFreq[i]; ++j)
             if (abs(howlingFreq[i] - inst->group[j].center) < HS_FREQ_DEVIATION)
             {
                 if (group[j].freqCount < HS_GROUP_FREQ_MAX)
@@ -45,7 +45,17 @@ void Hs_BiquadUpdate(HsHandle *inst, short howlingFreq[], int freqCount)
                 }
                 // Down freq
                 howlingFreq[i] = 0;
-                break;
+            }
+        for (short j = 0; j  < groupCount && howlingFreq[i]; ++j)
+            if (abs(howlingFreq[i] - inst->group[j].center) < HS_FREQ_DEVIATION2)
+            {
+                group[groupCount].freqCount = 1;
+                group[groupCount].freq[0]   = howlingFreq[i];
+                group[groupCount].gain      = inst->group[j].gain;
+                group[groupCount].center    = group[groupCount].freq[0];
+                ++groupCount;
+                // Down freq
+                howlingFreq[i] = 0;
             }
         // When freq is not used - create group
         if (howlingFreq[i])
@@ -159,10 +169,6 @@ void Hs_EvaluatePNPR(float Y[], float PNPR[])
             i2 = HS_RAD_TO_INDEX * (HS_INDEX_TO_RAD * i + 2 * PI_F * m[j] / HS_M);
             if (i2 < HS_BLOCKL_A)
                 PNPR[i] += 10 * log10f(quad(Y[i]) / quad(Y[i2]));
-#ifdef HS_DEBUG
-            else
-                fprintf(stderr, "PNPR out of RANGE on %d\n", HS_INDEX_TO_HZ * i);
-#endif
         }
     }
 }
