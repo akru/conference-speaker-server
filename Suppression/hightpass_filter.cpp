@@ -1,6 +1,8 @@
 #include "hightpass_filter.h"
 
-static float fir[] = {
+#include <QDebug>
+
+static float FIR[] = {
     0.000000, 0.000104, 0.000223, 0.000285, 0.000221,
     0.000000, -0.000329, -0.000638, -0.000758, -0.000551,
     -0.000000, 0.000745, 0.001389, 0.001591, 0.001121,
@@ -23,10 +25,11 @@ static float fir[] = {
     0.000000, 0.000221, 0.000285, 0.000223, 0.000104,
     0.000000
 };
+static const int FIR_LENGTH = sizeof(FIR) / sizeof(float);
 
 HightPassFilter::HightPassFilter()
+    : xv(QVector<float>(FIR_LENGTH, 0))
 {
-    xv.fill(0, sizeof(fir));
 }
 
 HightPassFilter::~HightPassFilter()
@@ -40,18 +43,18 @@ QByteArray HightPassFilter::process(const QByteArray &sample)
 
     qint16 *inp = (qint16 *) sample.data(),
             *outp = (qint16 *) out.data();
-    while ((char *) outp < sample.data() + sample.length())
+    while ((char *) inp < sample.data() + sample.length())
         *outp++ = firProcess(*inp++);
     return out;
 }
 
-qint16 HightPassFilter::firProcess(qint16 wave)
+float HightPassFilter::firProcess(float wave)
 {
     // SV rift
     xv.pop_front(); xv.push_back(wave);
     // Calc res by params and input
     double result = 0;
-    for (short k = 0; k < xv.size(); ++k)
-        result += xv[k] * fir[k];
+    for (short k = 0; k < xv.length(); ++k)
+        result += xv.at(k) * FIR[k];
     return result;
 }

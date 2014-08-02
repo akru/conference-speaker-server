@@ -29,15 +29,13 @@ int main()
 
             res = bsf.process(
                         hsf.process(
-                            hpf.process(sam)));
+                            hpf.process(sam)
+                            )
+                        );
 
             phones.write(res);
             qDebug() << t.elapsed() << "passed" << tm++ * 32 << "ms";
         }
     }
-
-    audio.close();
-    phones.close();
-
     return 0;
 }

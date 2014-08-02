@@ -15,7 +15,7 @@ public:
 
 private:
     QVector<float> xv;
-    qint16 firProcess(qint16 wave);
+    float firProcess(float wave);
 };
 
 #endif // HIGHTPASS_FILTER_H
