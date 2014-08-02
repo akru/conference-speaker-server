@@ -31,6 +31,7 @@
 #define HS_IP_LENGTH        (HS_BLOCKL * 2 >> 1) // Must be at least ceil(2 + sqrt(HS_BLOCKL/2))
 #define HS_W_LENGTH         (HS_BLOCKL * 2 >> 1)
 #define HS_BIQUAD_COUNT     20
+#define HS_FREQ_DEVIATION2  100
 #define HS_FREQ_DEVIATION   50    // Howling freq interpolation range in Hz
 #define HS_FREQ_MIN         10    // Minimal freq
 #define HS_FREQ_MAX         4000  // Maximal freq
