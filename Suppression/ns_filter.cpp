@@ -29,8 +29,7 @@ QByteArray NSFilter::process(const QByteArray &sample)
     Q_ASSERT(sample.length() == 512);
     QByteArray out;
     out.resize(sample.length());
-    qDebug() << "NS process:" <<
-            WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
-                                     (short *)out.data(), NULL);
+    WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
+                             (short *)out.data(), NULL);
     return out;
 }

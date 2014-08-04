@@ -56,8 +56,8 @@
 #define PROCESS_FLOW_2    // Use the new method of speech/noise classification.
 
 #define BLOCKL_MAX          256 // max processing block length: 160
-#define ANAL_BLOCKL_MAX     256 // max analysis block length: 256
-#define HALF_ANAL_BLOCKL    129 // half max analysis block length + 1
+#define ANAL_BLOCKL_MAX     512 // max analysis block length: 256
+#define HALF_ANAL_BLOCKL    257 // half max analysis block length + 1
 
 #define QUANTILE            (float)0.25
 
