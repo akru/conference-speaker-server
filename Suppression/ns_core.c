@@ -88,8 +88,8 @@ int WebRtcNs_InitCore(NSinst_t* inst, WebRtc_UWord32 fs) {
     // We only support 256 point frames
     inst->blockLen = 256;
     inst->blockLen10ms = 256;
-    inst->anaLen = 256;
-    inst->window = kBlocks160w256;
+    inst->anaLen = 512;
+    inst->window = kBlocks240w512;
     inst->outLen = 0;
   }
   inst->magnLen = inst->anaLen / 2 + 1; // Number of frequency bins
