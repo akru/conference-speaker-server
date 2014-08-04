@@ -5,6 +5,8 @@
 
 #include <ns_filter.h>
 #include <hs_filter.h>
+#include <bandswitch_filter.h>
+#include <highpass_filter.h>
 
 #ifdef QT_DEBUG
 #include <QTextBrowser>
@@ -69,14 +71,17 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
-//    filters.append(new HSFilter(SAMPLE_RATE));
+    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::Low));
+    filters.append(new HighPassFilter());
+    HSFilter *hsf = new HSFilter(SAMPLE_RATE,  15, 40, 0, 0.5);
+    hs = hsf->handle();
+    filters.append(hsf);
+    filters.append(new BandswitchFilter(SAMPLE_RATE));
+
 #ifdef QT_DEBUG
-    hs_filter = new HSFilter(SAMPLE_RATE);
     connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),
             SLOT(setTrashHolds(qreal,qreal,qreal,qreal)));
     debug_dialog.show();
-    filters.append(hs_filter);
     QTimer *t = new QTimer;
     t->setInterval(500);
     connect(t, SIGNAL(timeout()), SLOT(showDebug()));
@@ -106,15 +111,16 @@ void Speaker::setVolume(qreal volume)
 }
 
 #ifdef QT_DEBUG
-void Speaker::setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal ISMD)
+void Speaker::setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal IMSD)
 {
-    delete hs_filter;
-    hs_filter = new HSFilter(SAMPLE_RATE, PAPR, PHPR, PNPR, ISMD);
+    hs->PAPR_TH = PAPR;
+    hs->PHPR_TH = PHPR;
+    hs->PNPR_TH = PNPR;
+    hs->IMSD_TH = IMSD;
 }
 
 void Speaker::showDebug()
 {
-    HsHandle *hs = ((HSFilter *) hs_filter)->handle();
     QString groupTempl = "%1. center <b>%2 Hz</b>; gain <b>%3 dB</b>; count <b>%4</b>:<br>",
             groupFreqTempl = "<span style=\"margin-right: 15px\">%1. <b>%2 Hz</b></span><br>",
             groupText = "";
@@ -124,7 +130,7 @@ void Speaker::showDebug()
                                       .arg(hs->group[i].gain)
                                       .arg(hs->group[i].freqCount);
         for (short j = 0; j < hs->group[i].freqCount; ++j)
-            groupText += groupFreqTempl.arg(j, hs->group[i].freq[j]);
+            groupText += groupFreqTempl.arg(j).arg(hs->group[i].freq[j]);
     }
     if (hs->filterCount)
     {

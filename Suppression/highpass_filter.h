@@ -4,18 +4,18 @@
 #include "../Speaker/filter.h"
 #include <QVector>
 
-class HightPassFilter : public Filter
+class HighPassFilter : public Filter
 {
 public:
-    HightPassFilter();
-    ~HightPassFilter();
+    HighPassFilter();
+    ~HighPassFilter();
 
     QByteArray process(const QByteArray &sample);
     QString name() { return "High pass"; }
 
 private:
-    QVector<float> xv;
-    float firProcess(float wave);
+    QVector<double> xv;
+    double firProcess(double wave);
 };
 
 #endif // HIGHTPASS_FILTER_H

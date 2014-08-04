@@ -28,3 +28,7 @@ CONFIG(debug): {
 
 INCLUDEPATH += $$PWD/../Protocol $$PWD/../Speaker
 DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker
+
+INCLUDEPATH += $$PWD/../Suppression
+DEPENDPATH += $$PWD/../Suppression
+
