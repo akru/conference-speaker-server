@@ -73,9 +73,7 @@ Speaker::Speaker(QObject *parent) :
     // Append filters
     filters.append(new NSFilter(SAMPLE_RATE, NSFilter::Low));
     filters.append(new HighPassFilter());
-    HSFilter *hsf = new HSFilter(SAMPLE_RATE,  15, 40, 0, 0.5);
-    hs = hsf->handle();
-    filters.append(hsf);
+    filters.append(new HSFilter(SAMPLE_RATE,  15, 40, 0, 0.5));
     filters.append(new BandswitchFilter(SAMPLE_RATE));
 
 #ifdef QT_DEBUG
@@ -143,8 +141,14 @@ void Speaker::showDebug()
 void Speaker::play(const QByteArray &packet)
 {
     Q_ASSERT(audio_buffer);
+    accBuf.putData((qint16 *) packet.data(),
+                   packet.length() / sizeof(qint16));
+    // When accumulator has too low sounds - skips
+    if (!accBuf.avail(512)) return;
     // Prepare sample
-    QByteArray sample(packet);
+    QByteArray sample(512, 0);
+    accBuf.getData((qint16 *) sample.data(),
+                   sample.length() / sizeof(qint16));
     // Apply filters
     foreach (Filter *f, filters) {
         qDebug() << "Applying:" << f->name();

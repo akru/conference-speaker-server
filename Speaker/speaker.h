@@ -4,8 +4,12 @@
 #include <QList>
 #include <QObject>
 #include "filter.h"
+#include "accbuffer.hpp"
+
+#ifdef QT_DEBUG
 #include "debug_dialog.h"
 #include <hs_filter.h>
+#endif
 
 class QAudioOutput;
 class QAudioFormat;
@@ -42,6 +46,7 @@ private:
     QAudioOutput    *audio;
     QIODevice       *audio_buffer;
     QList<Filter *> filters;
+    AccBuffer<qint16> accBuf;
 #ifdef QT_DEBUG
     HsHandle *hs;
     DebugDialog     debug_dialog;

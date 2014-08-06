@@ -8,6 +8,7 @@ SOURCES  += \
     speaker.cpp
 
 HEADERS += \
+    accbuffer.hpp \
     speaker.h \
     filter.h
 

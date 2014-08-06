@@ -1,13 +1,13 @@
 #include <hs_filter.h>
 #include <bandswitch_filter.h>
-#include <hightpass_filter.h>
+#include <highpass_filter.h>
 #include <QDebug>
 #include <QFile>
 #include <QTime>
 
 int main()
 {
-    HightPassFilter hpf;
+    HighPassFilter hpf;
     HSFilter hsf(8000);
     BandswitchFilter bsf(8000);
 
