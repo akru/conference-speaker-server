@@ -7,7 +7,7 @@ class CompressorFilter : public Filter
 {
 public:
     CompressorFilter(bool  normalize=true,
-                     bool  use_peak=false,
+                     bool  use_peak=true,
                      float threshold=0.25,
                      float attack_time=0.2,
                      float decay_time=1.0,
@@ -17,6 +17,7 @@ public:
                      float noise_floor_db=-40,
                      float noise_floor=0.01);
     ~CompressorFilter();
+
 
     QByteArray process(const QByteArray &sample);
     QString name() { return "Compressor"; }
@@ -60,6 +61,9 @@ private:
     float    *mFollow1;
     float    *mFollow2;
     int       mFollowLen;
+
+    float    *mSampleIn;
+    float    *mSampleOut;
 
     double    mMax;			//MJS
 
