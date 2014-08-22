@@ -17,7 +17,7 @@ static const int BAND_SHIFT_TIME = 1000; // ms; WARN: it divided by frame length
 class BandswitchFilter : public Filter
 {
 public:
-    BandswitchFilter(quint32 sample_rate);
+    BandswitchFilter();
     ~BandswitchFilter();
 
     QByteArray process(const QByteArray &sample);

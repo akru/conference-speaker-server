@@ -3,12 +3,13 @@
 
 #include <QDebug>
 
-NSFilter::NSFilter(quint32 sample_rate, Level level)
-    : len10ms(sample_rate / 100)
+NSFilter::NSFilter(Level level, int count, int trashold)
+    : count(count),
+      trashold(trashold)
 {
     Q_ASSERT(sample_rate == 8000);
 
-    qDebug() << "NSFilter(" << sample_rate << "," << level << ")";
+    qDebug() << "NSFilter(" << level << ")";
 
     if (!WebRtcNs_Create(&ns_ptr))
     {
@@ -26,10 +27,30 @@ NSFilter::~NSFilter()
 
 QByteArray NSFilter::process(const QByteArray &sample)
 {
-    Q_ASSERT(sample.length() == 512);
-    QByteArray out;
-    out.resize(sample.length());
+    Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
+
+    QByteArray out(sample.length(), Qt::Uninitialized);
     WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
                              (short *)out.data(), NULL);
-    return out;
+
+    return postSuppression(out);
+}
+
+QByteArray NSFilter::postSuppression(const QByteArray &sample)
+{
+    qint16 *sample_p = (qint16 *) sample.data();
+    int energy;
+    while ((char *) sample_p < sample.data() + sample.length())
+    {
+        energy = 0;
+        for (short i = 0; i < count && sample_p + i < (qint16 *) sample.data(); ++i)
+            energy += sample_p[i] * sample_p[i];
+
+        if (energy < trashold)
+            for (short i = 0; i < count && sample_p + i < (qint16 *) sample.data(); ++i)
+                *sample_p++ = 0;
+        else
+            sample_p += count;
+    }
+    return sample;
 }

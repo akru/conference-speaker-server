@@ -1,7 +1,7 @@
 #include "bandswitch_filter.h"
 #include "fft4g.h"
 
-BandswitchFilter::BandswitchFilter(quint32 sample_rate)
+BandswitchFilter::BandswitchFilter()
     : currentBand(0),
       iteration(0)
 {
@@ -24,7 +24,8 @@ BandswitchFilter::~BandswitchFilter()
 
 QByteArray BandswitchFilter::process(const QByteArray &sample)
 {
-    Q_ASSERT(sample.length() == 512);
+    Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
+
     if (++iteration > BAND_SHIFT_TIME / 32.0)
     {
         currentBand = (currentBand + 1) % BAND_COUNT;

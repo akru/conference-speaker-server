@@ -15,8 +15,6 @@
 
 #include <QDebug>
 
-const int SAMPLE_RATE = 8000;
-
 #ifdef MACOSX
 Sample convertAudio(Sample &sample)
 {
@@ -52,7 +50,7 @@ Speaker::Speaker(QObject *parent) :
 #ifdef MACOSX
     format->setSampleRate(48000);
 #else
-    format->setSampleRate(SAMPLE_RATE);
+    format->setSampleRate(Filter::sample_rate);
 #endif
     format->setCodec("audio/pcm");
     format->setSampleType(QAudioFormat::SignedInt);
@@ -71,10 +69,10 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
-    filters.append(new HighPassFilter());
-    //filters.append(new HSFilter(SAMPLE_RATE,  15, 40, 0, 0.3));
-    //filters.append(new BandswitchFilter(SAMPLE_RATE));
+    filters.append(new NSFilter(NSFilter::High, 10, 500));
+    filters.append(new HighPassFilter);
+    filters.append(new HSFilter(15, 40, 0, 0.3));
+    filters.append(new BandswitchFilter);
 
 #ifdef QT_DEBUG
     connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),

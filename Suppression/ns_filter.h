@@ -15,15 +15,18 @@ public:
         High
     };
 
-    NSFilter(quint32 sample_rate, Level level);
+    NSFilter(Level level, int count, int trashold);
     ~NSFilter();
 
     QByteArray process(const QByteArray &sample);
     QString name() { return "Noise suppression"; }
 
+protected:
+    QByteArray postSuppression(const QByteArray &sample);
+
 private:
     NsHandle *ns_ptr;
-    short     len10ms;
+    int count, trashold;
 };
 
 #endif // NS_FILTER_H

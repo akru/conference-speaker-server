@@ -3,8 +3,7 @@
 
 #include <QDebug>
 
-HSFilter::HSFilter(quint32 sample_rate,
-                   float PAPR_TH, float PHPR_TH,
+HSFilter::HSFilter(float PAPR_TH, float PHPR_TH,
                    float PNPR_TH, float ISMD_TH)
 {
     Q_ASSERT(sample_rate == 8000);
@@ -27,7 +26,7 @@ HSFilter::~HSFilter()
 
 QByteArray HSFilter::process(const QByteArray &sample)
 {
-    Q_ASSERT(sample.length() == 512);
+    Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
 
     QByteArray out;
     out.resize(sample.length());
