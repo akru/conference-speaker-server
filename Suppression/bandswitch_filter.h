@@ -12,7 +12,7 @@ static const int BAND_FREQ[BAND_COUNT][FILTER_COUNT] = {
     {50, 250, 450, 700, 1000, 1370, 1850, 2500, 3400},
     {150, 350, 570, 840, 1170, 1600, 2150, 2900, 4000}
 };
-static const int BAND_SHIFT_TIME = 10; // ms
+static const int BAND_SHIFT_TIME = 1000; // ms; WARN: it divided by frame length (32 ms)
 
 class BandswitchFilter : public Filter
 {

@@ -289,6 +289,7 @@ int Hs_Create(HsHandle **inst)
 {
     *inst = (HsHandle *) malloc(sizeof(HsHandle));
     if (*inst != NULL) {
+      memset(*inst, 0, sizeof(HsHandle));
       return 0;
     } else {
       return -1;

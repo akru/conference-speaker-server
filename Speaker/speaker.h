@@ -3,6 +3,8 @@
 
 #include <QList>
 #include <QObject>
+#include <QThread>
+#include <QTimer>
 #include "filter.h"
 #include "accbuffer.hpp"
 
@@ -36,17 +38,23 @@ public slots:
     void setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal IMSD);
     void showDebug();
 #endif
-    void play(const QByteArray &packet);
+    void play(QByteArray packet);
+
+private slots:
+    void ampAnalyze(const QByteArray &sample);
+    void speakHeartbeat();
 
 private:
-    void ampAnalyze(const QByteArray &sample);
-
     bool            disabled;
     QAudioFormat    *format;
     QAudioOutput    *audio;
     QIODevice       *audio_buffer;
+
     QList<Filter *> filters;
     AccBuffer<qint16> accBuf;
+
+    QThread         myThread;
+    QTimer          heartbeat;
 #ifdef QT_DEBUG
     HsHandle *hs;
     DebugDialog     debug_dialog;

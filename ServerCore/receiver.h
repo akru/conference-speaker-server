@@ -10,6 +10,7 @@ class Receiver : public QObject
     Q_OBJECT
 public:
     explicit Receiver(QHostAddress address, QObject *parent = 0);
+    ~Receiver();
 
     ChannelInformation getChannelInfo() const
     {
@@ -22,7 +23,8 @@ public:
     }
 
 signals:
-    void audioAmpUpdated(int amplitude);
+    void audioAmpUpdated(int);
+    void sampleReceived(QByteArray);
 
 public slots:
     void setVolume(qreal volume)
@@ -38,9 +40,8 @@ private slots:
     }
 
 private:
-    QUdpSocket sock;
-    QIODevice *buffer;
-    Speaker speaker;
+    QUdpSocket         sock;
+    Speaker            speaker;
     ChannelInformation channel;
 };
 

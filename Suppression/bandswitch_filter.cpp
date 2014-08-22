@@ -9,7 +9,7 @@ BandswitchFilter::BandswitchFilter(quint32 sample_rate)
     filter.resize(BAND_COUNT);
 
     BiquadParams biq;
-    biq.Q = 2; // Because ? I don't know but may be it's working
+    biq.Q = 10; // Because ? I don't know but may be it's working
     for (short i = 0; i < BAND_COUNT; ++i)
         for (short j = 0; j < FILTER_COUNT; ++j)
         {
@@ -25,7 +25,7 @@ BandswitchFilter::~BandswitchFilter()
 QByteArray BandswitchFilter::process(const QByteArray &sample)
 {
     Q_ASSERT(sample.length() == 512);
-    if (++iteration > BAND_SHIFT_TIME)
+    if (++iteration > BAND_SHIFT_TIME / 32.0)
     {
         currentBand = (currentBand + 1) % BAND_COUNT;
         iteration   = 0;
@@ -34,6 +34,8 @@ QByteArray BandswitchFilter::process(const QByteArray &sample)
     int   ip[HS_IP_LENGTH]; ip[0] = 0;
     float wfft[HS_W_LENGTH],
           outVect[FILTER_COUNT + 1][HS_BLOCKL];
+    memset(outVect[0], 0, HS_BLOCKL * sizeof(float));
+    rdft(HS_BLOCKL, 1, outVect[0], ip, wfft);
     memset(outVect[0], 0, HS_BLOCKL * sizeof(float));
 
     const short *input_p;

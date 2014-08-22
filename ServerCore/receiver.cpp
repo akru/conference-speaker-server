@@ -2,10 +2,10 @@
 
 #include <QHostAddress>
 
-
 Receiver::Receiver(QHostAddress address, QObject *parent)
     : QObject(parent)
 {
+    // Bind socket
     if (sock.bind(address))
     {
         channel = ChannelInformation(sock.localAddress().toString(),
@@ -20,6 +20,12 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
         throw(std::exception());
     // Connects with speaker
     connect(&speaker, SIGNAL(audioAmpUpdated(int)), SLOT(updateAmp(int)));
+    connect(this, SIGNAL(sampleReceived(QByteArray)), &speaker, SLOT(play(QByteArray)));
+}
+
+Receiver::~Receiver()
+{
+    sock.close();
 }
 
 void Receiver::sockReadyRead()
@@ -30,6 +36,6 @@ void Receiver::sockReadyRead()
     buf.resize(sock.pendingDatagramSize());
     sock.readDatagram(buf.data(), buf.size());
     // Play sample
-    speaker.play(buf);
+    emit sampleReceived(buf);
 }
 

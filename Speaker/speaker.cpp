@@ -71,10 +71,10 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::Low));
+    filters.append(new NSFilter(SAMPLE_RATE, NSFilter::High));
     filters.append(new HighPassFilter());
-    filters.append(new HSFilter(SAMPLE_RATE,  15, 40, 0, 0.5));
-    filters.append(new BandswitchFilter(SAMPLE_RATE));
+    //filters.append(new HSFilter(SAMPLE_RATE,  15, 40, 0, 0.3));
+    //filters.append(new BandswitchFilter(SAMPLE_RATE));
 
 #ifdef QT_DEBUG
     connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),
@@ -85,10 +85,20 @@ Speaker::Speaker(QObject *parent) :
     connect(t, SIGNAL(timeout()), SLOT(showDebug()));
     t->start();
 #endif
+    // Moving to separate thread
+    this->moveToThread(&myThread);
+    myThread.start(QThread::TimeCriticalPriority);
+    // Starting heartbeat timer
+    connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
+    heartbeat.setInterval(256 / 8);
+    heartbeat.start();
 }
 
 Speaker::~Speaker()
 {
+    myThread.terminate();
+    myThread.wait();
+
     audio->stop();
 
     delete format;
@@ -138,15 +148,23 @@ void Speaker::showDebug()
 }
 #endif
 
-void Speaker::play(const QByteArray &packet)
+void Speaker::play(QByteArray packet)
 {
     Q_ASSERT(audio_buffer);
+    // Analyze sample amplitude
+    ampAnalyze(packet);
+    // Put sample to accum
     accBuf.putData((qint16 *) packet.data(),
                    packet.length() / sizeof(qint16));
+}
+
+void Speaker::speakHeartbeat()
+{
     // When accumulator has too low sounds - skips
-    if (!accBuf.avail(512)) return;
+    if (!accBuf.avail(2048)) return;
+    qDebug() << "Playing...";
     // Prepare sample
-    QByteArray sample(512, 0);
+    QByteArray sample(512, Qt::Uninitialized);
     accBuf.getData((qint16 *) sample.data(),
                    sample.length() / sizeof(qint16));
     // Apply filters
@@ -154,8 +172,6 @@ void Speaker::play(const QByteArray &packet)
         qDebug() << "Applying:" << f->name();
         sample = f->process(sample);
     }
-    // Analyze sample amplitude
-    ampAnalyze(sample);
     // Play buffer
 #ifdef MACOSX
     sample = convertAudio(sample);
