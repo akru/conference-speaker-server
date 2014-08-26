@@ -1,6 +1,7 @@
 #include "ns_filter.h"
 #include "noise_suppression.h"
 
+#include <cmath>
 #include <QDebug>
 
 NSFilter::NSFilter(Level level, int count, int trashold)
@@ -38,20 +39,20 @@ QByteArray NSFilter::process(const QByteArray &sample)
 
 QByteArray NSFilter::postSuppression(const QByteArray &sample)
 {
-    qint16 *sample_p = (qint16 *) sample.data();
+    qint16 *samp = (qint16 *) sample.data();
     int energy; // RMS
-    while ((char *) sample_p < sample.data() + sample.length())
+    for (short pos = 0; pos < sample_length; ++pos)
     {
         energy = 0;
-        for (short i = 0; i < count && sample_p + i < (qint16 *) sample.data(); ++i)
-            energy += sample_p[i] * sample_p[i];
-        energy = sqrt(energy/sample.length());
+        for (short i = 0; i < count && pos + i < sample_length; ++i)
+            energy += samp[pos + i] * samp[pos + i];
+        energy = sqrt(energy / sample_length);
 
         if (energy < trashold)
-            for (short i = 0; i < count && sample_p + i < (qint16 *) sample.data(); ++i)
-                *sample_p++ = 0;
+            for (short i = 0; i < count && pos + i < sample_length; ++i)
+                samp[pos + i] = 0;
         else
-            sample_p += count;
+            pos += count;
     }
     return sample;
 }
