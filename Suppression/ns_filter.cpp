@@ -39,12 +39,13 @@ QByteArray NSFilter::process(const QByteArray &sample)
 QByteArray NSFilter::postSuppression(const QByteArray &sample)
 {
     qint16 *sample_p = (qint16 *) sample.data();
-    int energy;
+    int energy; // RMS
     while ((char *) sample_p < sample.data() + sample.length())
     {
         energy = 0;
         for (short i = 0; i < count && sample_p + i < (qint16 *) sample.data(); ++i)
             energy += sample_p[i] * sample_p[i];
+        energy = sqrt(energy/sample.length());
 
         if (energy < trashold)
             for (short i = 0; i < count && sample_p + i < (qint16 *) sample.data(); ++i)
