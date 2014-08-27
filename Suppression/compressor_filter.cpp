@@ -1,6 +1,8 @@
 #include "compressor_filter.h"
 #include <cmath>
 
+#include <QDebug>
+
 CompressorFilter::CompressorFilter(bool normalize,
                                    bool use_peak,
                                    float threshold,
@@ -25,6 +27,8 @@ CompressorFilter::CompressorFilter(bool normalize,
       mFollow1(new float[sample_length]),
       mFollow2(new float[sample_length]),
       mFollowLen(sample_length),
+      mSampleIn(new float[sample_length]),
+      mSampleOut(new float[sample_length]),
       first_start(true)
 {
     NewTrackPass1();
@@ -35,6 +39,8 @@ CompressorFilter::~CompressorFilter()
     delete [] mCircle;
     delete [] mFollow1;
     delete [] mFollow2;
+    delete [] mSampleIn;
+    delete [] mSampleOut;
 }
 
 bool CompressorFilter::NewTrackPass1()
@@ -268,6 +274,8 @@ float CompressorFilter::DoCompression(float value, double env)
    if(mMax < fabs(out))
       mMax = fabs(out);
 
+   qDebug() << "val:" << value << "cout:" << out << "max" << mMax;
+
    return out;
 }
 
@@ -276,24 +284,30 @@ QByteArray CompressorFilter::process(const QByteArray &sample)
     Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
 
     QByteArray out(sample_length * sizeof(qint16), Qt::Uninitialized);
-    float fin[sample_length],
-          fout[sample_length];
 
+    // Swap buffers
+    float *tmp = mSampleIn;
+    mSampleIn = mSampleOut;
+    mSampleOut = tmp;
+
+    // Read sample
     qint16 *inp = (qint16 *) sample.data();
     for (short i = 0; i < sample_length; ++i)
-        fin[i] = (float) *inp++;
+        mSampleIn[i] = (float) *inp++;
 
+    // Process sample
     if (first_start)
     {
-        TwoBufferProcessPass1(0, fin);
+        TwoBufferProcessPass1(0, mSampleIn);
         first_start = false;
-        memset(fout, 0, sizeof(float) * sample_length);
+        memset(mSampleOut, 0, sizeof(float) * sample_length);
     }
     else
-        TwoBufferProcessPass1(fout, fin);
+        TwoBufferProcessPass1(mSampleOut, mSampleIn);
 
+    // Return sample
     qint16 *outp = (qint16 *) out.data();
     for (short i = 0; i < sample_length; ++i)
-        *outp++ = fout[sample_length];
+        *outp++ = mSampleOut[i];
     return out;
 }
