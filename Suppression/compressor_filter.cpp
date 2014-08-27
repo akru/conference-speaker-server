@@ -3,6 +3,8 @@
 
 #include <QDebug>
 
+#define INT16_DIV (1<<15)
+
 CompressorFilter::CompressorFilter(bool normalize,
                                    bool use_peak,
                                    float threshold,
@@ -100,6 +102,8 @@ bool CompressorFilter::TwoBufferProcessPass1(float *buffer1, float *buffer2)
       }
       if (mNormalize)
           ProcessPass2(buffer1);
+      // Upto
+      buffer1[i] *= INT16_DIV;
    }
 
    // Rotate the buffer pointers
@@ -293,7 +297,7 @@ QByteArray CompressorFilter::process(const QByteArray &sample)
     // Read sample
     qint16 *inp = (qint16 *) sample.data();
     for (short i = 0; i < sample_length; ++i)
-        mSampleIn[i] = (float) *inp++;
+        mSampleIn[i] = (float) *inp++ / INT16_DIV;
 
     // Process sample
     if (first_start)
