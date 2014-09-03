@@ -13,18 +13,15 @@ class Broadcaster : public QObject
 public:
     explicit Broadcaster(QObject *parent = 0);
 
-signals:
-
 public slots:
     void setServerInformation(ServerInformation info);
-
     void sendInformation();
 
 private:
     QList<QHostAddress> addreses;
-    QByteArray serverPacket;
-    QUdpSocket sock;
-    QTimer t;
+    QByteArray          serverPacket;
+    QUdpSocket          sock;
+    QTimer              t;
 };
 
 #endif // BROADCASTER_H

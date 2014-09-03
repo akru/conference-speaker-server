@@ -13,8 +13,8 @@ Server::Server(QString &address, QObject *parent)
     : QObject(parent), server(new QTcpServer)
 {
     connect(server, SIGNAL(newConnection()), SLOT(newConnection()));
-    connect(this, SIGNAL(registrationRequest(Connection*,UserInformation)),
-                  SLOT(registerUser(Connection*,UserInformation)));
+    connect(this, SIGNAL(registrationRequest(QString,UserInformation)),
+                  SLOT(registerUser(QString,UserInformation)));
     connect(this, SIGNAL(channelCloseRequest(QString)), SLOT(closeChannel(QString)));
 
     QHostAddress hostAddress = QHostAddress(address);
@@ -35,16 +35,21 @@ void Server::newConnection()
     QTcpSocket *sock = server->nextPendingConnection();
     while (sock)
     {
-        qDebug() << "New connection from"
-                 << sock->peerAddress().toString();
-        // Create connection instance
-        Connection *c = new Connection(sock);
-        // Connect to incoming data handler
-        connect(c, SIGNAL(readyRead(Connection*)),
-                   SLOT(connectionReadyRead(Connection*)));
-        // Connect to connection destroyer
-        connect(c, SIGNAL(disconnected(Connection*)),
-                   SLOT(connectionClose(Connection*)));
+        if (!clients.contains(sock->peerAddress().toString()))
+        {
+            qDebug() << "New connection from"
+                     << sock->peerAddress().toString();
+            // Create connection instance
+            Connection *c = new Connection(sock, this);
+            // Connect to incoming data handler
+            connect(c, SIGNAL(readyRead(Connection*)),
+                    SLOT(connectionReadyRead(Connection*)));
+            // Connect to connection destroyer
+            connect(c, SIGNAL(disconnected(Connection*)),
+                    SLOT(connectionClose(Connection*)));
+            // Store connection pointer
+            clients[c->getAddress()] = c;
+        }
 
         // Get new connection
         sock = server->nextPendingConnection();
@@ -76,6 +81,7 @@ void Server::connectionClose(Connection *client)
     }
 
     // Drop connection
+    clients.remove(client->getAddress());
     delete client;
     qDebug() << "Connection closed:" << address;
 }
@@ -95,12 +101,12 @@ void Server::connectionReadyRead(Connection *client)
         {
         case Request::REGISTRATION:
             qDebug() << "New registration request from" << client->getAddress();
-            emit registrationRequest(client,
+            emit registrationRequest(client->getAddress(),
                  RegistrationRequest::fromJson(packet).user);
             break;
         case Request::CHANNEL:
             qDebug() << "New channel request from" << client->getAddress();
-            emit channelRequest(client, users[client->getAddress()]);
+            emit channelRequest(client->getAddress(), users[client->getAddress()]);
             break;
         case Request::CHANNEL_CLOSE:
             qDebug() << "New channel close request from" << client->getAddress();
@@ -109,13 +115,13 @@ void Server::connectionReadyRead(Connection *client)
         case Request::VOTE_YES:
             qDebug() << "New vote yes request from" << client->getAddress();
             if (users.contains(client->getAddress()))
-                emit voteRequest(client, true);
+                emit voteRequest(client->getAddress(), true);
             else
-                denyVote(client);
+                denyVote(client->getAddress());
             break;
         case Request::VOTE_NO:
             qDebug() << "New vote no request from" << client->getAddress();
-            emit voteRequest(client, false);
+            emit voteRequest(client->getAddress(), false);
             break;
         }
     } catch (BadPacket) {
@@ -127,55 +133,57 @@ void Server::connectionReadyRead(Connection *client)
     }
 }
 
-void Server::registerUser(Connection *client, UserInformation info)
+void Server::registerUser(QString address, UserInformation info)
 {
-    Q_ASSERT(client);
+    Q_ASSERT(clients.contains(address));
 
     Response res;
     // When users not cointains user record
-    if (!users.contains(client->getAddress()))
+    if (!users.contains(address))
     {
-        users.insert(client->getAddress(), info);
+        users.insert(address, info);
         res = Response(Request::REGISTRATION, Response::SUCCESS);
-        emit userConnected(client->getAddress(), info);
+        emit userConnected(address, info);
         qDebug() << "Success registered user:" << info.name;
     }
     else
     {
-        qDebug() << "Double registration:" << client->getAddress();
+        qDebug() << "Double registration:" << address;
         res = Response(Request::REGISTRATION,
                        Response::ERROR, "IP already registered");
     }
-    client->write(res.toJson());
+    clients[address]->write(res.toJson());
 }
 
-void Server::denyChannel(Connection *client)
+void Server::denyChannel(QString address)
 {
+    Q_ASSERT(clients.contains(address));
+
     qDebug() << "Channel request denied";
     Response res(Request::CHANNEL, Response::ERROR, "Access denied");
     QJsonObject result = res.toJson();
-    client->write(result);
+    clients[address]->write(result);
 }
 
-void Server::openChannel(Connection *client)
+void Server::openChannel(QString address)
 {
-    Q_ASSERT(client);
+    Q_ASSERT(clients.contains(address));
 
     QJsonObject result;
     // Unregistered user
-    if (!users.contains(client->getAddress()))
+    if (!users.contains(address))
     {
-        qDebug() << "Unregistered:" << client->getAddress();
+        qDebug() << "Unregistered:" << address;
         Response res(Request::CHANNEL, Response::ERROR, "Please register first");
         result = res.toJson();
     }
     else
     {
         // Existed channel
-        if (channels.contains(client->getAddress()))
+        if (channels.contains(address))
         {
             // Return existed channel info
-            Receiver *r = channels[client->getAddress()];
+            Receiver *r = channels[address];
             ChannelResponse res(r->getChannelInfo());
             result = res.toJson();
         }
@@ -186,12 +194,12 @@ void Server::openChannel(Connection *client)
             try {
                 Receiver *r = new Receiver(server->serverAddress());
                 // Append to channel map
-                channels.insert(client->getAddress(), r);
+                channels.insert(address, r);
                 // Make success response
                 ChannelResponse res(r->getChannelInfo());
                 result = res.toJson();
                 qDebug() << "Success channel open:" << r->getChannelInfo().toJson();
-                emit channelConnected(client->getAddress(), users[client->getAddress()], r);
+                emit channelConnected(address, users[address], r);
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::CHANNEL, Response::ERROR, "Server fault");
@@ -199,11 +207,30 @@ void Server::openChannel(Connection *client)
             }
         }
     }
-    client->write(result);
+    clients[address]->write(result);
+}
+
+void Server::dropUser(QString address)
+{
+    qDebug() << "Drop user at address" << address;
+    if (channels.contains(address))
+    {
+        delete channels[address];
+        channels.remove(address);
+    }
+    if (users.contains(address))
+        users.remove(address);
+    if (clients.contains(address))
+    {
+        delete clients[address];
+        clients.remove(address);
+    }
+    emit userDisconnected(address);
 }
 
 void Server::closeChannel(QString address)
 {
+    qDebug() << "Close channel at address" << address;
     if(channels.contains(address))
     {
         // Delete voice receiver instance
@@ -215,18 +242,22 @@ void Server::closeChannel(QString address)
     }
 }
 
-void Server::acceptVote(Connection *client)
+void Server::acceptVote(QString address)
 {
+    Q_ASSERT(clients.contains(address));
+
     qDebug() << "Channel request accepted";
     Response res(Request::VOTE_YES, Response::SUCCESS); // TODO: Vote request
     QJsonObject result = res.toJson();
-    client->write(result);
+    clients[address]->write(result);
 }
 
-void Server::denyVote(Connection *client)
+void Server::denyVote(QString address)
 {
+    Q_ASSERT(clients.contains(address));
+
     qDebug() << "Vote request denied";
     Response res(Request::VOTE_YES, Response::ERROR, "Access denied");
     QJsonObject result = res.toJson();
-    client->write(result);
+    clients[address]->write(result);
 }

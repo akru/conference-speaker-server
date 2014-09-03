@@ -68,6 +68,8 @@ void MainWindow::appendClient(QString address, UserInformation info)
     ui->clientBox->layout()->addWidget(w);
     clients.insert(address, w);
     w->show();
+    // Ban handler
+    connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
     // Update vote info
     voting.appendClient();
     // Update header
@@ -85,6 +87,10 @@ void MainWindow::dropClient(QString address)
     if (requests.contains(address))
     {
         dropRequest(address);
+    }
+    if (channels.contains(address))
+    {
+        dropChannel(address);
     }
     // Update vote info
     voting.dropClient();
@@ -122,21 +128,21 @@ void MainWindow::dropChannel(QString address)
                 chatHeader.arg(ui->channelBox->count()));
 }
 
-void MainWindow::channelRequest(Connection *client, UserInformation info)
+void MainWindow::channelRequest(QString address, UserInformation info)
 {
-    if(requests.contains(client->getAddress()))
+    if(requests.contains(address))
         return;
 
-    RequestWidget *reqWidget = new RequestWidget(info, client, this);
-    requests[client->getAddress()] = reqWidget;
-    connect(reqWidget, SIGNAL(accepted(Connection*)),
-            server, SLOT(openChannel(Connection*)));
-    connect(reqWidget, SIGNAL(discarded(Connection*)),
-            server, SLOT(denyChannel(Connection*)));
-    connect(reqWidget, SIGNAL(accepted(Connection*)),
-            SLOT(dropRequest(Connection*)));
-    connect(reqWidget, SIGNAL(discarded(Connection*)),
-            SLOT(dropRequest(Connection*)));
+    RequestWidget *reqWidget = new RequestWidget(info, address, this);
+    requests[address] = reqWidget;
+    connect(reqWidget, SIGNAL(accepted(QString)),
+            server, SLOT(openChannel(QString)));
+    connect(reqWidget, SIGNAL(discarded(QString)),
+            server, SLOT(denyChannel(QString)));
+    connect(reqWidget, SIGNAL(accepted(QString)),
+            SLOT(dropRequest(QString)));
+    connect(reqWidget, SIGNAL(discarded(QString)),
+            SLOT(dropRequest(QString)));
 
     ui->wantsBox->layout()->addWidget(reqWidget);
     reqWidget->show();
@@ -175,19 +181,19 @@ void MainWindow::updateServerInfo(ServerInformation info)
     connect(server, SIGNAL(channelDisconnected(QString)),
             SLOT(dropChannel(QString)));
 
-    connect(server, SIGNAL(voteRequest(Connection*,bool)),
-            &voting, SLOT(vote(Connection*,bool)));
-    connect(&voting, SIGNAL(voteAccepted(Connection*)),
-            server, SLOT(acceptVote(Connection*)));
-    connect(&voting, SIGNAL(voteDenied(Connection*)),
-            server, SLOT(denyVote(Connection*)));
+    connect(server, SIGNAL(voteRequest(QString,bool)),
+            &voting, SLOT(vote(QString,bool)));
+    connect(&voting, SIGNAL(voteAccepted(QString)),
+            server, SLOT(acceptVote(QString)));
+    connect(&voting, SIGNAL(voteDenied(QString)),
+            server, SLOT(denyVote(QString)));
 
-    connect(server, SIGNAL(channelRequest(Connection*,UserInformation)),
-            SLOT(channelRequest(Connection*,UserInformation)));
-    connect(this, SIGNAL(channelRequestAccepted(Connection*)),
-            server, SLOT(openChannel(Connection*)));
-    connect(this, SIGNAL(channelRequestDiscarded(Connection*)),
-            server, SLOT(denyChannel(Connection*)));
+    connect(server, SIGNAL(channelRequest(QString,UserInformation)),
+            SLOT(channelRequest(QString,UserInformation)));
+    connect(this, SIGNAL(channelRequestAccepted(QString)),
+            server, SLOT(openChannel(QString)));
+    connect(this, SIGNAL(channelRequestDiscarded(QString)),
+            server, SLOT(denyChannel(QString)));
 
     // Update headers
     ui->labelName->setText(info.name);

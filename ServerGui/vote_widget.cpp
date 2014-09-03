@@ -36,24 +36,22 @@ void VoteWidget::updateNoL(int count)
     ui->noL->setText(QString::number(count) + "%");
 }
 
-void VoteWidget::vote(Connection *client, bool type)
+void VoteWidget::vote(QString address, bool type)
 {
-    Q_ASSERT(client);
-
-    if (voters.contains(client->getAddress()))
+    if (voters.contains(address))
         // Emit denied signal when double vote
-        emit voteDenied(client);
+        emit voteDenied(address);
     else
     {
         // Append voter to list
-        voters.append(client->getAddress());
+        voters.append(address);
         // Increment counter value
         if (type)
             appendYes();
         else
             appendNo();
         // Emit accepted signal
-        emit voteAccepted(client);
+        emit voteAccepted(address);
     }
 }
 

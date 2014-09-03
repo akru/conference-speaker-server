@@ -33,8 +33,8 @@ public:
     ~MainWindow();
 
 signals:
-    void channelRequestAccepted(Connection *);
-    void channelRequestDiscarded(Connection *);
+    void channelRequestAccepted(QString address);
+    void channelRequestDiscarded(QString address);
 
 public slots:
 
@@ -43,9 +43,8 @@ private slots:
     void dropClient(QString address);
     void appendChannel(QString address, UserInformation info, Receiver *channel);
     void dropChannel(QString address);
-    void channelRequest(Connection *client, UserInformation info);
+    void channelRequest(QString address, UserInformation info);
     void dropRequest(QString address);
-    void dropRequest(Connection *client) { dropRequest(client->getAddress()); }
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
 

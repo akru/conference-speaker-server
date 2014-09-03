@@ -1,10 +1,12 @@
 #include "request_widget.h"
 #include "ui_request_widget.h"
 
-RequestWidget::RequestWidget(UserInformation &user, Connection *client, QWidget *parent)
+RequestWidget::RequestWidget(UserInformation &user,
+                             QString address,
+                             QWidget *parent)
     : QWidget(parent),
       ui(new Ui::RequestWidget),
-      client(client)
+      client(address)
 {
     ui->setupUi(this);
     ui->nameLabel->setText(user.name);

@@ -22,31 +22,34 @@ signals:
     void channelDisconnected(QString address);
 
 public slots:
-    void denyChannel(Connection *client);
-    void openChannel(Connection *client);
+    void denyChannel(QString address);
+    void openChannel(QString address);
     void closeChannel(QString address);
-    void denyVote(Connection *client);
-    void acceptVote(Connection *client);
+    void dropUser(QString address);
+    void denyVote(QString address);
+    void acceptVote(QString address);
 
 signals:
-    void registrationRequest(Connection *client, UserInformation info);
-    void channelRequest(Connection *client, UserInformation info);
+    void registrationRequest(QString address, UserInformation info);
+    void channelRequest(QString address, UserInformation info);
     void channelCloseRequest(QString address);
-    void voteRequest(Connection *client, bool type);
+    void voteRequest(QString address, bool type);
 
 private slots:
     void newConnection();
     void connectionReadyRead(Connection *client);
     void connectionClose(Connection *client);
-    void registerUser(Connection *client, UserInformation info);
+    void registerUser(QString address, UserInformation info);
 
 private:
     // TCP server instance
-    QTcpServer *server;
+    QTcpServer                    *server;
     // User information by address map
     QMap<QString, UserInformation> users;
     // Channel information by address map
-    QMap<QString, Receiver *> channels;
+    QMap<QString, Receiver *>      channels;
+    // Connection by address map
+    QMap<QString, Connection *>    clients;
 };
 
 #endif // SERVER_H

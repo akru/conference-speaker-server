@@ -18,13 +18,13 @@ public:
     ~VoteWidget();
 
 signals:
-    void voteDenied(Connection *client);
-    void voteAccepted(Connection *client);
+    void voteDenied(QString);
+    void voteAccepted(QString);
 
 public slots:
     void appendClient();
     void dropClient();
-    void vote(Connection *client, bool type);
+    void vote(QString address, bool type);
 
 private slots:
     void setCount(int count);

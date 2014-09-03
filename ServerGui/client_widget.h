@@ -13,8 +13,11 @@ class ClientWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ClientWidget(UserInformation &user, QString &address, QWidget *parent = 0);
+    explicit ClientWidget(UserInformation &user,
+                          QString &address,
+                          QWidget *parent = 0);
     ~ClientWidget();
+
 signals:
     void banned(QString);
 
@@ -23,7 +26,6 @@ private slots:
     {
         emit banned(address);
     }
-
 
 private:
     Ui::ClientWidget *ui;

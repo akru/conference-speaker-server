@@ -14,12 +14,14 @@ class RequestWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit RequestWidget(UserInformation &user, Connection *client, QWidget *parent = 0);
+    explicit RequestWidget(UserInformation &user,
+                           QString address,
+                           QWidget *parent = 0);
     ~RequestWidget();
 
 signals:
-    void accepted(Connection *);
-    void discarded(Connection *);
+    void accepted(QString address);
+    void discarded(QString address);
 
 private slots:
     void on_okButton_clicked()
@@ -33,7 +35,7 @@ private slots:
 
 private:
     Ui::RequestWidget *ui;
-    Connection *client;
+    QString            client;
 };
 
 #endif // REQUEST_WIDGET_H
