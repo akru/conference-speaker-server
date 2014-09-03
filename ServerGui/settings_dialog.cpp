@@ -20,10 +20,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         ui->addressSelect->addItem(address.toString());
     }
     connect(this, SIGNAL(accepted()), SLOT(genServerInfo()));
-
-    loadSettings();
-    if (!configured)
-        show();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -38,7 +34,7 @@ void SettingsDialog::genServerInfo()
     info = ServerInformation(name, addr);
     qDebug() << "New server info" << info.toJson();
 
-    QSettings s(settingsFileName, QSettings::NativeFormat);
+    QSettings s(settingsFileName, QSettings::IniFormat);
     s.setValue("conference-name", name);
     s.setValue("ip-address", addr);
 
@@ -47,7 +43,7 @@ void SettingsDialog::genServerInfo()
 
 void SettingsDialog::loadSettings()
 {
-    QSettings s(settingsFileName, QSettings::NativeFormat);
+    QSettings s(settingsFileName, QSettings::IniFormat);
     QString name = s.value("conference-name", "").toString(),
             addr = s.value("ip-address", "").toString();
 

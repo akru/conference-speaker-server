@@ -8,8 +8,8 @@
 int main()
 {
     HighPassFilter hpf;
-    HSFilter hsf(8000);
-    BandswitchFilter bsf(8000);
+    HSFilter hsf;
+    BandswitchFilter bsf;
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);

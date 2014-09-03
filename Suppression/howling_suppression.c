@@ -9,8 +9,8 @@
 
 #include <stdio.h>
 
-inline float quad(float a) { return a * a; }
-inline float mod(float a[], int i) { return sqrtf(a[i] * a[i] + a[i+1] * a[i+1]); }
+float quad(float a) { return a * a; }
+float mod(float a[], int i) { return sqrtf(a[i] * a[i] + a[i+1] * a[i+1]); }
 
 /*
  * Cascade filter applying

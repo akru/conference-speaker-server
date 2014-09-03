@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Reload broadcaster server information
     connect(&settings, SIGNAL(newServerInfo(ServerInformation)),
             &broadcaster, SLOT(setServerInformation(ServerInformation)));
+    // Load server settings
+    settings.loadSettings();
     // Set scroll boxes alignments
     ui->channelBox->setAlignment(Qt::AlignTop);
     ui->wantsBox->layout()->setAlignment(Qt::AlignTop);
@@ -47,7 +49,10 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->statusBar->showMessage(statusBarConfigured);
     }
     else
+    {
         ui->statusBar->showMessage(statusBarNonConfig);
+        settings.show();
+    }
 }
 
 MainWindow::~MainWindow()

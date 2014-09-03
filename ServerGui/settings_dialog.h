@@ -17,6 +17,8 @@ public:
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
 
+    void loadSettings();
+
     bool isConfigured() const { return configured; }
     ServerInformation serverInfo() const { return info; }
 
@@ -25,9 +27,6 @@ signals:
 
 private slots:
     void genServerInfo();
-
-protected:
-    void loadSettings();
 
 private:
     Ui::SettingsDialog *ui;
