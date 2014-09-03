@@ -1,22 +1,17 @@
 #include "bandswitch_filter.h"
 #include "fft4g.h"
+#include "bandswitch_firs.h"
 
 BandswitchFilter::BandswitchFilter()
     : currentBand(0),
       iteration(0)
 {
     Q_ASSERT(sample_rate == 8000);
-    filter.resize(BAND_COUNT);
 
-    BiquadParams biq;
-    biq.Q = 10; // Because ? I don't know but may be it's working
-    for (short i = 0; i < BAND_COUNT; ++i)
-        for (short j = 0; j < FILTER_COUNT; ++j)
-        {
-            biq.freq = BAND_FREQ[i][j];
-            BiquadCalcBandpass(&biq);
-            filter[i].append(biq);
-        }
+    xv.resize(BAND_COUNT*FILTER_COUNT);
+    for (short i = 0; i < BAND_COUNT*FILTER_COUNT; ++i)
+        xv[i].fill(0, sample_length);
+
 }
 
 BandswitchFilter::~BandswitchFilter()
@@ -45,7 +40,7 @@ QByteArray BandswitchFilter::process(const QByteArray &sample)
         // Apply filter
         input_p = (qint16 *) sample.data();
         for (short j = 0; j < HS_BLOCKL; ++j)
-            outVect[i][j] = BiquadProcess(&filter[currentBand][i - 1], *input_p++);
+            outVect[i][j] = firProcess(i+currentBand*FILTER_COUNT - 1, *input_p++);
         // FFT
         rdft(HS_BLOCKL, 1, outVect[i], ip, wfft);
         // Sum with
@@ -64,4 +59,16 @@ QByteArray BandswitchFilter::process(const QByteArray &sample)
         *out_p++ = outVect[0][j];
 
     return out;
+}
+
+double BandswitchFilter::firProcess(int i, double wave)
+{
+    // Direct form I FIR filter
+    // SV rift
+    xv[i].pop_front(); xv[i].push_back(wave);
+    // Calc res by params and input
+    double result = 0;
+    for (short k = 0; k < xv[i].length(); ++k)
+        result += xv[i].at(k) * FIR[i][k];
+    return result;
 }
