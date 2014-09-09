@@ -7,15 +7,19 @@
 #include <QTime>
 #include <windows_private.h>
 
+#include <cmath>
+
 int main()
 {
-    HighPassFilter hpf;
-    HSFilter hsf;
+//    HighPassFilter hpf;
+//    HSFilter hsf;
     //BandswitchFilter bsf;
     float eqs[Filter::sample_length];
-    for (short i = 0; i<Filter::sample_length; ++i)
-        eqs[i] = 1;
-    EqualizerFilter eq(1, eqs, kBlackmanWindow256);
+    for (short i = 0; i<Filter::sample_length; ++i) {
+        eqs[i] = sin(i / 4 / PI_F) < 0 ? 0 : sin(i / 4 / PI_F);
+        qDebug() << "H[" << i << "]=" <<eqs[i];
+    }
+    EqualizerFilter eq(0.01, eqs, kBlackmanWindow256);
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);
@@ -37,8 +41,10 @@ int main()
             qint16 *rawp = (qint16 *) sam.data();
             float sample[Filter::sample_length];
             float *fltp = sample;
-            while ((char *) rawp < sam.data() + sam.length())
-                *fltp++ = ((float) *rawp++) / (1<<15);
+            while ((char *) rawp < sam.data() + sam.length()) {
+//                qDebug() << "I:" << *rawp;
+                *fltp++ = (float) *rawp++;
+            }
 
 //            hsf.process(sample);
 //            hpf.process(sample);
@@ -47,8 +53,10 @@ int main()
 
             rawp = (qint16 *) sam.data();
             fltp = sample;
-            while ((char *) rawp < sam.data() + sam.length())
-                *rawp++ = (qint16) (*fltp++ * (1<<15));
+            while ((char *) rawp < sam.data() + sam.length()) {
+//                qDebug() << "O:" << *fltp;
+                *rawp++ = (qint16) *fltp++;
+            }
 
             phones.write(sam);
             qDebug() << t.elapsed() << "passed" << tm++ * 32 << "ms";
