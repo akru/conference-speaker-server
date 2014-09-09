@@ -12,7 +12,7 @@ public:
              float PNPR_TH = 0, float ISMD_TH = 0);
     ~HSFilter();
 
-    QByteArray process(const QByteArray &sample);
+    void process(float sample[]);
     QString name() { return "Howling suppression"; }
 
 #ifdef QT_DEBUG

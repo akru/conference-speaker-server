@@ -24,15 +24,9 @@ HSFilter::~HSFilter()
     Hs_Free(hs_ptr);
 }
 
-QByteArray HSFilter::process(const QByteArray &sample)
+void HSFilter::process(float sample[])
 {
-    Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
-
-    QByteArray out;
-    out.resize(sample.length());
-
-    Hs_Process(hs_ptr, (qint16 *) sample.data(), (qint16 *) out.data());
-    return out;
+    Hs_Process(hs_ptr, sample);
 }
 
 #ifdef QT_DEBUG

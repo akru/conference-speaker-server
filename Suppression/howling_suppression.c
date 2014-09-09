@@ -204,7 +204,7 @@ void Hs_EvaluateIMSD(float Y[], float IMSD[])
  * Find howling freques and write into instance array
  * returns: count of found freq
  */
-int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const short *input)
+int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const float *input)
 {
     float fin[HS_BLOCKL];
     // Convert input data to float and apply window
@@ -339,14 +339,13 @@ void Hs_Free(HsHandle *inst)
     free(inst);
 }
 
-void Hs_Process(HsHandle *inst, const short *input, short *output)
+void Hs_Process(HsHandle *inst, float *sample)
 {
     short howlingFreq[HS_BIQUAD_COUNT];
-    int freqCount = Hs_AnalyzeHowling(inst, howlingFreq, input);
+    int freqCount = Hs_AnalyzeHowling(inst, howlingFreq, sample);
     if (!freqCount && !inst->filterCount)
     {
         // Howling not found
-        memcpy(output, input, HS_BLOCKL * sizeof(short));
         return;
     }
 
@@ -369,7 +368,7 @@ void Hs_Process(HsHandle *inst, const short *input, short *output)
                 inst->filter[i].Q);
 #endif
     // Apply IIR filter
-    const short *input_p = input;
-    while (input_p < input + HS_BLOCKL)
-        *output++ = Hs_BiquadCascade(inst, *input_p++);
+    const short *input_p = sample;
+    while (input_p < sample + HS_BLOCKL)
+        *sample++ = Hs_BiquadCascade(inst, *input_p++);
 }

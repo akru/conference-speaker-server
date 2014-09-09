@@ -18,11 +18,11 @@ public:
     NSFilter(Level level, int count, int trashold);
     ~NSFilter();
 
-    QByteArray process(const QByteArray &sample);
+    void process(float sample[]);
     QString name() { return "Noise suppression"; }
 
 protected:
-    QByteArray postSuppression(const QByteArray &sample);
+    void postSuppression(float sample[]);
 
 private:
     NsHandle *ns_ptr;

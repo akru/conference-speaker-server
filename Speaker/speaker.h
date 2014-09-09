@@ -17,6 +17,8 @@ class QAudioOutput;
 class QAudioFormat;
 class QIODevice;
 
+static const quint16 norm_int16 = (1<<15);
+
 class Speaker : public QObject
 {
     Q_OBJECT

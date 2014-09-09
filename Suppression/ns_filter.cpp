@@ -26,37 +26,32 @@ NSFilter::~NSFilter()
     WebRtcNs_Free(ns_ptr);
 }
 
-QByteArray NSFilter::process(const QByteArray &sample)
+void NSFilter::process(float sample[])
 {
-    Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
+//    QByteArray out(sample.length(), Qt::Uninitialized);
+//    WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
+//                             (short *)out.data(), NULL);
 
-    QByteArray out(sample.length(), Qt::Uninitialized);
-    WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
-                             (short *)out.data(), NULL);
-
-    return postSuppression(out);
+    postSuppression(sample);
 }
 
-QByteArray NSFilter::postSuppression(const QByteArray &sample)
+void NSFilter::postSuppression(float sample[])
 {
-    qint16 *samp = (qint16 *) sample.data();
     long long energy; // RMS
     for (short pos = 0; pos < sample_length; ++pos)
     {
         energy = 0;
         for (short i = 0; i < count && pos + i < sample_length; ++i)
         {
-            qDebug() << "Sample " << pos + i << ": " << samp[pos + i] << ";";
-            energy += abs(samp[pos + i]) * abs(samp[pos + i]);
+            qDebug() << "Sample " << pos + i << ": " << sample[pos + i] << ";";
+            energy += fabs(sample[pos + i]) * fabs(sample[pos + i]);
         }
         energy = sqrt(energy / count);
         qDebug() << "RMS Energy TH:" << energy;
 
         if (energy < trashold)
             for (short i = 0; i < count && pos + i < sample_length; ++i)
-                samp[pos + i] = 0;
+                sample[pos + i] = 0;
         pos += count;
     }
-
-    return sample;
 }

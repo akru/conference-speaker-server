@@ -41,7 +41,7 @@ void Hs_Free(HsHandle *);
 /*
  * Process buffer
  */
-void Hs_Process(HsHandle *, const short *, short *);
+void Hs_Process(HsHandle *, float *);
 
 #ifdef __cplusplus
 }

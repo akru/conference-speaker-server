@@ -283,21 +283,16 @@ float CompressorFilter::DoCompression(float value, double env)
    return out;
 }
 
-QByteArray CompressorFilter::process(const QByteArray &sample)
+void CompressorFilter::process(float sample[])
 {
-    Q_ASSERT(sample.length() == sample_length * sizeof(qint16));
-
-    QByteArray out(sample_length * sizeof(qint16), Qt::Uninitialized);
-
     // Swap buffers
     float *tmp = mSampleIn;
     mSampleIn = mSampleOut;
     mSampleOut = tmp;
 
     // Read sample
-    qint16 *inp = (qint16 *) sample.data();
     for (short i = 0; i < sample_length; ++i)
-        mSampleIn[i] = (float) *inp++ / INT16_DIV;
+        mSampleIn[i] = sample[i];
 
     // Process sample
     if (first_start)
@@ -310,8 +305,6 @@ QByteArray CompressorFilter::process(const QByteArray &sample)
         TwoBufferProcessPass1(mSampleOut, mSampleIn);
 
     // Return sample
-    qint16 *outp = (qint16 *) out.data();
     for (short i = 0; i < sample_length; ++i)
-        *outp++ = mSampleOut[i];
-    return out;
+        sample[i] = mSampleOut[i];
 }

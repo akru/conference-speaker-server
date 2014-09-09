@@ -10,12 +10,12 @@ public:
     HighPassFilter();
     ~HighPassFilter();
 
-    QByteArray process(const QByteArray &sample);
+    void process(float sample[]);
     QString name() { return "High pass"; }
 
 private:
-    QVector<double> xv;
-    double firProcess(double wave);
+    QVector<float> xv;
+    float firProcess(float wave);
 };
 
 #endif // HIGHTPASS_FILTER_H

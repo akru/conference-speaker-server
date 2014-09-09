@@ -72,7 +72,7 @@ Speaker::Speaker(QObject *parent) :
     filters.append(new NSFilter(NSFilter::High, 10, 500));
     filters.append(new HighPassFilter);
     filters.append(new HSFilter(15, 40, 0, 0.3));
-    filters.append(new BandswitchFilter);
+    //filters.append(new BandswitchFilter);
 
 #ifdef QT_DEBUG
     connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),
@@ -162,19 +162,30 @@ void Speaker::speakHeartbeat()
     if (!accBuf.avail(2048)) return;
     qDebug() << "Playing...";
     // Prepare sample
-    QByteArray sample(512, Qt::Uninitialized);
-    accBuf.getData((qint16 *) sample.data(),
-                   sample.length() / sizeof(qint16));
-    // Apply filters
+    QByteArray sample_raw(Filter::sample_length * sizeof(qint16),
+                          Qt::Uninitialized);
+    accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
+    float sample[Filter::sample_length];
+    // Normalization
+    qint16 *rawp = (qint16 *) sample_raw.data();
+    float *fltp = sample;
+    while ((char *) rawp < sample_raw.data() + sample_raw.length())
+        *fltp++ = ((float) *rawp++) / norm_int16;
+    // Apply filters in float area
     foreach (Filter *f, filters) {
         qDebug() << "Applying:" << f->name();
-        sample = f->process(sample);
+        f->process(sample);
     }
+    // Back to the INT
+    rawp = (qint16 *) sample_raw.data();
+    fltp = sample;
+    while ((char *) rawp < sample_raw.data() + sample_raw.length())
+        *rawp++ = *fltp++ * norm_int16;
     // Play buffer
 #ifdef MACOSX
-    sample = convertAudio(sample);
+    sample = convertAudio(sample_raw);
 #endif
-    audio_buffer->write(sample);
+    audio_buffer->write(sample_raw);
 }
 
 /*

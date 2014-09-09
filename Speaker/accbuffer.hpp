@@ -7,7 +7,7 @@ template <class T>
 class AccBuffer
 {
 public:
-    AccBuffer(int size=1024000)
+    explicit AccBuffer(int size=1024000)
       : size(size), used(0),
         head(new T[size]), tail(head)
     {}
