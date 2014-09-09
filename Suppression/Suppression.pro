@@ -17,7 +17,8 @@ SOURCES  += \
 #    bandswitch_filter.cpp \
     highpass_filter.cpp \
     compressor_filter.cpp \
-    equalizer_filter.cpp
+    equalizer_filter.cpp \
+    pitch_shift_filter.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -34,4 +35,5 @@ HEADERS  += \
 #    bandswitch_filter.h \
     highpass_filter.h \
     compressor_filter.h \
-    equalizer_filter.h
+    equalizer_filter.h \
+    pitch_shift_filter.h
