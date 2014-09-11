@@ -6,7 +6,7 @@
 HSFilter::HSFilter(float PAPR_TH, float PHPR_TH,
                    float PNPR_TH, float ISMD_TH)
 {
-    Q_ASSERT(sample_rate == 8000);
+    Q_ASSERT(sample_rate == 8000.0);
 
     qDebug() << "HSFilter(" << sample_rate << ")";
 

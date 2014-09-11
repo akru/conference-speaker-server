@@ -5,8 +5,7 @@
 
 #include <ns_filter.h>
 #include <hs_filter.h>
-#include <bandswitch_filter.h>
-#include <highpass_filter.h>
+#include <pitch_shift_filter.h>
 #include <equalizer_filter.h>
 
 #include <QDebug>

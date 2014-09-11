@@ -3,6 +3,9 @@
 
 #include "../Speaker/filter.h"
 
+static const int PITCH_COUNT   = 2;
+static const int PITCH_SHIFT_TIME = 800; // ms; WARN: it divided by frame length (32 ms)
+
 class PitchShiftFilter : public Filter
 {
 public:
@@ -25,6 +28,7 @@ private:
     float gSynMagn[sample_length];
     long gRover, osamp;
     float pitchShift;
+    int currentPitch, iteration;
 
     void smbPitchShift(long numSampsToProcess,
                        long fftFrameSize,

@@ -19,8 +19,6 @@ public:
     ~DebugDialog();
 
 private slots:
-    void on_pushButton_clicked();
-
     void on_applyButton_clicked();
 
 private:

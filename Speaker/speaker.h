@@ -36,10 +36,6 @@ signals:
 
 public slots:
     void setVolume(qreal volume);
-#ifdef QT_DEBUG
-    void setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal IMSD);
-    void showDebug();
-#endif
     void play(QByteArray packet);
 
 private slots:

@@ -2,6 +2,7 @@
 #define ACCBUFFER_H
 
 #include <cstring>
+#include <QDebug>
 
 template <class T>
 class AccBuffer
@@ -17,6 +18,7 @@ public:
 
     inline bool avail(int data_size) const
     {
+        qDebug() << "avail" << used;
         return used >= data_size;
     }
 
