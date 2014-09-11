@@ -58,8 +58,7 @@ int WebRtcNs_set_policy(NsHandle* NS_inst, int mode) {
 }
 
 
-int WebRtcNs_Process(NsHandle* NS_inst, const short* spframe, const short *spframe_H,
-                     short* outframe, short* outframe_H) {
-  return WebRtcNs_ProcessCore(
-      (NSinst_t*) NS_inst, spframe, spframe_H, outframe, outframe_H);
+int WebRtcNs_Process(NsHandle* NS_inst, const float* spframe,
+                     float* outframe) {
+  return WebRtcNs_ProcessCore((NSinst_t*) NS_inst, spframe, outframe);
 }

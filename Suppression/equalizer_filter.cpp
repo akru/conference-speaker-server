@@ -3,19 +3,85 @@
 
 #include <QDebug>
 
-EqualizerFilter::EqualizerFilter(float X, const float *H, const float *W)
+void interpolate(float *samples,
+                 size_t length,
+                 quint32 *xs,
+                 float *ys,
+                 size_t n_points) {
+    /* Note that xs must be monotonically increasing! */
+    float x_range_lower, x_range_upper, c0;
+
+    Q_ASSERT(n_points >= 2);
+    Q_ASSERT(xs[0] == 0);
+    Q_ASSERT(xs[n_points - 1] == length - 1);
+
+    for (size_t x = 0, x_range_lower_i = 0; x < length-1; ++x) {
+        Q_ASSERT(x_range_lower_i < n_points-1);
+
+        x_range_lower = (float) xs[x_range_lower_i];
+        x_range_upper = (float) xs[x_range_lower_i+1];
+
+        Q_ASSERT(x_range_lower < x_range_upper);
+        Q_ASSERT(x >= x_range_lower);
+        Q_ASSERT(x <= x_range_upper);
+
+        /* bilinear-interpolation of coefficients specified */
+        c0 = (x-x_range_lower) / (x_range_upper-x_range_lower);
+        Q_ASSERT(c0 >= 0 && c0 <= 1.0);
+
+        samples[x] = ((1.0f - c0) * ys[x_range_lower_i] + c0 * ys[x_range_lower_i + 1]);
+        while(x >= xs[x_range_lower_i + 1])
+            x_range_lower_i++;
+    }
+
+    samples[length-1] = ys[n_points-1];
+}
+
+EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
     : first_iteration(true),
-      X(X), H(H), W(W)
+      X(X / fft_size), W(W)
 {
     memset(overlap, 0, sizeof(float) * overlap_size);
     memset(buffer,  0, sizeof(float) * sample_length * 2);
     memset(ip, 0, (fft_size * 2 >> 1) * sizeof(float));
     memset(wfft, 0, (fft_size * 2 >> 1) * sizeof(float));
-    //cdft(fft_size, 1, buffer, ip, wfft);
+
+    setFullBand(fbH);
 }
 
 EqualizerFilter::~EqualizerFilter()
 {
+}
+
+void EqualizerFilter::setSixBand(short B1, short B2, short B3,
+                                 short B4, short B5, short B6)
+{
+    float sixBandH[fft_size], ys[7];
+    /* Static indexes for 16kHz freq */
+    static quint32 xs[7] = { 0, 4, 8, 16, 48, 80, 128 };
+    static const float scale = 0.1;
+    // Set six bands coefs
+    ys[0] = 0;
+    ys[1] = (B1 - 50) * scale; ys[2] = (B2 - 50) * scale; ys[3] = (B3 - 50) * scale;
+    ys[4] = (B4 - 50) * scale; ys[5] = (B5 - 50) * scale; ys[6] = (B6 - 50) * scale;
+    // Interpolate values
+    interpolate(sixBandH, fft_size, xs, ys, 7);
+    // Debug output
+    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6;
+    for (short i = 0; i < fft_size; ++i)
+        qDebug() << "H [" << i << "] =" << H[i];
+    // Set new H
+    setFullBand(sixBandH);
+}
+
+void EqualizerFilter::setFullBand(const float fbH[])
+{
+    // Copy new H
+    if (fbH)
+        memcpy(H, fbH, fft_size * sizeof(float));
+    else
+        for (short i = 0; i < fft_size; ++i)
+            H[i] = 1;
 }
 
 void EqualizerFilter::process(float sample[])

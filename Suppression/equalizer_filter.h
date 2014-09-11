@@ -2,29 +2,39 @@
 #define EQUALIZER_FILTER_H
 
 #include "../Speaker/filter.h"
+#include "windows_private.h"
 
 class EqualizerFilter : public Filter
 {
 public:
-    EqualizerFilter(float X,  //multiplier
-            const float *H, //The freq. magnitude scalers filter
-            const float *W  //The windowing function
-            );
+    EqualizerFilter(float X=1,                          // Multiplier
+                    const float *fbH=0,                 // The freq. magnitude scalers filter
+                    const float *W=kBlackmanWindow256); // The windowing function
     ~EqualizerFilter();
+
+    inline void setMultiplier(float x) { X = x / fft_size; }
+    /*
+     * Input: six values from 0 to 100 for bands:
+     * 250Hz, 500Hz, 1kHz, 3kHz, 5kHz, 8kHz
+     * and 16kHz sample rate
+     */
+    void setSixBand(short B1, short B2, short B3,
+                    short B4, short B5, short B6);
+    void setFullBand(const float fbH[]);
 
     void process(float sample[]);
     QString name() { return "Equalizer"; }
 
+private:
     static const int window_size  = sample_length;
     static const int R            = window_size / 2;
     static const int overlap_size = window_size - R;
     static const int fft_size     = sample_length;
 
-private:
     bool first_iteration;
-    float X;  //multiplier
-    const float *H; //The freq. magnitude scalers filter
-    const float *W; //The windowing function
+    float X;
+    float *H;
+    const float *W;
     float overlap[overlap_size];
     float buffer[sample_length * 2];
     float wfft[fft_size * 2 >> 1];

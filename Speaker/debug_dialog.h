@@ -2,6 +2,7 @@
 #define DEBUG_DIALOG_H
 
 #include <QDialog>
+#include "filter.h"
 
 class QTextBrowser;
 
@@ -14,18 +15,17 @@ class DebugDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit DebugDialog(QWidget *parent = 0);
+    explicit DebugDialog(Filter *eq, Filter *hs, QWidget *parent = 0);
     ~DebugDialog();
-    QTextBrowser * textBrowser() const;
-
-signals:
-    void trasholdes(qreal, qreal, qreal, qreal);
 
 private slots:
     void on_pushButton_clicked();
 
+    void on_applyButton_clicked();
+
 private:
     Ui::DebugDialog *ui;
+    Filter *eq, *hs;
 };
 
 #endif // DEBUG_DIALOG_H

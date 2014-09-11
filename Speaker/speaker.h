@@ -58,8 +58,7 @@ private:
     QThread         myThread;
     QTimer          heartbeat;
 #ifdef QT_DEBUG
-    HsHandle *hs;
-    DebugDialog     debug_dialog;
+    DebugDialog     *debug_dialog;
 #endif
 };
 

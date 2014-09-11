@@ -112,10 +112,8 @@ int WebRtcNs_set_policy(NsHandle* NS_inst, int mode);
  *                        -1 - Error
  */
 int WebRtcNs_Process(NsHandle* NS_inst,
-                     const short *spframe,
-                     const short *spframe_H,
-                     short* outframe,
-                     short* outframe_H);
+                     const float *spframe,
+                     float* outframe);
 
 #ifdef __cplusplus
 }

@@ -7,11 +7,7 @@
 #include <hs_filter.h>
 #include <bandswitch_filter.h>
 #include <highpass_filter.h>
-
-#ifdef QT_DEBUG
-#include <QTextBrowser>
-#include <QTimer>
-#endif
+#include <equalizer_filter.h>
 
 #include <QDebug>
 
@@ -68,16 +64,22 @@ Speaker::Speaker(QObject *parent) :
     // Open audio device
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
+#ifndef QT_DEBUG
     // Append filters
     filters.append(new NSFilter(NSFilter::High, 10, 500));
-    filters.append(new HighPassFilter);
+//    filters.append(new HighPassFilter);
     filters.append(new HSFilter(15, 40, 0, 0.3));
     //filters.append(new BandswitchFilter);
+#else
+    HSFilter *hs = new HSFilter(15, 40, 0, 0.3);
+    EqualizerFilter *eq = new EqualizerFilter;
+    // Append filters
+    filters.append(hs);
+    filters.append(eq);
+    filters.append(new NSFilter(NSFilter::High, 10, 500));
 
-#ifdef QT_DEBUG
-    connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),
-            SLOT(setTrashHolds(qreal,qreal,qreal,qreal)));
-    debug_dialog.show();
+    debug_dialog = new DebugDialog(eq, hs);
+    debug_dialog->show();
     QTimer *t = new QTimer;
     t->setInterval(500);
     connect(t, SIGNAL(timeout()), SLOT(showDebug()));
@@ -88,12 +90,15 @@ Speaker::Speaker(QObject *parent) :
     myThread.start(QThread::TimeCriticalPriority);
     // Starting heartbeat timer
     connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
-    heartbeat.setInterval(256 / 8);
+    heartbeat.setInterval(Filter::sample_length * 1000.0 / Filter::sample_rate);
     heartbeat.start();
 }
 
 Speaker::~Speaker()
 {
+#ifdef QT_DEBUG
+    delete debug_dialog;
+#endif
     myThread.terminate();
     myThread.wait();
 
@@ -115,36 +120,6 @@ void Speaker::setVolume(qreal volume)
 
     audio->setVolume(volume);
 }
-
-#ifdef QT_DEBUG
-void Speaker::setTrashHolds(qreal PAPR, qreal PHPR, qreal PNPR, qreal IMSD)
-{
-    hs->PAPR_TH = PAPR;
-    hs->PHPR_TH = PHPR;
-    hs->PNPR_TH = PNPR;
-    hs->IMSD_TH = IMSD;
-}
-
-void Speaker::showDebug()
-{
-    QString groupTempl = "%1. center <b>%2 Hz</b>; gain <b>%3 dB</b>; count <b>%4</b>:<br>",
-            groupFreqTempl = "<span style=\"margin-right: 15px\">%1. <b>%2 Hz</b></span><br>",
-            groupText = "";
-    for (short i = 0; i < hs->filterCount; ++i)
-    {
-        groupText += groupTempl.arg(i).arg(hs->group[i].center)
-                                      .arg(hs->group[i].gain)
-                                      .arg(hs->group[i].freqCount);
-        for (short j = 0; j < hs->group[i].freqCount; ++j)
-            groupText += groupFreqTempl.arg(j).arg(hs->group[i].freq[j]);
-    }
-    if (hs->filterCount)
-    {
-        QTextBrowser *groupList  = debug_dialog.textBrowser();
-        groupList->setText(groupText);
-    }
-}
-#endif
 
 void Speaker::play(QByteArray packet)
 {

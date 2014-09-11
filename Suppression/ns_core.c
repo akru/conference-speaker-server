@@ -78,20 +78,14 @@ int WebRtcNs_InitCore(NSinst_t* inst, WebRtc_UWord32 fs) {
   }
 
   // Initialization of struct
-  if (fs == 8000) {
-    inst->fs = fs;
-  } else {
-    return -1;
-  }
+  inst->fs = fs;
   inst->windShift = 0;
-  if (fs == 8000) {
-    // We only support 256 point frames
-    inst->blockLen = 256;
-    inst->blockLen10ms = 256;
-    inst->anaLen = 512;
-    inst->window = kBlocks240w512;
-    inst->outLen = 0;
-  }
+  // We only support 256 point frames
+  inst->blockLen = 256;
+  inst->blockLen10ms = 256;
+  inst->anaLen = 512;
+  inst->window = kBlocks240w512;
+  inst->outLen = 0;
   inst->magnLen = inst->anaLen / 2 + 1; // Number of frequency bins
 
   // Initialize fft work arrays.
@@ -701,13 +695,10 @@ void WebRtcNs_SpeechNoiseProb(NSinst_t* inst, float* probSpeechFinal, float* snr
 }
 
 int WebRtcNs_ProcessCore(NSinst_t* inst,
-                         const short* speechFrame,
-                         const short* speechFrameHB,
-                         short* outFrame,
-                         short* outFrameHB) {
+                         const float* fin,
+                         float* fout) {
   // main routine for noise reduction
 
-  int     flagHB = 0;
   int     i;
   const int kStartBand = 5; // Skip first frequency bins during estimation.
   int     updateParsFlag;
@@ -717,8 +708,7 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
   float   snrPrior, currentEstimateStsa;
   float   tmpFloat1, tmpFloat2, tmpFloat3, probSpeech, probNonSpeech;
   float   gammaNoiseTmp, gammaNoiseOld;
-  float   noiseUpdateTmp, fTmp, dTmp;
-  float   fin[BLOCKL_MAX], fout[BLOCKL_MAX];
+  float   noiseUpdateTmp, fTmp;
   float   winData[ANAL_BLOCKL_MAX];
   float   magn[HALF_ANAL_BLOCKL], noise[HALF_ANAL_BLOCKL];
   float   theFilter[HALF_ANAL_BLOCKL], theFilterTmp[HALF_ANAL_BLOCKL];
@@ -734,54 +724,20 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
   float   parametric_exp = 0.0;
   float   parametric_num = 0.0;
 
-  // SWB variables
-  int     deltaBweHB = 1;
-  int     deltaGainHB = 1;
-  float   decayBweHB = 1.0;
-  float   gainMapParHB = 1.0;
-  float   gainTimeDomainHB = 1.0;
-  float   avgProbSpeechHB, avgProbSpeechHBTmp, avgFilterGainHB, gainModHB;
-
   // Check that initiation has been done
   if (inst->initFlag != 1) {
     return (-1);
-  }
-  // Check for valid pointers based on sampling rate
-  if (inst->fs == 32000) {
-    if (speechFrameHB == NULL) {
-      return -1;
-    }
-    flagHB = 1;
-    // range for averaging low band quantities for H band gain
-    deltaBweHB = (int)inst->magnLen / 4;
-    deltaGainHB = deltaBweHB;
   }
   //
   updateParsFlag = inst->modelUpdatePars[0];
   //
 
   //for LB do all processing
-  // convert to float
-  for (i = 0; i < inst->blockLen10ms; i++) {
-    fin[i] = (float)speechFrame[i];
-  }
   // update analysis buffer for L band
   memcpy(inst->dataBuf, inst->dataBuf + inst->blockLen10ms,
          sizeof(float) * (inst->anaLen - inst->blockLen10ms));
   memcpy(inst->dataBuf + inst->anaLen - inst->blockLen10ms, fin,
          sizeof(float) * inst->blockLen10ms);
-
-  if (flagHB == 1) {
-    // convert to float
-    for (i = 0; i < inst->blockLen10ms; i++) {
-      fin[i] = (float)speechFrameHB[i];
-    }
-    // update analysis buffer for H band
-    memcpy(inst->dataBufHB, inst->dataBufHB + inst->blockLen10ms,
-           sizeof(float) * (inst->anaLen - inst->blockLen10ms));
-    memcpy(inst->dataBufHB + inst->anaLen - inst->blockLen10ms, fin,
-           sizeof(float) * inst->blockLen10ms);
-  }
 
   // check if processing needed
   if (inst->outLen == 0) {
@@ -818,30 +774,6 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
           inst->outBuf[i] = fout[i + inst->blockLen10ms];
         }
       }
-      // convert to short
-      for (i = 0; i < inst->blockLen10ms; i++) {
-        dTmp = fout[i];
-        if (dTmp < WEBRTC_SPL_WORD16_MIN) {
-          dTmp = WEBRTC_SPL_WORD16_MIN;
-        } else if (dTmp > WEBRTC_SPL_WORD16_MAX) {
-          dTmp = WEBRTC_SPL_WORD16_MAX;
-        }
-        outFrame[i] = (short)dTmp;
-      }
-
-      // for time-domain gain of HB
-      if (flagHB == 1) {
-        for (i = 0; i < inst->blockLen10ms; i++) {
-          dTmp = inst->dataBufHB[i];
-          if (dTmp < WEBRTC_SPL_WORD16_MIN) {
-            dTmp = WEBRTC_SPL_WORD16_MIN;
-          } else if (dTmp > WEBRTC_SPL_WORD16_MAX) {
-            dTmp = WEBRTC_SPL_WORD16_MAX;
-          }
-          outFrameHB[i] = (short)dTmp;
-        }
-      } // end of H band gain computation
-      //
       return 0;
     }
 
@@ -1223,68 +1155,6 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
            sizeof(float) * inst->blockLen10ms);
     inst->outLen -= inst->blockLen10ms;
   }
-
-  // convert to short
-  for (i = 0; i < inst->blockLen10ms; i++) {
-    dTmp = fout[i];
-    if (dTmp < WEBRTC_SPL_WORD16_MIN) {
-      dTmp = WEBRTC_SPL_WORD16_MIN;
-    } else if (dTmp > WEBRTC_SPL_WORD16_MAX) {
-      dTmp = WEBRTC_SPL_WORD16_MAX;
-    }
-    outFrame[i] = (short)dTmp;
-  }
-
-  // for time-domain gain of HB
-  if (flagHB == 1) {
-    for (i = 0; i < inst->magnLen; i++) {
-      inst->speechProbHB[i] = probSpeechFinal[i];
-    }
-    if (inst->blockInd > END_STARTUP_LONG) {
-      // average speech prob from low band
-      // avg over second half (i.e., 4->8kHz) of freq. spectrum
-      avgProbSpeechHB = 0.0;
-      for (i = inst->magnLen - deltaBweHB - 1; i < inst->magnLen - 1; i++) {
-        avgProbSpeechHB += inst->speechProbHB[i];
-      }
-      avgProbSpeechHB = avgProbSpeechHB / ((float)deltaBweHB);
-      // average filter gain from low band
-      // average over second half (i.e., 4->8kHz) of freq. spectrum
-      avgFilterGainHB = 0.0;
-      for (i = inst->magnLen - deltaGainHB - 1; i < inst->magnLen - 1; i++) {
-        avgFilterGainHB += inst->smooth[i];
-      }
-      avgFilterGainHB = avgFilterGainHB / ((float)(deltaGainHB));
-      avgProbSpeechHBTmp = (float)2.0 * avgProbSpeechHB - (float)1.0;
-      // gain based on speech prob:
-      gainModHB = (float)0.5 * ((float)1.0 + (float)tanh(gainMapParHB * avgProbSpeechHBTmp));
-      //combine gain with low band gain
-      gainTimeDomainHB = (float)0.5 * gainModHB + (float)0.5 * avgFilterGainHB;
-      if (avgProbSpeechHB >= (float)0.5) {
-        gainTimeDomainHB = (float)0.25 * gainModHB + (float)0.75 * avgFilterGainHB;
-      }
-      gainTimeDomainHB = gainTimeDomainHB * decayBweHB;
-    } // end of converged
-    //make sure gain is within flooring range
-    // flooring bottom
-    if (gainTimeDomainHB < inst->denoiseBound) {
-      gainTimeDomainHB = inst->denoiseBound;
-    }
-    // flooring top
-    if (gainTimeDomainHB > (float)1.0) {
-      gainTimeDomainHB = 1.0;
-    }
-    //apply gain
-    for (i = 0; i < inst->blockLen10ms; i++) {
-      dTmp = gainTimeDomainHB * inst->dataBufHB[i];
-      if (dTmp < WEBRTC_SPL_WORD16_MIN) {
-        dTmp = WEBRTC_SPL_WORD16_MIN;
-      } else if (dTmp > WEBRTC_SPL_WORD16_MAX) {
-        dTmp = WEBRTC_SPL_WORD16_MAX;
-      }
-      outFrameHB[i] = (short)dTmp;
-    }
-  } // end of H band gain computation
   //
 
   return 0;

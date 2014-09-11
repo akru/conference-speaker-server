@@ -34,11 +34,11 @@
 #define HS_FREQ_DEVIATION2  100
 #define HS_FREQ_DEVIATION   50    // Howling freq interpolation range in Hz
 #define HS_FREQ_MIN         10    // Minimal freq
-#define HS_FREQ_MAX         4000  // Maximal freq
+#define HS_FREQ_MAX         8000  // Maximal freq
 #define HS_GAIN_UP_STEP     1     // Gain raise step in dB
 #define HS_GAIN_DOWN_STEP   3     // Gain decrise step in dB
 #define HS_GAIN_MIN         -60   // Gain minimal value
-#define HS_SAMPLE_RATE      8000.0
+#define HS_SAMPLE_RATE      16000.0
 #define HS_M                HS_BLOCKL
 #define HS_INDEX_TO_HZ      HS_SAMPLE_RATE / HS_M
 #define HS_INDEX_TO_RAD     2 * PI_F * HS_SAMPLE_RATE / HS_M

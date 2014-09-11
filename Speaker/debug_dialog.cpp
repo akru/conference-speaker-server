@@ -1,9 +1,12 @@
 #include "debug_dialog.h"
 #include "ui_debug_dialog.h"
 
-DebugDialog::DebugDialog(QWidget *parent) :
+#include <hs_filter.h>
+#include <equalizer_filter.h>
+
+DebugDialog::DebugDialog(Filter *eq, Filter *hs, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DebugDialog)
+    ui(new Ui::DebugDialog), eq(eq), hs(hs)
 {
     ui->setupUi(this);
 }
@@ -13,15 +16,18 @@ DebugDialog::~DebugDialog()
     delete ui;
 }
 
-QTextBrowser * DebugDialog::textBrowser() const
+void DebugDialog::on_applyButton_clicked()
 {
-    return ui->textBrowser;
-}
-
-void DebugDialog::on_pushButton_clicked()
-{
-    emit trasholdes(ui->paprEnabled->isChecked() ? ui->paprSpin->value() : -1000,
-                    ui->phprEnabled->isChecked() ? ui->phprSpin->value() : -1000,
-                    ui->pnprEnabled->isChecked() ? ui->pnprSpin->value() : -1000,
-                    ui->ismdEnabled->isChecked() ? ui->ismdSpin->value() : 1000);
+    HSFilter *hsf = (HSFilter *) hs;
+    hsf->handle()->PAPR_TH = ui->paprSpin->value();
+    hsf->handle()->PHPR_TH = ui->phprSpin->value();
+    hsf->handle()->PNPR_TH = ui->pnprSpin->value();
+    hsf->handle()->IMSD_TH = ui->ismdSpin->value();
+    EqualizerFilter *eqf = (EqualizerFilter *) eq;
+    eqf->setSixBand(ui->verticalSlider->value(),
+                    ui->verticalSlider_2->value(),
+                    ui->verticalSlider_3->value(),
+                    ui->verticalSlider_4->value(),
+                    ui->verticalSlider_5->value(),
+                    ui->verticalSlider_6->value());
 }

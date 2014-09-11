@@ -8,8 +8,6 @@ NSFilter::NSFilter(Level level, int count, int trashold)
     : count(count),
       trashold(trashold)
 {
-    Q_ASSERT(sample_rate == 8000);
-
     qDebug() << "NSFilter(" << level << ")";
 
     if (!WebRtcNs_Create(&ns_ptr))
@@ -28,11 +26,13 @@ NSFilter::~NSFilter()
 
 void NSFilter::process(float sample[])
 {
-//    QByteArray out(sample.length(), Qt::Uninitialized);
-//    WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
-//                             (short *)out.data(), NULL);
+    float out[sample_length];
 
-    postSuppression(sample);
+    WebRtcNs_Process(ns_ptr, sample, out);
+    postSuppression(out);
+
+    for (short i = 0; i < sample_length; ++i)
+        sample[i] = out[i];
 }
 
 void NSFilter::postSuppression(float sample[])
