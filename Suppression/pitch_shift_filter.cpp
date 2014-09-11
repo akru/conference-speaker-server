@@ -48,7 +48,7 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign);
 double smbAtan2(double x, double y);
 
 PitchShiftFilter::PitchShiftFilter(float pitch_shift, long osamp)
-    : gRover(false), osamp(osamp), pitchShift(pitch_shift)
+    : gRover(false), osamp(osamp), pitchShift(pitch_shift), currentPitch(0), iteration(0)
 {
     memset(gInFIFO, 0, sample_length*sizeof(float));
     memset(gOutFIFO, 0, sample_length*sizeof(float));
@@ -66,10 +66,22 @@ PitchShiftFilter::~PitchShiftFilter()
 
 void PitchShiftFilter::process(float sample[])
 {
-    float output[sample_length];
-    smbPitchShift(1, sample_length, sample, output);
-    for (short i = 0; i < sample_length; ++i)
-        sample[i] = output[i];
+    if (++iteration > PITCH_SHIFT_TIME / 32.0)
+    {
+        currentPitch = (currentPitch + 1) % PITCH_COUNT;
+        iteration   = 0;
+    }
+
+    if(currentPitch) // for now works only with currentPitch = 0 or 1, for more please add switch-case or if-elseif-else construction
+    {
+        float output[sample_length];
+        smbPitchShift(sample_length, sample_length, sample, output);
+        for (short i = 0; i < sample_length; ++i)
+            sample[i] = output[i];
+    }
+    else
+    {
+    }
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -131,7 +143,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 				/* compute magnitude and phase */
 				magn = 2.*sqrt(real*real + imag*imag);
-				phase = atan2(imag,real);
+                phase = smbAtan2(imag,real);
 
 				/* compute phase difference */
 				tmp = phase - gLastPhase[k];

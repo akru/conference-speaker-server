@@ -11,6 +11,7 @@ EqualizerFilter::EqualizerFilter(float X, const float *H, const float *W)
     memset(buffer,  0, sizeof(float) * sample_length * 2);
     memset(ip, 0, (fft_size * 2 >> 1) * sizeof(float));
     memset(wfft, 0, (fft_size * 2 >> 1) * sizeof(float));
+
     //cdft(fft_size, 1, buffer, ip, wfft);
 }
 
@@ -66,6 +67,7 @@ void EqualizerFilter::dsp_logic()
     for(short j = 0; j < fft_size / 2 - 1; ++j) {
         output_window[j]   *= H[j];
         output_window[j+1] *= H[j];
+        qDebug() << "H:" << H[j];
     }
     //inverse fft
     rdft(fft_size, -1, output_window, ip, wfft);

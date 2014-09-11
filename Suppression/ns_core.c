@@ -78,13 +78,13 @@ int WebRtcNs_InitCore(NSinst_t* inst, WebRtc_UWord32 fs) {
   }
 
   // Initialization of struct
-  if (fs == 8000) {
+  if (fs == HS_SAMPLE_RATE) {
     inst->fs = fs;
   } else {
     return -1;
   }
   inst->windShift = 0;
-  if (fs == 8000) {
+  if (fs == HS_SAMPLE_RATE) {
     // We only support 256 point frames
     inst->blockLen = 256;
     inst->blockLen10ms = 256;

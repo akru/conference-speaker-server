@@ -8,7 +8,7 @@ NSFilter::NSFilter(Level level, int count, int trashold)
     : count(count),
       trashold(trashold)
 {
-    Q_ASSERT(sample_rate == 8000);
+    Q_ASSERT(sample_rate == 8000.0);
 
     qDebug() << "NSFilter(" << level << ")";
 
@@ -32,7 +32,7 @@ void NSFilter::process(float sample[])
 //    WebRtcNs_Process(ns_ptr, (short *)sample.data(), NULL,
 //                             (short *)out.data(), NULL);
 
-    postSuppression(sample);
+//    postSuppression(sample);
 }
 
 void NSFilter::postSuppression(float sample[])

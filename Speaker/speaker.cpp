@@ -5,8 +5,8 @@
 
 #include <ns_filter.h>
 #include <hs_filter.h>
-#include <bandswitch_filter.h>
-#include <highpass_filter.h>
+#include <pitch_shift_filter.h>
+#include <equalizer_filter.h>
 
 #ifdef QT_DEBUG
 #include <QTextBrowser>
@@ -69,10 +69,22 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new NSFilter(NSFilter::High, 10, 500));
-    filters.append(new HighPassFilter);
-    filters.append(new HSFilter(15, 40, 0, 0.3));
-    //filters.append(new BandswitchFilter);
+
+//    filters.append(new NSFilter(NSFilter::High, 10, 500));
+//    filters.append(new HSFilter(15, 40, 0, 0.3));
+//    filters.append(new PitchShiftFilter(1.0, 32));
+
+//    float eqs[Filter::sample_length];
+//    for (short i = 0; i<Filter::sample_length / 2 + 1; ++i) {
+//        eqs[i] = 1;
+//        if (i > 10 && i < 50)
+//            eqs[i] = 0;
+//    }
+
+//    EqualizerFilter eq(0.01,                //multiplier
+//                       eqs,                 //The freq. magnitude scalers filter
+//                       kBlackmanWindow256   //The windowing function
+//                      );
 
 #ifdef QT_DEBUG
     connect(&debug_dialog, SIGNAL(trasholdes(qreal,qreal,qreal,qreal)),
@@ -89,6 +101,7 @@ Speaker::Speaker(QObject *parent) :
     // Starting heartbeat timer
     connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
     heartbeat.setInterval(256 / 8);
+//    heartbeat.setInterval(256 / 22.050);
     heartbeat.start();
 }
 

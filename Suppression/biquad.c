@@ -42,7 +42,7 @@ void BiquadCalcNotch(BiquadParams *inst, HsFreqGroup *group)
     }
 
     float V    = powf(10, fabsf(inst->peakGain) / 20.0),
-          Fc   = inst->freq / 8000.0,
+          Fc   = inst->freq / HS_SAMPLE_RATE,
           K    = tanf(PI_F * Fc),
           norm;
     // peak
