@@ -126,7 +126,7 @@ void Hs_EvaluatePAPR(float Y[], float PAPR[])
     float energy = 0;
     for (short i = 0; i < HS_BLOCKL_A; ++i)
         energy += quad(Y[i]);
-    energy /= HS_BLOCKL;
+    energy /= HS_BLOCKL_A;
     // -- Elements
     float *PAPR_p = PAPR;
     for (short i = 0; i < HS_BLOCKL_A; ++i)
@@ -150,7 +150,7 @@ void Hs_EvaluatePHPR(float Y[], float PHPR[])
         {
             float phprc = 10 * log10f(quad(Y[i]) / quad(Y[i2]));
             if (phprc > PHPR[i])
-            PHPR[i] = phprc;
+                PHPR[i] = phprc;
         }
     }
 }
@@ -209,7 +209,7 @@ int Hs_AnalyzeHowling(HsHandle *inst, short howlingFreq[], const float *input)
     float fin[HS_BLOCKL];
     // Convert input data to float and apply window
     for (short i = 0; i < HS_BLOCKL; ++i)
-        fin[i] = (float) input[i] * kBlackmanWindow256[i];
+        fin[i] = input[i] * kBlackmanWindow256[i];
 
     // Apply RDFT
     rdft(HS_BLOCKL, 1, fin, inst->ip, inst->wfft);
@@ -368,7 +368,10 @@ void Hs_Process(HsHandle *inst, float *sample)
                 inst->filter[i].Q);
 #endif
     // Apply IIR filter
-    const short *input_p = sample;
+    float *input_p = sample;
     while (input_p < sample + HS_BLOCKL)
-        *sample++ = Hs_BiquadCascade(inst, *input_p++);
+    {
+        *input_p = Hs_BiquadCascade(inst, *input_p);
+        ++input_p;
+    }
 }

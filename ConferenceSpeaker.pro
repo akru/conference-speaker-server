@@ -7,6 +7,5 @@ SUBDIRS += \
     ServerCore   \
     ServerGui    \
     ServerTests  \
-    SpeakerTests \
     SuppressionTests
 

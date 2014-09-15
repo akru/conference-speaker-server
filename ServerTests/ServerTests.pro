@@ -1,5 +1,4 @@
 QT       += core network multimedia
-
 QT       -= gui
 
 TARGET    = ServerTests

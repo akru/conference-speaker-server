@@ -1,12 +1,11 @@
-QT       += core
-QT       -= gui
+QT      += core
+QT      -= gui
 
-TARGET = SuppressionTests
-CONFIG   += console
-CONFIG   -= app_bundle
+TARGET   = SuppressionTests
+CONFIG  += console
+CONFIG  -= app_bundle
 
 TEMPLATE = app
-
 
 SOURCES += main.cpp
 
@@ -15,7 +14,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Suppression/debu
 else:unix: LIBS += -L$$OUT_PWD/../Suppression/ -lSuppression
 
 INCLUDEPATH += $$PWD/../Suppression
-DEPENDPATH += $$PWD/../Suppression
+DEPENDPATH  += $$PWD/../Suppression
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Suppression/release/libSuppression.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Suppression/debug/libSuppression.a
@@ -28,7 +27,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Speaker/debug/ -
 else:unix: LIBS += -L$$OUT_PWD/../Speaker/ -lSpeaker
 
 INCLUDEPATH += $$PWD/../Speaker
-DEPENDPATH += $$PWD/../Speaker
+DEPENDPATH  += $$PWD/../Speaker
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Speaker/release/libSpeaker.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Speaker/debug/libSpeaker.a
