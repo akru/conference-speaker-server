@@ -98,8 +98,8 @@ Speaker::~Speaker()
 #ifdef QT_DEBUG
     delete debug_dialog;
 #endif
-    myThread.terminate();
-    myThread.wait();
+//    myThread.terminate();
+//    myThread.wait();
 
     audio->stop();
 
