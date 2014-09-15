@@ -85,8 +85,8 @@ Speaker::Speaker(QObject *parent) :
     t->start();
 #endif
     // Moving to separate thread
-    this->moveToThread(&myThread);
-    myThread.start(QThread::TimeCriticalPriority);
+//    this->moveToThread(&myThread);
+//    myThread.start(QThread::TimeCriticalPriority);
     // Starting heartbeat timer
     connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
     heartbeat.setInterval(Filter::sample_length * 1000.0 / Filter::sample_rate);

@@ -3,7 +3,7 @@
 
 #include <QList>
 #include <QObject>
-#include <QThread>
+//#include <QThread>
 #include <QTimer>
 #include "filter.h"
 #include "accbuffer.hpp"
@@ -51,7 +51,7 @@ private:
     QList<Filter *> filters;
     AccBuffer<qint16> accBuf;
 
-    QThread         myThread;
+//    QThread         myThread;
     QTimer          heartbeat;
 #ifdef QT_DEBUG
     DebugDialog     *debug_dialog;
