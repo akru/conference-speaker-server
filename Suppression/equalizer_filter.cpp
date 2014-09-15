@@ -177,9 +177,10 @@ void EqualizerFilter::dsp_logic()
     //do fft
     rdft(fft_size, 1, output_window, ip, wfft);
     //perform filtering
-    for(short j = 0; j < fft_size / 2 - 1; ++j) {
-        output_window[j]   *= H[j];
-        output_window[j+1] *= H[j];
+    for(short j = 0; j < fft_size; j+=2) {
+        output_window[j]   *= H[j/2];
+        output_window[j+1] *= H[j/2];
+        qDebug() << "H["<<j/2<<"]="<<H[j/2];
     }
     //inverse fft
     rdft(fft_size, -1, output_window, ip, wfft);
