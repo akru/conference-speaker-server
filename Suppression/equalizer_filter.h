@@ -30,10 +30,11 @@ private:
     static const int R            = window_size / 2;
     static const int overlap_size = window_size - R;
     static const int fft_size     = sample_length;
+    static const int h_size       = fft_size / 2 + 1;
 
     bool first_iteration;
     float X;
-    float *H;
+    float H[h_size];
     const float *W;
     float overlap[overlap_size];
     float buffer[sample_length * 2];

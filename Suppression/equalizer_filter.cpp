@@ -3,12 +3,22 @@
 
 #include <QDebug>
 
+#define B_SPLINE_EQ
+#define LINEAR_EQ
+#define NUM_PTS 180 // As i think it's represents a number of points on ordinate
+
 void interpolate(float *samples,
                  size_t length,
                  quint32 *xs,
                  float *ys,
                  size_t n_points) {
+
+#ifdef LINEAR_EQ
     /* Note that xs must be monotonically increasing! */
+    /* Description: x - frequency, y - scale
+     *
+     */
+
     float x_range_lower, x_range_upper, c0;
 
     Q_ASSERT(n_points >= 2);
@@ -35,6 +45,65 @@ void interpolate(float *samples,
     }
 
     samples[length-1] = ys[n_points-1];
+#endif
+
+#ifdef B_SPLINE_EQ
+    double dist, span, s;
+    double value = 0.0;
+    int minF = 0;
+    int NUMBER_OF_BANDS = 6;
+
+    double whens[NUM_PTS];
+    double whenSliders[NUMBER_OF_BANDS];
+    double m_EQVals[NUMBER_OF_BANDS];
+
+    for(int i=0; i<NUM_PTS-1; i++)
+        whens[i] = (double)i/(NUM_PTS-1.);
+    whens[NUM_PTS-1] = 1.;
+    whenSliders[NUMBER_OF_BANDS] = 1.;
+    m_EQVals[NUMBER_OF_BANDS] = 0.;
+
+    for(int i=0; i<NUM_PTS; i++)
+    {
+       while( (whenSliders[minF] <= whens[i]) & (minF < bandsInUse) )
+          minF++;
+       minF--;
+       if( minF < 0 ) //before first slider
+       {
+          dist = whenSliders[0] - whens[i];
+          span = whenSliders[1] - whenSliders[0];
+          if( dist < span )
+             value = m_EQVals[0]*(1. + cos(M_PI*dist/span))/2.;
+          else
+             value = 0.;
+       }
+       else
+       {
+          if( whens[i] > whenSliders[bandsInUse-1] )   //after last fader
+          {
+             span = whenSliders[bandsInUse-1] - whenSliders[bandsInUse-2];
+             dist = whens[i] - whenSliders[bandsInUse-1];
+             if( dist < span )
+                value = m_EQVals[bandsInUse-1]*(1. + cos(M_PI*dist/span))/2.;
+             else
+                value = 0.;
+          }
+          else  //normal case
+                         {
+                            span = whenSliders[minF+1] - whenSliders[minF];
+                            dist = whenSliders[minF+1] - whens[i];
+                            value = m_EQVals[minF]*(1. + cos(M_PI*(span-dist)/span))/2. +
+                            m_EQVals[minF+1]*(1. + cos(M_PI*dist/span))/2.;
+                         }
+                      }
+                      if(whens[i]<=0.)
+                         env->Move( 0., value );
+                      env->Insert( whens[i], value );
+                   }
+                   env->Move( 1., value );
+                   break;
+#endif
+
 }
 
 EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
@@ -56,20 +125,21 @@ EqualizerFilter::~EqualizerFilter()
 void EqualizerFilter::setSixBand(short B1, short B2, short B3,
                                  short B4, short B5, short B6)
 {
-    float sixBandH[fft_size], ys[7];
+    float sixBandH[h_size], ys[7];
     /* Static indexes for 16kHz freq */
     static quint32 xs[7] = { 0, 4, 8, 16, 48, 80, 128 };
-    static const float scale = 0.1;
+    static const float scale = 0.02;
     // Set six bands coefs
     ys[0] = 0;
-    ys[1] = (B1 - 50) * scale; ys[2] = (B2 - 50) * scale; ys[3] = (B3 - 50) * scale;
-    ys[4] = (B4 - 50) * scale; ys[5] = (B5 - 50) * scale; ys[6] = (B6 - 50) * scale;
+    ys[1] = B1 * scale; ys[2] = B2 * scale; ys[3] = B3* scale;
+    ys[4] = B4 * scale; ys[5] = B5 * scale; ys[6] = B6 * scale;
     // Interpolate values
-    interpolate(sixBandH, fft_size, xs, ys, 7);
+    interpolate(sixBandH, h_size, xs, ys, 7);
     // Debug output
     qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6;
-    for (short i = 0; i < fft_size; ++i)
-        qDebug() << "H [" << i << "] =" << H[i];
+    for (short i = 0; i < h_size; ++i)
+//        qDebug() << "H [" << i << "] =" << sixBandH[i];
+        qDebug() << sixBandH[i];
     // Set new H
     setFullBand(sixBandH);
 }
@@ -78,9 +148,9 @@ void EqualizerFilter::setFullBand(const float fbH[])
 {
     // Copy new H
     if (fbH)
-        memcpy(H, fbH, fft_size * sizeof(float));
+        memcpy(H, fbH, h_size * sizeof(float));
     else
-        for (short i = 0; i < fft_size; ++i)
+        for (short i = 0; i < h_size; ++i)
             H[i] = 1;
 }
 
@@ -111,9 +181,6 @@ void EqualizerFilter::process(float sample[])
 
 void EqualizerFilter::dsp_logic()
 {
-//    qDebug() << "DSP: X=" << X;
-//    for (short i =0; i < sample_length; ++i)
-//        qDebug() << "H[" << i << "]=" << H[i];
 
     float output_window[fft_size];
     //use a linear-phase sliding STFT and overlap-add method (for each channel)
@@ -132,7 +199,6 @@ void EqualizerFilter::dsp_logic()
     for(short j = 0; j < fft_size / 2 - 1; ++j) {
         output_window[j]   *= H[j];
         output_window[j+1] *= H[j];
-        qDebug() << "H:" << H[j];
     }
     //inverse fft
     rdft(fft_size, -1, output_window, ip, wfft);

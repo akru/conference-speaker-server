@@ -69,7 +69,7 @@ void BiquadCalcNotch(BiquadParams *inst, HsFreqGroup *group)
  */
 void BiquadCalcBandpass(BiquadParams *inst)
 {
-    float Fc   = inst->freq / 8000.0,
+    float Fc   = inst->freq / HS_SAMPLE_RATE,
           K    = tanf(PI_F * Fc),
           norm = 1 / (1 + K / inst->Q + K * K);
     inst->a0 = K / inst->Q * norm;
