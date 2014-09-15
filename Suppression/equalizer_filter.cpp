@@ -89,7 +89,7 @@ void interpolate(float *samples, quint16 length,
 
 EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
     : first_iteration(true),
-      X(X / fft_size), W(W)
+      X(X / fft_size * 2), W(W)
 {
     memset(overlap, 0, sizeof(float) * overlap_size);
     memset(buffer,  0, sizeof(float) * sample_length * 2);

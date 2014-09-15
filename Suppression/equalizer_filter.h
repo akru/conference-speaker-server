@@ -12,7 +12,7 @@ public:
                     const float *W=kBlackmanWindow256); // The windowing function
     ~EqualizerFilter();
 
-    inline void setMultiplier(float x) { X = x / fft_size; }
+    inline void setMultiplier(float x) { X = x / fft_size * 2; }
     /*
      * Input: six values from 0 to 100 for bands:
      * 250Hz, 500Hz, 1kHz, 3kHz, 5kHz, 8kHz
