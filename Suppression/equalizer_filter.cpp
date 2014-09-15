@@ -1,23 +1,81 @@
 #include "equalizer_filter.h"
 #include "fft4g.h"
 
+#include <cmath>
 #include <QDebug>
 
 #define B_SPLINE_EQ
-#define LINEAR_EQ
-#define NUM_PTS 180 // As i think it's represents a number of points on ordinate
 
-void interpolate(float *samples,
-                 size_t length,
-                 quint32 *xs,
-                 float *ys,
-                 size_t n_points) {
+/*
+ * Interpolate samples.
+ * Params:
+ *  samples - output interpolated array
+ *  length - samples length
+ *  xs, ys - interpolation input
+ *  n_points - input arrays length
+ */
+void interpolate(float *samples, short length,
+                 quint32 *xs, float *ys, short n_points)
+{
+#ifdef B_SPLINE_EQ // B-Spline interpolation
+    double dist, span;
+    double value = 0.0;
+    int minF = 0;
 
-#ifdef LINEAR_EQ
+    float *whens = new float[length];
+    for(short i = 0; i < length-1; ++i)
+        whens[i] = ((float) i) / (length - 1);
+    whens[length-1] = 1;
+
+//    whenSliders[NUMBER_OF_BANDS] = 1.;
+//    m_EQVals[NUMBER_OF_BANDS] = 0.;
+
+    for(short i = 0; i < length; ++i)
+    {
+        while ((xs[minF] <= whens[i]) && (minF < n_points))
+            ++minF;
+        --minF;
+        if (minF < 0) //before first slider
+        {
+            dist = xs[0] - whens[i];
+            span = xs[1] - xs[0];
+            if( dist < span )
+                value = ys[0]*(1. + cos(M_PI*dist/span))/2.;
+            else
+                value = 0.;
+        }
+        else
+        {
+            if( whens[i] > xs[n_points-1] )   //after last fader
+            {
+                span = xs[n_points-1] - xs[n_points-2];
+                dist = whens[i] - xs[n_points-1];
+                if( dist < span )
+                    value = ys[n_points-1]*(1. + cos(M_PI*dist/span))/2.;
+                else
+                    value = 0.;
+            }
+            else  //normal case
+            {
+                span = xs[minF+1] - xs[minF];
+                dist = xs[minF+1] - whens[i];
+                value = ys[minF]*(1. + cos(M_PI*(span-dist)/span))/2. +
+                        ys[minF+1]*(1. + cos(M_PI*dist/span))/2.;
+            }
+        }
+        qDebug() << "whens[" << i << "] =" << whens[i] << "v =" << value;
+        if (whens[i] < length && whens[i] >= 0)
+            samples[(short) whens[i]] = value;
+//        if(whens[i]<=0.)
+//            env->Move( 0., value );
+//        env->Insert( whens[i], value );
+    }
+
+    delete [] whens;
+
+#else // Bilinear interpolation
     /* Note that xs must be monotonically increasing! */
-    /* Description: x - frequency, y - scale
-     *
-     */
+    /* Description: x - frequency, y - scale */
 
     float x_range_lower, x_range_upper, c0;
 
@@ -46,64 +104,6 @@ void interpolate(float *samples,
 
     samples[length-1] = ys[n_points-1];
 #endif
-
-#ifdef B_SPLINE_EQ
-    double dist, span, s;
-    double value = 0.0;
-    int minF = 0;
-    int NUMBER_OF_BANDS = 6;
-
-    double whens[NUM_PTS];
-    double whenSliders[NUMBER_OF_BANDS];
-    double m_EQVals[NUMBER_OF_BANDS];
-
-    for(int i=0; i<NUM_PTS-1; i++)
-        whens[i] = (double)i/(NUM_PTS-1.);
-    whens[NUM_PTS-1] = 1.;
-    whenSliders[NUMBER_OF_BANDS] = 1.;
-    m_EQVals[NUMBER_OF_BANDS] = 0.;
-
-    for(int i=0; i<NUM_PTS; i++)
-    {
-       while( (whenSliders[minF] <= whens[i]) & (minF < bandsInUse) )
-          minF++;
-       minF--;
-       if( minF < 0 ) //before first slider
-       {
-          dist = whenSliders[0] - whens[i];
-          span = whenSliders[1] - whenSliders[0];
-          if( dist < span )
-             value = m_EQVals[0]*(1. + cos(M_PI*dist/span))/2.;
-          else
-             value = 0.;
-       }
-       else
-       {
-          if( whens[i] > whenSliders[bandsInUse-1] )   //after last fader
-          {
-             span = whenSliders[bandsInUse-1] - whenSliders[bandsInUse-2];
-             dist = whens[i] - whenSliders[bandsInUse-1];
-             if( dist < span )
-                value = m_EQVals[bandsInUse-1]*(1. + cos(M_PI*dist/span))/2.;
-             else
-                value = 0.;
-          }
-          else  //normal case
-                         {
-                            span = whenSliders[minF+1] - whenSliders[minF];
-                            dist = whenSliders[minF+1] - whens[i];
-                            value = m_EQVals[minF]*(1. + cos(M_PI*(span-dist)/span))/2. +
-                            m_EQVals[minF+1]*(1. + cos(M_PI*dist/span))/2.;
-                         }
-                      }
-                      if(whens[i]<=0.)
-                         env->Move( 0., value );
-                      env->Insert( whens[i], value );
-                   }
-                   env->Move( 1., value );
-                   break;
-#endif
-
 }
 
 EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
