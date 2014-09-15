@@ -14,30 +14,22 @@
  *  xs, ys - interpolation input
  *  n_points - input arrays length
  */
-void interpolate(float *samples, short length,
-                 quint32 *xs, float *ys, short n_points)
+void interpolate(float *samples, quint16 length,
+                 quint32 *xs, float *ys, quint16 n_points)
 {
 #ifdef B_SPLINE_EQ // B-Spline interpolation
     double dist, span;
     double value = 0.0;
     int minF = 0;
 
-    float *whens = new float[length];
-    for(short i = 0; i < length-1; ++i)
-        whens[i] = ((float) i) / (length - 1);
-    whens[length-1] = 1;
-
-//    whenSliders[NUMBER_OF_BANDS] = 1.;
-//    m_EQVals[NUMBER_OF_BANDS] = 0.;
-
-    for(short i = 0; i < length; ++i)
+    for(quint16 i = 0; i < length; ++i)
     {
-        while ((xs[minF] <= whens[i]) && (minF < n_points))
+        while ((xs[minF] <= i) && (minF < n_points))
             ++minF;
         --minF;
         if (minF < 0) //before first slider
         {
-            dist = xs[0] - whens[i];
+            dist = xs[0] - i;
             span = xs[1] - xs[0];
             if( dist < span )
                 value = ys[0]*(1. + cos(M_PI*dist/span))/2.;
@@ -46,33 +38,22 @@ void interpolate(float *samples, short length,
         }
         else
         {
-            if( whens[i] > xs[n_points-1] )   //after last fader
+            if(i > xs[n_points-1])   //after last fader
             {
                 span = xs[n_points-1] - xs[n_points-2];
-                dist = whens[i] - xs[n_points-1];
-                if( dist < span )
-                    value = ys[n_points-1]*(1. + cos(M_PI*dist/span))/2.;
-                else
-                    value = 0.;
+                dist = i - xs[n_points-1];
+                value = ys[n_points-1]*(1. + cos(M_PI*dist/span))/2.;
             }
             else  //normal case
             {
                 span = xs[minF+1] - xs[minF];
-                dist = xs[minF+1] - whens[i];
+                dist = xs[minF+1] - i;
                 value = ys[minF]*(1. + cos(M_PI*(span-dist)/span))/2. +
                         ys[minF+1]*(1. + cos(M_PI*dist/span))/2.;
             }
         }
-        qDebug() << "whens[" << i << "] =" << whens[i] << "v =" << value;
-        if (whens[i] < length && whens[i] >= 0)
-            samples[(short) whens[i]] = value;
-//        if(whens[i]<=0.)
-//            env->Move( 0., value );
-//        env->Insert( whens[i], value );
+        samples[i] = value;
     }
-
-    delete [] whens;
-
 #else // Bilinear interpolation
     /* Note that xs must be monotonically increasing! */
     /* Description: x - frequency, y - scale */
