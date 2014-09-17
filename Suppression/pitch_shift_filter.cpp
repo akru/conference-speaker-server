@@ -69,18 +69,26 @@ void PitchShiftFilter::process(float sample[])
     if (++iteration > PITCH_SHIFT_TIME / 32.0)
     {
         currentPitch = (currentPitch + 1) % PITCH_COUNT;
-        iteration   = 0;
+        iteration    = 0;
     }
 
-    if(currentPitch) // for now works only with currentPitch = 0 or 1, for more please add switch-case or if-elseif-else construction
+    float output[sample_length];
+
+    if(currentPitch) // Pitch up
     {
-        float output[sample_length];
+        pitchShift = 1 + pitchShift;
         smbPitchShift(sample_length, sample_length, sample, output);
         for (short i = 0; i < sample_length; ++i)
             sample[i] = output[i];
+        pitchShift = pitchShift - 1;
     }
-    else
+    else // Pitch down
     {
+       pitchShift = 1 - pitchShift;
+       smbPitchShift(sample_length, sample_length, sample, output);
+       for (short i = 0; i < sample_length; ++i)
+           sample[i] = output[i];
+       pitchShift = 1 - pitchShift;
     }
 }
 

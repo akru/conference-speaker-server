@@ -4,12 +4,12 @@
 #include "../Speaker/filter.h"
 
 static const int PITCH_COUNT   = 2;
-static const int PITCH_SHIFT_TIME = 800; // ms; WARN: it divided by frame length (32 ms)
+static const int PITCH_SHIFT_TIME = 1200; // ms; WARN: it divided by frame length (32 ms)
 
 class PitchShiftFilter : public Filter
 {
 public:
-    PitchShiftFilter(float pitch_shift=1.0, long osamp=32);
+    PitchShiftFilter(float pitch_shift=0.0, long osamp=32);
     ~PitchShiftFilter();
 
     void process(float sample[]);
@@ -27,7 +27,7 @@ private:
     float gSynFreq[sample_length];
     float gSynMagn[sample_length];
     long gRover, osamp;
-    float pitchShift;
+    float pitchShift; // should be in [0; 1), 0.04 - for example
     int currentPitch, iteration;
 
     void smbPitchShift(long numSampsToProcess,
