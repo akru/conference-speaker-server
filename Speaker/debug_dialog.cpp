@@ -19,10 +19,10 @@ DebugDialog::~DebugDialog()
 void DebugDialog::on_applyButton_clicked()
 {
     HSFilter *hsf = (HSFilter *) hs;
-    hsf->handle()->PAPR_TH = ui->paprSpin->value();
-    hsf->handle()->PHPR_TH = ui->phprSpin->value();
-    hsf->handle()->PNPR_TH = ui->pnprSpin->value();
-    hsf->handle()->IMSD_TH = ui->ismdSpin->value();
+    hsf->setTH(ui->paprSpin->value(),
+               ui->phprSpin->value(),
+               ui->pnprSpin->value(),
+               ui->ismdSpin->value());
     EqualizerFilter *eqf = (EqualizerFilter *) eq;
     eqf->setSixBand(ui->verticalSlider->value(),
                     ui->verticalSlider_2->value(),

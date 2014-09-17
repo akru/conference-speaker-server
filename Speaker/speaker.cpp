@@ -70,8 +70,9 @@ Speaker::Speaker(QObject *parent) :
     filters.append(new HSFilter(15, 40, 0, 0.3));
     //filters.append(new BandswitchFilter);
 #else
-    HSFilter *hs = new HSFilter(15, 40, 0, 0.3);
+
     EqualizerFilter *eq = new EqualizerFilter;
+    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
     // Append filters
     filters.append(hs);
     filters.append(eq);
