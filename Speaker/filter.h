@@ -20,8 +20,8 @@ public:
      */
     virtual QString name() = 0;
 
-    static const int sample_rate   = 16000; // Hz
-    static const int sample_length = 256;  // Bins
+    static const int sample_rate   = 22050; // Hz
+    static const int sample_length = 512;  // Bins
 };
 
 #endif // FILTER_H

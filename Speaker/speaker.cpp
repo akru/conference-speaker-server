@@ -67,11 +67,12 @@ Speaker::Speaker(QObject *parent) :
     // Append filters
     filters.append(new NSFilter(NSFilter::High, 10, 500));
 //    filters.append(new HighPassFilter);
-    filters.append(new HSFilter(15, 40, 0, 0.3));
+    //filters.append(new HSFilter(15, 40, 0, 0.3));
     //filters.append(new BandswitchFilter);
 #else
-    HSFilter *hs = new HSFilter(15, 40, 0, 0.3);
+
     EqualizerFilter *eq = new EqualizerFilter;
+    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
     // Append filters
     filters.append(hs);
     filters.append(eq);

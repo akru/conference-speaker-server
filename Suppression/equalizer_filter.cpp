@@ -6,6 +6,18 @@
 
 #define B_SPLINE_EQ
 
+static const quint32 bands[8] = {
+    EqualizerFilter::hz_to_index * 0,
+    EqualizerFilter::hz_to_index * 250,
+    EqualizerFilter::hz_to_index * 500,
+    EqualizerFilter::hz_to_index * 1000,
+    EqualizerFilter::hz_to_index * 3000,
+    EqualizerFilter::hz_to_index * 5000,
+    EqualizerFilter::hz_to_index * 8000,
+    EqualizerFilter::hz_to_index * 10000
+};
+
+
 /*
  * Interpolate samples.
  * Params:
@@ -15,7 +27,7 @@
  *  n_points - input arrays length
  */
 void interpolate(float *samples, quint16 length,
-                 quint32 *xs, float *ys, quint16 n_points)
+                 const quint32 *xs, const float *ys, quint16 n_points)
 {
 #ifdef B_SPLINE_EQ // B-Spline interpolation
     double dist, span;
@@ -103,26 +115,27 @@ EqualizerFilter::~EqualizerFilter()
 {
 }
 
-void EqualizerFilter::setSixBand(short B1, short B2, short B3,
-                                 short B4, short B5, short B6)
+void EqualizerFilter::setUserBand(short B1, short B2, short B3,
+                                  short B4, short B5, short B6, short B7)
 {
-    float sixBandH[h_size], ys[7];
+    float uBandH[h_size], ys[8];
     /* Static indexes for 16kHz freq */
-    static quint32 xs[7] = { 0, 4, 8, 16, 48, 80, 128 };
+    const quint32 *xs = bands;
     static const float scale = 0.02;
     // Set six bands coefs
     ys[0] = 0;
     ys[1] = B1 * scale; ys[2] = B2 * scale; ys[3] = B3* scale;
     ys[4] = B4 * scale; ys[5] = B5 * scale; ys[6] = B6 * scale;
+    ys[7] = B7 * scale;
     // Interpolate values
-    interpolate(sixBandH, h_size, xs, ys, 7);
+    interpolate(uBandH, h_size, xs, ys, 8);
     // Debug output
-    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6;
+    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6 << B7;
     for (short i = 0; i < h_size; ++i)
 //        qDebug() << "H [" << i << "] =" << sixBandH[i];
-        qDebug() << sixBandH[i];
+        qDebug() << uBandH[i];
     // Set new H
-    setFullBand(sixBandH);
+    setFullBand(uBandH);
 }
 
 void EqualizerFilter::setFullBand(const float fbH[])

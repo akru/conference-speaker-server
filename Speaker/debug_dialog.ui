@@ -91,13 +91,13 @@
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
-          <string>Six row</string>
+          <string>User row</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="3" column="6">
            <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>8k </string>
+             <string>5k </string>
             </property>
            </widget>
           </item>
@@ -211,6 +211,26 @@
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>8k</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="8">
+           <widget class="QSlider" name="verticalSlider_7">
+            <property name="value">
+             <number>50</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="8">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>10k</string>
             </property>
            </widget>
           </item>

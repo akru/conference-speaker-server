@@ -2,25 +2,63 @@
 #define HS_FILTER_H
 
 #include "../Speaker/filter.h"
-//#include "../Speaker/sample.h"
-#include "howling_suppression.h"
+#include "equalizer_filter.h"
+#include <cmath>
+
+#define HS_DEBUG
 
 class HSFilter : public Filter
 {
 public:
-    HSFilter(float PAPR_TH = 0, float PHPR_TH = 0,
-             float PNPR_TH = 0, float ISMD_TH = 0);
+    HSFilter(EqualizerFilter *eq,
+             float PAPR_TH = 0, float PHPR_TH = 0,
+             float PNPR_TH = 0, float IMSD_TH = 0);
     ~HSFilter();
 
     void process(float sample[]);
     QString name() { return "Howling suppression"; }
 
-#ifdef QT_DEBUG
-    HsHandle *handle() const;
-#endif
+    inline void setTH(float PAPR_TH_, float PHPR_TH_,
+                      float PNPR_TH_, float IMSD_TH_)
+    {
+        PAPR_TH = PAPR_TH_;
+        PHPR_TH = PHPR_TH_;
+        PNPR_TH = PNPR_TH_;
+        IMSD_TH = IMSD_TH_;
+    }
 
 private:
-    HsHandle *hs_ptr;
+    // Static constants
+    static const short analyze_length = sample_length;
+    static const short fft_input_length = analyze_length * 2;
+    // Must be at least ceil(2 + sqrt(HS_BLOCKL/2))
+    static const short ip_length = (fft_input_length * 2 >> 1);
+    static const short w_length = (fft_input_length * 2 >> 1);
+    static const short dft_buffer_count = 5;
+    static const int   dft_buffer_len = dft_buffer_count * analyze_length;
+    static const short freq_count_max = 20;
+    static const float index_to_hz = sample_rate / 2.0 / analyze_length;
+    static const float index_to_rad = 2.0 * M_PI * sample_rate / analyze_length;
+    static const float hz_to_index = analyze_length * 2.0 / sample_rate;
+    static const float rad_to_index = analyze_length / 2.0 / M_PI / sample_rate;
+    static const short minimal_freq = 50;
+    static const short maximal_freq = 10000;
+    static const float filter_step = 0.1;
+
+    // Equalizer instance
+    EqualizerFilter *eq;
+    // Analyzer data
+    int   ip[ip_length];
+    float wfft[w_length];
+    float dft_buf[dft_buffer_len];
+    // Trasholds
+    float PAPR_TH, PHPR_TH, PNPR_TH, IMSD_TH;
+
+    short analyze_howling(short howling_freq[], const float input[]);
+    void  evaluatePAPR(const float input[], float papr[]);
+    void  evaluatePHPR(const float input[], float phpr[]);
+    void  evaluatePNPR(const float input[], float pnpr[]);
+    void  evaluateIMSD(const float input[], float imsd[]);
 };
 
 #endif // HS_FILTER_H
