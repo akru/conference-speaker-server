@@ -12,7 +12,7 @@ public:
                     const float *W=kBlackmanWindow512); // The windowing function
     ~EqualizerFilter();
 
-    inline void setMultiplier(float x) { X = x / fft_size; }
+    inline void setMultiplier(float x) { X = x / fft_size * 2; }
     /*
      * Input: six values from 0 to 100 for bands:
      * 250Hz, 500Hz, 1kHz, 3kHz, 5kHz, 8kHz, 10kHz
@@ -33,7 +33,7 @@ public:
     static const int R            = window_size / 2;
     static const int overlap_size = window_size - R;
     static const int fft_size     = sample_length;
-    static const int h_size       = fft_size / 2 + 1;
+    static const int h_size       = fft_size / 2;
 
     // Freq to index converter for H
     static const float hz_to_index = 2.0 * h_size / sample_rate;

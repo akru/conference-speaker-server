@@ -101,7 +101,7 @@ void interpolate(float *samples, quint16 length,
 
 EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
     : first_iteration(true),
-      X(X / fft_size), W(W)
+      X(X / fft_size * 2), W(W)
 {
     memset(overlap, 0, sizeof(float) * overlap_size);
     memset(buffer,  0, sizeof(float) * sample_length * 2);
@@ -190,9 +190,10 @@ void EqualizerFilter::dsp_logic()
     //do fft
     rdft(fft_size, 1, output_window, ip, wfft);
     //perform filtering
-    for(short j = 0; j < fft_size / 2 - 1; ++j) {
-        output_window[j]   *= H[j];
-        output_window[j+1] *= H[j];
+    for(short j = 0; j < fft_size; j+=2) {
+        output_window[j]   *= H[j/2];
+        output_window[j+1] *= H[j/2];
+        qDebug() << "H["<<j/2<<"]="<<H[j/2];
     }
     //inverse fft
     rdft(fft_size, -1, output_window, ip, wfft);
