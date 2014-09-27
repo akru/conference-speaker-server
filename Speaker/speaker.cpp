@@ -67,7 +67,7 @@ Speaker::Speaker(QObject *parent) :
     // Append filters
     filters.append(new NSFilter(NSFilter::High, 10, 500));
 //    filters.append(new HighPassFilter);
-    filters.append(new HSFilter(15, 40, 0, 0.3));
+    //filters.append(new HSFilter(15, 40, 0, 0.3));
     //filters.append(new BandswitchFilter);
 #else
 

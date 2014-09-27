@@ -24,6 +24,7 @@ private slots:
 private:
     Ui::DebugDialog *ui;
     Filter *eq, *hs;
+    QString settingsFileName;
 };
 
 #endif // DEBUG_DIALOG_H

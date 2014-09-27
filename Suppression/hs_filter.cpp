@@ -1,5 +1,4 @@
 #include "hs_filter.h"
-#include "howling_suppression.h"
 #include "fft4g.h"
 
 #include <cstdio>
@@ -43,6 +42,16 @@ void HSFilter::process(float sample[])
     for (short i = 0; i < freq_count; ++i)
         qDebug() << i + 1 << ">" << howling_freq[i] << "Hz";
 #endif
+    // Fix equalizer by hoowling
+    float *H = eq->getFullBand();
+    for (short i = 0; i < freq_count; ++i)
+    {
+        int ix = (int) (howling_freq[i] * EqualizerFilter::hz_to_index);
+        if (H[ix] > filter_step)
+            H[ix] -= filter_step;
+        else
+            H[ix] = 0;
+    }
 }
 /*
  * Find howling freques and write into instance array
@@ -53,7 +62,7 @@ short HSFilter::analyze_howling(short howling_freq[], const float input[])
     float fin[fft_input_length];
     // Convert input data to float and apply window
     for (short i = 0; i < sample_length; ++i)
-        fin[i] = input[i] * kBlackmanWindow256[i];
+        fin[i] = input[i] * kBlackmanWindow512[i];
     memset(fin + sample_length, 0, sizeof(float) * (fft_input_length - sample_length));
 
     // Apply RDFT
@@ -84,24 +93,15 @@ short HSFilter::analyze_howling(short howling_freq[], const float input[])
     for (short i = 0; i < analyze_length; ++i)
     {
 #ifdef HS_DEBUG
-        const char *out;
-        // Some magic freq converter from index
-        freq = index_to_hz * i;
-        fprintf(stderr, "Freq %d Hz >\t", freq);
-        out = papr[i] > PAPR_TH ? "+" : " ";
-        fprintf(stderr, "PAPR : %.1f %s\t", papr[i], out);
-        out = phpr[i] > PHPR_TH ? "+" : " ";
-        fprintf(stderr, "PHPR : %.1f %s\t", phpr[i], out);
-        out = pnpr[i] > PNPR_TH ? "+" : " ";
-        fprintf(stderr, "PNPR : %.1f %s\t", pnpr[i], out);
-        out = fabsf(imsd[i]) < IMSD_TH ? "+" : " ";
-        fprintf(stderr, "IMSD : %.1f %s\t", imsd[i], out);
-        if ( papr[i] > PAPR_TH &&
-             phpr[i] > PHPR_TH &&
-             pnpr[i] > PNPR_TH &&
-             fabsf(imsd[i]) < IMSD_TH)
-            fprintf(stderr, " << FOUND >> ");
-        fprintf(stderr, "\n");
+        qDebug() << "Freq" << (int) (index_to_hz * i) << "Hz >"
+                 << "PAPR :" << papr[i] << (papr[i] > PAPR_TH ? "+" : " ")
+                 << "PHPR :" << papr[i] << (phpr[i] > PHPR_TH ? "+" : " ")
+                 << "PNPR :" << pnpr[i] << (pnpr[i] > PNPR_TH ? "+" : " ")
+                 << "IMSD :" << imsd[i] << (imsd[i] < IMSD_TH ? "+" : " ")
+                 << (( papr[i] > PAPR_TH &&
+                       phpr[i] > PHPR_TH &&
+                       pnpr[i] > PNPR_TH &&
+                       fabsf(imsd[i]) < IMSD_TH) ? "\t<< FOUND >>" : "");
 #endif
         // TH check
         if ( papr[i] > PAPR_TH &&
@@ -186,7 +186,7 @@ void HSFilter::evaluatePNPR(const float Y[], float PNPR[])
  */
 void HSFilter::evaluateIMSD(const float Y[], float IMSD[])
 {
-    const short Q_m = 16,
+    const short Q_m = 5,
                 P   = 1,
                 t   = dft_buffer_count - 1;
     float fst_sum, snd_sum;
