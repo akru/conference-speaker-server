@@ -5,7 +5,7 @@
 #include "equalizer_filter.h"
 #include <cmath>
 
-#define HS_DEBUG
+//#define HS_DEBUG
 
 class HSFilter : public Filter
 {

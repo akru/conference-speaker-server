@@ -16,22 +16,22 @@
 int main()
 {
 
-//    NSFilter nsf(NSFilter::High, 10, 500);
-//    HSFilter hsf;
+    NSFilter nsf(NSFilter::High, 10, 500);
 //    PitchShiftFilter psf(1.04, 4);
 
     float eqs[Filter::sample_length];
     for (short i = 0; i<Filter::sample_length / 2 + 1; ++i) {
         eqs[i] = 1;//sin(i / 4 / PI_F) < 0 ? 0 : sin(i / 4 / PI_F);
-        if (i > 10 && i < 50)
-            eqs[i] = 0;
-        qDebug() << "H[" << i << "]=" <<eqs[i];
+//        if (i > 10 && i < 50)
+//            eqs[i] = 0;
+//        qDebug() << "H[" << i << "]=" <<eqs[i];
     }
 
-    EqualizerFilter eq(0.01,                //multiplier
+    EqualizerFilter eq(1,                //multiplier
                        eqs,                 //The freq. magnitude scalers filter
                        kBlackmanWindow256   //The windowing function
                       );
+    HSFilter hsf(&eq, 15, 15, 13, 0.8);
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);
@@ -54,17 +54,17 @@ int main()
             float sample[Filter::sample_length];
             float *fltp = sample;
             while ((char *) rawp < sam.data() + sam.length()) {
-                qDebug() << "I:" << *rawp;
+//                qDebug() << "I:" << *rawp;
                 *fltp++ = (float) *rawp++ / 30000;
                 //qDebug() << "O:" << *fltp;
             }
-
+            hsf.process(sample);
             eq.process(sample);
 
             rawp = (qint16 *) sam.data();
             fltp = sample;
             while ((char *) rawp < sam.data() + sam.length()) {
-                qDebug() << "O:" << *fltp;
+//                qDebug() << "O:" << *fltp;
                 *rawp++ = (qint16) (*fltp++ * 30000);
             }
 

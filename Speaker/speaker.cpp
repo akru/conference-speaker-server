@@ -66,17 +66,19 @@ Speaker::Speaker(QObject *parent) :
 #ifndef QT_DEBUG
     // Append filters
     filters.append(new NSFilter(NSFilter::High, 10, 500));
-//    filters.append(new HighPassFilter);
-    //filters.append(new HSFilter(15, 40, 0, 0.3));
-    //filters.append(new BandswitchFilter);
-#else
-
     EqualizerFilter *eq = new EqualizerFilter;
-    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
-    // Append filters
+    HSFilter *hs = new HSFilter(eq, 15, 44, 35, 0.3);
     filters.append(hs);
     filters.append(eq);
+#else
     filters.append(new NSFilter(NSFilter::High, 10, 500));
+    EqualizerFilter *eq = new EqualizerFilter;
+    HSFilter *hs = new HSFilter(eq, 15, 15, 13, 0.8);
+    // Append filters
+    filters.append(hs);
+    filters.append(new PitchShiftFilter(0.04, 32));
+    filters.append(eq);
+
 
     debug_dialog = new DebugDialog(eq, hs);
     debug_dialog->show();
@@ -90,7 +92,7 @@ Speaker::Speaker(QObject *parent) :
 //    myThread.start(QThread::TimeCriticalPriority);
     // Starting heartbeat timer
     connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
-    heartbeat.setInterval(Filter::sample_length * 1000.0 / Filter::sample_rate);
+    heartbeat.setInterval(Filter::sample_length * 999.0 / Filter::sample_rate);
     heartbeat.start();
 }
 
@@ -118,7 +120,11 @@ void Speaker::setVolume(qreal volume)
     Q_ASSERT(audio);
     Q_ASSERT(volume >= 0 && volume <= 1);
 
-    audio->setVolume(volume);
+    if(volume == 0)
+        audio->setVolume(volume);
+    else{
+        audio->setVolume(volume*1.2);
+    }
 }
 
 void Speaker::play(QByteArray packet)

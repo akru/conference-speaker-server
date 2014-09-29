@@ -15,12 +15,12 @@ HSFilter::HSFilter(EqualizerFilter *eq,
     // Initialize fft work arrays.
     ip[0] = 0; // Setting this triggers initialization.
     memset(dft_buf, 0, sizeof(float) * dft_buffer_len);
-#ifdef QT_DEBUG
-    qDebug() << "HS_INIT: PAPR_TH =" << PAPR_TH
-             << "PHPR_TH =" << PHPR_TH
-             << "PNPR_TH =" << PNPR_TH
-             << "IMSD =" << IMSD_TH;
-#endif
+//#ifdef QT_DEBUG
+//    qDebug() << "HS_INIT: PAPR_TH =" << PAPR_TH
+//             << "PHPR_TH =" << PHPR_TH
+//             << "PNPR_TH =" << PNPR_TH
+//             << "IMSD =" << IMSD_TH;
+//#endif
 }
 
 HSFilter::~HSFilter()
@@ -37,11 +37,11 @@ void HSFilter::process(float sample[])
         return;
     }
     // Print freq information
-#ifdef QT_DEBUG
-    qDebug() << "Detected" << freq_count << "hoOowling:";
-    for (short i = 0; i < freq_count; ++i)
-        qDebug() << i + 1 << ">" << howling_freq[i] << "Hz";
-#endif
+//#ifdef QT_DEBUG
+//    qDebug() << "Detected" << freq_count << "hoOowling:";
+//    for (short i = 0; i < freq_count; ++i)
+//        qDebug() << i + 1 << ">" << howling_freq[i] << "Hz";
+//#endif
     // Fix equalizer by hoowling
     float *H = eq->getFullBand();
     for (short i = 0; i < freq_count; ++i)
@@ -62,7 +62,7 @@ short HSFilter::analyze_howling(short howling_freq[], const float input[])
     float fin[fft_input_length];
     // Convert input data to float and apply window
     for (short i = 0; i < sample_length; ++i)
-        fin[i] = input[i] * kBlackmanWindow512[i];
+        fin[i] = input[i] * kBlackmanWindow256[i];
     memset(fin + sample_length, 0, sizeof(float) * (fft_input_length - sample_length));
 
     // Apply RDFT
@@ -92,22 +92,22 @@ short HSFilter::analyze_howling(short howling_freq[], const float input[])
     short freq_count = 0, freq;
     for (short i = 0; i < analyze_length; ++i)
     {
-#ifdef HS_DEBUG
-        qDebug() << "Freq" << (int) (index_to_hz * i) << "Hz >"
-                 << "PAPR :" << papr[i] << (papr[i] > PAPR_TH ? "+" : " ")
-                 << "PHPR :" << papr[i] << (phpr[i] > PHPR_TH ? "+" : " ")
-                 << "PNPR :" << pnpr[i] << (pnpr[i] > PNPR_TH ? "+" : " ")
-                 << "IMSD :" << imsd[i] << (imsd[i] < IMSD_TH ? "+" : " ")
-                 << (( papr[i] > PAPR_TH &&
-                       phpr[i] > PHPR_TH &&
-                       pnpr[i] > PNPR_TH &&
-                       fabsf(imsd[i]) < IMSD_TH) ? "\t<< FOUND >>" : "");
-#endif
+//#ifdef HS_DEBUG
+//        qDebug() << "Freq" << (int) (index_to_hz * i) << "Hz >"
+//                 << "PAPR :" << papr[i] << (papr[i] > PAPR_TH ? "+" : " ")
+//                 << "PHPR :" << papr[i] << (phpr[i] > PHPR_TH ? "+" : " ")
+//                 << "PNPR :" << pnpr[i] << (pnpr[i] > PNPR_TH ? "+" : " ")
+//                 << "IMSD :" << imsd[i] << (fabs(imsd[i]) < IMSD_TH ? "+" : " ")
+//                 << (( papr[i] > PAPR_TH &&
+//                       phpr[i] > PHPR_TH &&
+//                       pnpr[i] > PNPR_TH &&
+//                       fabsf(imsd[i]) < IMSD_TH) ? "\t<< FOUND >>" : "");
+//#endif
         // TH check
-        if ( papr[i] > PAPR_TH &&
-             phpr[i] > PHPR_TH &&
-             pnpr[i] > PNPR_TH &&
-             imsd[i] < IMSD_TH)
+        if ( papr[i] > PAPR_TH
+             && phpr[i] > PHPR_TH
+             //&& pnpr[i] > PNPR_TH
+             && fabs(imsd[i]) < IMSD_TH)
         {
             // Some magic freq converter from index
             freq = index_to_hz * i;
@@ -186,7 +186,7 @@ void HSFilter::evaluatePNPR(const float Y[], float PNPR[])
  */
 void HSFilter::evaluateIMSD(const float Y[], float IMSD[])
 {
-    const short Q_m = 5,
+    const short Q_m = 4,
                 P   = 1,
                 t   = dft_buffer_count - 1;
     float fst_sum, snd_sum;

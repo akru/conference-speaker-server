@@ -29,7 +29,7 @@ void NSFilter::process(float sample[])
     float out[sample_length];
 
     WebRtcNs_Process(ns_ptr, sample, out);
-    postSuppression(out);
+//    postSuppression(out);
 
     for (short i = 0; i < sample_length; ++i)
         sample[i] = out[i];
@@ -49,9 +49,9 @@ void NSFilter::postSuppression(float sample[])
         energy = sqrt(energy / count);
         qDebug() << "RMS Energy TH:" << energy;
 
-        if (energy < trashold)
-            for (short i = 0; i < count && pos + i < sample_length; ++i)
-                sample[pos + i] = 0;
+//        if (energy < trashold)
+//            for (short i = 0; i < count && pos + i < sample_length; ++i)
+//                sample[pos + i] = 0;
         pos += count;
     }
 }

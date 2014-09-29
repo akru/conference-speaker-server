@@ -130,10 +130,10 @@ void EqualizerFilter::setUserBand(short B1, short B2, short B3,
     // Interpolate values
     interpolate(uBandH, h_size, xs, ys, 8);
     // Debug output
-    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6 << B7;
+//    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6 << B7;
     for (short i = 0; i < h_size; ++i)
 //        qDebug() << "H [" << i << "] =" << sixBandH[i];
-        qDebug() << uBandH[i];
+//        qDebug() << uBandH[i];
     // Set new H
     setFullBand(uBandH);
 }
@@ -193,7 +193,7 @@ void EqualizerFilter::dsp_logic()
     for(short j = 0; j < fft_size; j+=2) {
         output_window[j]   *= H[j/2];
         output_window[j+1] *= H[j/2];
-        qDebug() << "H["<<j/2<<"]="<<H[j/2];
+//        qDebug() << "H["<<j/2<<"]="<<H[j/2];
     }
     //inverse fft
     rdft(fft_size, -1, output_window, ip, wfft);

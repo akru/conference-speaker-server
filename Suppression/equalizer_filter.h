@@ -9,7 +9,7 @@ class EqualizerFilter : public Filter
 public:
     EqualizerFilter(float X=1,                          // Multiplier
                     const float *fbH=0,                 // The freq. magnitude scalers filter
-                    const float *W=kBlackmanWindow512); // The windowing function
+                    const float *W=kBlackmanWindow256); // The windowing function
     ~EqualizerFilter();
 
     inline void setMultiplier(float x) { X = x / fft_size * 2; }

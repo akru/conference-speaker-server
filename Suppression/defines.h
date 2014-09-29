@@ -23,7 +23,6 @@
  * Howling suppression
  */
 
-#define HS_DEBUG
 #define HS_BUF_COUNT        20
 #define HS_BLOCKL           BLOCK_LEN_INPUT             // Input block
 #define HS_BLOCKL_A         HS_BLOCKL / 2               // Analyzed block
