@@ -29,7 +29,8 @@ void NSFilter::process(float sample[])
     float out[sample_length];
 
     WebRtcNs_Process(ns_ptr, sample, out);
-    postSuppression(out);
+    WebRtcNs_Process(ns_ptr, sample + Filter::sample_length / 2, out + Filter::sample_length / 2);
+//    postSuppression(out);
 
     for (short i = 0; i < sample_length; ++i)
         sample[i] = out[i];
