@@ -19,7 +19,7 @@ public:
     ~CompressorFilter();
 
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Compressor"; }
 
 private:

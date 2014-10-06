@@ -13,10 +13,10 @@ public:
     QString name() { return "AGC"; }
 
 private:
-    bool firstHack;
     float maxAmp;
     void  analyzeMax(float sample[]);
     void  gainSample(float sample[]);
+    bool firstSample;
 };
 
 #endif // AGC_FILTER_H
