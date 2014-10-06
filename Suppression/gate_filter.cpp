@@ -3,3 +3,12 @@
 GateFilter::GateFilter()
 {
 }
+
+GateFilter::~GateFilter()
+{
+}
+
+void GateFilter::process(float sample[])
+{
+
+}

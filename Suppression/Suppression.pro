@@ -19,7 +19,8 @@ SOURCES  += \
 #    compressor_filter.cpp \
     equalizer_filter.cpp \
     pitch_shift_filter.cpp \
-    gate_filter.cpp
+    gate_filter.cpp \
+    agc_filter.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -38,4 +39,5 @@ HEADERS  += \
 #    compressor_filter.h \
     equalizer_filter.h \
     pitch_shift_filter.h \
-    gate_filter.h
+    gate_filter.h \
+    agc_filter.h

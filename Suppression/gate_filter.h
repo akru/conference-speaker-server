@@ -11,6 +11,7 @@ public:
 
     void process(float sample[]);
     QString name() { return "Gate"; }
+
 private:
     float attack_time;
     float lower_TH;
