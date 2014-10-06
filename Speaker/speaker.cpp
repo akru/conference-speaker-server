@@ -39,7 +39,7 @@ void fromPCM(qint16 pcm[], float sample[])
     // Normalization
     qint16 *rawp = pcm;
     while (rawp < pcm + Filter::sample_length)
-        *sample++ = ((float) *rawp++) / norm_int16 / 2 + 0.5;
+        *sample++ = ((float) *rawp++) / norm_int16;
 }
 
 void toPCM(float sample[], qint16 pcm[])
@@ -47,7 +47,7 @@ void toPCM(float sample[], qint16 pcm[])
     // Back to the INT
     qint16 *rawp = pcm;
     while (rawp < pcm + Filter::sample_length)
-        *rawp++ = (*sample++ - 0.5) * norm_int16 * 2;
+        *rawp++ = *sample++ * norm_int16;
 }
 
 Speaker::Speaker(QObject *parent) :
@@ -90,7 +90,7 @@ Speaker::Speaker(QObject *parent) :
     filters.append(eq);
     filters.append(new PitchShiftFilter(0.04, 4));
 #else
-    filters.append(new NSFilter(NSFilter::Medium, 10, 500);
+    filters.append(new NSFilter(NSFilter::Medium, 10, 500));
     EqualizerFilter *eq = new EqualizerFilter;
     HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
     // Append filters
