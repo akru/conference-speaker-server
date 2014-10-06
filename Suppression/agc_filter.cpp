@@ -1,7 +1,8 @@
 #include "agc_filter.h"
+#include <cmath>
 
 AGCFilter::AGCFilter()
-    : maxAmp(0)
+    : maxAmp(0), firstSample(true)
 {
 }
 
@@ -17,13 +18,21 @@ void AGCFilter::process(float sample[])
 
 void AGCFilter::analyzeMax(float sample[])
 {
-    for (short i = 0; i < sample_length; ++i)
-        if (sample[i] > maxAmp)
-            maxAmp = sample[i];
+    if (firstSample) { // ignoring first sample
+        firstSample = false;
+        return;
+    }
+
+    for (short i = 0; i < sample_length; ++i) {
+        if (fabs(sample[i]) > maxAmp)
+            maxAmp = fabs(sample[i]);
+    }
 }
 
 void AGCFilter::gainSample(float sample[])
 {
+    if(!maxAmp) return;
+
     const float scaler = 1.0 / maxAmp;
     for (short i = 0; i < sample_length; ++i)
         sample[i] *= scaler;

@@ -1,4 +1,5 @@
 #include "gate_filter.h"
+#include <cmath>
 
 GateFilter::GateFilter(float raiseTH,
                        float fallTH,
@@ -32,15 +33,16 @@ float GateFilter::gateLogic(float s)
 {
     switch (state) {
     case Closed:
-        if (s > raiseTH)
+        if (fabs(s) > raiseTH)
             state = Opened;
         break;
 
     case Opened:
-        if (s < fallTH)
+        if (fabs(s) < fallTH)
         {
             holdCtr = 0;
             state = Holding;
+            break;
         }
         // Scale up
         if (scaleVal < 1)
@@ -48,7 +50,7 @@ float GateFilter::gateLogic(float s)
         break;
 
     case Holding:
-        if (s > raiseTH)
+        if (fabs(s) > raiseTH)
             state = Opened;
         else
             if (holdCtr++ > holdTime * sample_rate)
@@ -60,10 +62,7 @@ float GateFilter::gateLogic(float s)
         if (scaleVal > 0)
             scaleVal -= scaleDownStep;
         else
-        {
-            scaleVal = 0;
             state = Closed;
-        }
         break;
     }
     return s * scaleVal;
