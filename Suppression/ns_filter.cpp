@@ -24,7 +24,7 @@ NSFilter::~NSFilter()
     WebRtcNs_Free(ns_ptr);
 }
 
-void NSFilter::process(float sample[])
+void NSFilter::processFilter(float sample[])
 {
     float out[sample_length];
 

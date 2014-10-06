@@ -64,7 +64,7 @@ PitchShiftFilter::~PitchShiftFilter()
 {
 }
 
-void PitchShiftFilter::process(float sample[])
+void PitchShiftFilter::processFilter(float sample[])
 {
     if (++iteration > PITCH_SHIFT_TIME / 32.0)
     {

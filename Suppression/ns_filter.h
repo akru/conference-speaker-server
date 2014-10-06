@@ -18,7 +18,7 @@ public:
     NSFilter(Level level, int count, int trashold);
     ~NSFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Noise suppression"; }
 
 protected:

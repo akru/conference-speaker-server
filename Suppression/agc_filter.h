@@ -9,7 +9,7 @@ public:
     AGCFilter();
     ~AGCFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "AGC"; }
 
 private:

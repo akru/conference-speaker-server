@@ -9,7 +9,7 @@ AGCFilter::~AGCFilter()
 {
 }
 
-void AGCFilter::process(float sample[])
+void AGCFilter::processFilter(float sample[])
 {
     analyzeMax(sample);
     gainSample(sample);

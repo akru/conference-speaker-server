@@ -22,7 +22,7 @@ GateFilter::~GateFilter()
 {
 }
 
-void GateFilter::process(float sample[])
+void GateFilter::processFilter(float sample[])
 {
     for (short i = 0; i < sample_length; ++i)
         sample[i] = gateLogic(sample[i]);

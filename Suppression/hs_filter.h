@@ -15,7 +15,7 @@ public:
              float PNPR_TH = 0, float IMSD_TH = 0);
     ~HSFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Howling suppression"; }
 
     inline void setTH(float PAPR_TH_, float PHPR_TH_,

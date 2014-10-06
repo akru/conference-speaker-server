@@ -12,7 +12,7 @@ public:
     PitchShiftFilter(float pitch_shift=0.0, long osamp=32);
     ~PitchShiftFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Pitch shift"; }
 
 private:

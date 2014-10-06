@@ -26,7 +26,7 @@ public:
     void setFullBand(const float fbH[]);
     float * getFullBand() { return H; }
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Equalizer"; }
 
     static const int window_size  = sample_length;

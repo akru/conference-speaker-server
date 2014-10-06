@@ -27,7 +27,7 @@ HSFilter::~HSFilter()
 {
 }
 
-void HSFilter::process(float sample[])
+void HSFilter::processFilter(float sample[])
 {
     short howling_freq[freq_count_max];
     int freq_count = analyze_howling(howling_freq, sample);

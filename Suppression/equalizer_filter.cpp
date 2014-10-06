@@ -148,7 +148,7 @@ void EqualizerFilter::setFullBand(const float fbH[])
             H[i] = 1;
 }
 
-void EqualizerFilter::process(float sample[])
+void EqualizerFilter::processFilter(float sample[])
 {
     if (first_iteration)
     {
