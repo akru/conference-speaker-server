@@ -12,7 +12,7 @@ public:
     /*
      * Sample processing.
      * @param sample Is a normalized input sample with `sample_rate` rate
-     * and `sample_length` length.
+     * and `sample_length` length; [0..1]
      */
     virtual void process(float sample[]) = 0;
     /*

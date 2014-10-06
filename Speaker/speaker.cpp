@@ -8,6 +8,7 @@
 #include <pitch_shift_filter.h>
 #include <equalizer_filter.h>
 
+#include <QFile>
 #include <QDebug>
 
 #ifdef MACOSX
@@ -32,6 +33,22 @@ Sample convertAudio(Sample &sample)
     return Sample(output);
 }
 #endif
+
+void fromPCM(qint16 pcm[], float sample[])
+{
+    // Normalization
+    qint16 *rawp = pcm;
+    while (rawp < pcm + Filter::sample_length)
+        *sample++ = ((float) *rawp++) / norm_int16 / 2 + 0.5;
+}
+
+void toPCM(float sample[], qint16 pcm[])
+{
+    // Back to the INT
+    qint16 *rawp = pcm;
+    while (rawp < pcm + Filter::sample_length)
+        *rawp++ = (*sample++ - 0.5) * norm_int16 * 2;
+}
 
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
@@ -65,18 +82,21 @@ Speaker::Speaker(QObject *parent) :
     audio_buffer = audio->start();
 #ifndef QT_DEBUG
     // Append filters
-    filters.append(new NSFilter(NSFilter::High, 10, 500));
-//    filters.append(new HighPassFilter);
-    //filters.append(new HSFilter(15, 40, 0, 0.3));
-    //filters.append(new BandswitchFilter);
-#else
-
+    filters.append(new NSFilter(NSFilter::Medium, 10, 500);
     EqualizerFilter *eq = new EqualizerFilter;
     HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
     // Append filters
     filters.append(hs);
     filters.append(eq);
-    filters.append(new NSFilter(NSFilter::High, 10, 500));
+    filters.append(new PitchShiftFilter(0.04, 4));
+#else
+    filters.append(new NSFilter(NSFilter::Medium, 10, 500);
+    EqualizerFilter *eq = new EqualizerFilter;
+    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
+    // Append filters
+    filters.append(hs);
+    filters.append(eq);
+    filters.append(new PitchShiftFilter(0.04, 4));
 
     debug_dialog = new DebugDialog(eq, hs);
     debug_dialog->show();
@@ -129,6 +149,10 @@ void Speaker::play(QByteArray packet)
     // Put sample to accum
     accBuf.putData((qint16 *) packet.data(),
                    packet.length() / sizeof(qint16));
+
+//    QFile f("/tmp/sample.raw");
+//    f.open(QIODevice::Append);
+//    f.write(packet);
 }
 
 void Speaker::speakHeartbeat()
@@ -141,21 +165,17 @@ void Speaker::speakHeartbeat()
                           Qt::Uninitialized);
     accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
     float sample[Filter::sample_length];
-    // Normalization
-    qint16 *rawp = (qint16 *) sample_raw.data();
-    float *fltp = sample;
-    while ((char *) rawp < sample_raw.data() + sample_raw.length())
-        *fltp++ = ((float) *rawp++) / norm_int16;
+    // Normalisation
+    fromPCM((qint16 *)sample_raw.data(), sample);
+    qDebug() << qChecksum(sample_raw.data(), sample_raw.length());
     // Apply filters in float area
     foreach (Filter *f, filters) {
         qDebug() << "Applying:" << f->name();
         f->process(sample);
     }
-    // Back to the INT
-    rawp = (qint16 *) sample_raw.data();
-    fltp = sample;
-    while ((char *) rawp < sample_raw.data() + sample_raw.length())
-        *rawp++ = *fltp++ * norm_int16;
+    // Back to PCM
+    toPCM(sample, (qint16 *)sample_raw.data());
+    qDebug() << qChecksum(sample_raw.data(), sample_raw.length());
     // Play buffer
 #ifdef MACOSX
     sample = convertAudio(sample_raw);
