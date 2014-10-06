@@ -7,8 +7,11 @@
 #include <hs_filter.h>
 #include <pitch_shift_filter.h>
 #include <equalizer_filter.h>
+#include <agc_filter.h>
+#include <gate_filter.h>
+#include <compressor_filter.h>
 
-#include <QFile>
+//#include <QFile>
 #include <QDebug>
 
 #ifdef MACOSX
@@ -82,6 +85,8 @@ Speaker::Speaker(QObject *parent) :
     audio_buffer = audio->start();
 #ifndef QT_DEBUG
     // Append filters
+    filters.append(new AGCFilter);
+    filters.append(new GateFilter(0.05, 0.2, 0.1, 0.2, 0.1));
     filters.append(new NSFilter(NSFilter::Medium, 10, 500);
     EqualizerFilter *eq = new EqualizerFilter;
     HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
@@ -90,20 +95,32 @@ Speaker::Speaker(QObject *parent) :
     filters.append(eq);
     filters.append(new PitchShiftFilter(0.04, 4));
 #else
-    filters.append(new NSFilter(NSFilter::Medium, 10, 500));
-    EqualizerFilter *eq = new EqualizerFilter;
-    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
-    // Append filters
-    filters.append(hs);
-    filters.append(eq);
-    filters.append(new PitchShiftFilter(0.04, 4));
+    filters.append(new AGCFilter);
+    filters.append(new GateFilter(0.05, 0.2, 0.1, 0.2, 0.1));
+//    filters.append(new CompressorFilter(true,
+//                                        true,
+//                                        0.25,
+//                                        0.2,
+//                                        1.0,
+//                                        10,
+//                                        0.5,
+//                                        12.0,
+//                                        60,
+//                                        0.01));
+    filters.append(new NSFilter(NSFilter::Medium));
 
-    debug_dialog = new DebugDialog(eq, hs);
-    debug_dialog->show();
-    QTimer *t = new QTimer;
-    t->setInterval(500);
-    connect(t, SIGNAL(timeout()), SLOT(showDebug()));
-    t->start();
+//    EqualizerFilter *eq = new EqualizerFilter;
+//    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
+//    // Append filters
+//    filters.append(hs);
+//    filters.append(eq);
+//    filters.append(new PitchShiftFilter(0.04, 4));
+//    debug_dialog = new DebugDialog(eq, hs);
+//    debug_dialog->show();
+//    QTimer *t = new QTimer;
+//    t->setInterval(500);
+//    connect(t, SIGNAL(timeout()), SLOT(showDebug()));
+//    t->start();
 #endif
     // Moving to separate thread
 //    this->moveToThread(&myThread);
@@ -157,12 +174,15 @@ void Speaker::play(QByteArray packet)
 
 void Speaker::speakHeartbeat()
 {
-    // When accumulator has too low sounds - skips
-    if (!accBuf.avail(2048)) return;
-    qDebug() << "Playing...";
-    // Prepare sample
     QByteArray sample_raw(Filter::sample_length * sizeof(qint16),
                           Qt::Uninitialized);
+    // When accumulator has too low sounds - skips
+    if (!accBuf.avail(Filter::sample_length * sizeof(qint16) * 2)) return;
+    // Read while buffer large
+    while (accBuf.avail(Filter::sample_length * sizeof(qint16) * 4))
+        accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
+    qDebug() << "Playing...";
+    // Prepare sample
     accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
     float sample[Filter::sample_length];
     // Normalisation
