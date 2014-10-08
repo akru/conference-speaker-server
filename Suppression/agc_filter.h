@@ -13,8 +13,8 @@ public:
     QString name() { return "AGC"; }
 
 private:
-    bool firstHack;
     float maxAmp;
+    bool  firstSample;
     void  analyzeMax(float sample[]);
     void  gainSample(float sample[]);
 };
