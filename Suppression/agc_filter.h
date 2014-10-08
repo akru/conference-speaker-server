@@ -14,6 +14,7 @@ public:
 
 private:
     float maxAmp;
+    bool  firstSample;
     void  analyzeMax(float sample[]);
     void  gainSample(float sample[]);
     bool firstSample;
