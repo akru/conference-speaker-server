@@ -8,13 +8,15 @@ HEADERS += \
     broadcaster.h \
     connection.h \
     receiver.h \
-    server.h
+    server.h \
+    licensing.h
 
 SOURCES += \
     broadcaster.cpp \
     connection.cpp \
     receiver.cpp \
-    server.cpp
+    server.cpp \
+    licensing.cpp
 
 macx {
     DEFINES += MACOSX
@@ -30,5 +32,9 @@ INCLUDEPATH += $$PWD/../Protocol $$PWD/../Speaker
 DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker
 
 INCLUDEPATH += $$PWD/../Suppression
-DEPENDPATH += $$PWD/../Suppression
+DEPENDPATH  += $$PWD/../Suppression
 
+DEFINES     += NDEBUG
+
+INCLUDEPATH += $$PWD/../../cryptopp
+DEPENDPATH  += $$PWD/../../cryptopp

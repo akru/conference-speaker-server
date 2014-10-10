@@ -6,6 +6,7 @@
 #include "user_information.h"
 #include "connection.h"
 #include "receiver.h"
+#include "licensing.h"
 
 class Server : public QObject
 {
@@ -50,6 +51,10 @@ private:
     QMap<QString, Receiver *>      channels;
     // Connection by address map
     QMap<QString, Connection *>    clients;
+#ifndef QT_DEBUG
+    // Licensing policy
+    Licensing                      license;
+#endif
 };
 
 #endif // SERVER_H

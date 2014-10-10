@@ -8,6 +8,7 @@
 #include <channel_response.h>
 #include <registration_request.h>
 #include <user_information.h>
+#include <QDebug>
 
 Server::Server(QString &address, QObject *parent)
     : QObject(parent), server(new QTcpServer)
@@ -33,6 +34,15 @@ void Server::newConnection()
 {
     // Get first connection
     QTcpSocket *sock = server->nextPendingConnection();
+#ifndef QT_DEBUG
+    // Licensing policy for max connections
+    if (license.getMaxConnections() &&
+            clients.size() >= license.getMaxConnections())
+    {
+        sock->close();
+        return;
+    }
+#endif
     while (sock)
     {
         if (!clients.contains(sock->peerAddress().toString()))
