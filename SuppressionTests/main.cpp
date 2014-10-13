@@ -16,7 +16,7 @@
 int main()
 {
 
-    NSFilter nsf(NSFilter::High, 10, 500);
+    NSFilter nsf(NSFilter::High);
 //    PitchShiftFilter psf(1.04, 4);
 
     float eqs[Filter::sample_length];

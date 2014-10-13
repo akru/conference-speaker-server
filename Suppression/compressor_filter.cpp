@@ -278,12 +278,12 @@ float CompressorFilter::DoCompression(float value, double env)
    if(mMax < fabs(out))
       mMax = fabs(out);
 
-   qDebug() << "val:" << value << "cout:" << out << "max" << mMax;
+//   qDebug() << "val:" << value << "cout:" << out << "max" << mMax;
 
    return out;
 }
 
-void CompressorFilter::process(float sample[])
+void CompressorFilter::processFilter(float sample[])
 {
     // Swap buffers
     float *tmp = mSampleIn;

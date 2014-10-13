@@ -5,17 +5,40 @@
 
 class GateFilter : public Filter
 {
+    enum GateState {
+        Closed,
+        Opened,
+        Holding,
+        Releasing
+    };
+
 public:
-    GateFilter();
+    GateFilter(float raiseTH,
+               float fallTH,
+               float attackTime,
+               float holdTime,
+               float releaseTime);
     ~GateFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Gate"; }
+
+protected:
+    float raiseTH;
+    float fallTH;
+    float attackTime;
+    float holdTime;
+    float releaseTime;
+
 private:
-    float attack_time;
-    float lower_TH;
-    float upper_TH;
-    float hold_time;
+    GateState state;
+    float scaleVal;
+
+    float scaleUpStep;
+    float scaleDownStep;
+    unsigned int holdCtr;
+
+    float gateLogic(float s);
 };
 
 #endif // GATE_FILTER_H

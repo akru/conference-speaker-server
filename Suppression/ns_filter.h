@@ -15,18 +15,14 @@ public:
         High
     };
 
-    NSFilter(Level level, int count, int trashold);
+    NSFilter(Level level);
     ~NSFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Noise suppression"; }
-
-protected:
-    void postSuppression(float sample[]);
 
 private:
     NsHandle *ns_ptr;
-    int count, trashold;
 };
 
 #endif // NS_FILTER_H

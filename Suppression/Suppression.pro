@@ -16,9 +16,11 @@ SOURCES  += \
 #    biquad.c \
 #    bandswitch_filter.cpp \
 #    highpass_filter.cpp \
-#    compressor_filter.cpp \
+    compressor_filter.cpp \
     equalizer_filter.cpp \
-    pitch_shift_filter.cpp
+    pitch_shift_filter.cpp \
+    gate_filter.cpp \
+    agc_filter.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -33,7 +35,9 @@ HEADERS  += \
     hs_filter.h \
 #    biquad.h \
 #    bandswitch_filter.h \
-    highpass_filter.h \
-#    compressor_filter.h \
+#    highpass_filter.h \
+    compressor_filter.h \
     equalizer_filter.h \
-    pitch_shift_filter.h
+    pitch_shift_filter.h \
+    gate_filter.h \
+    agc_filter.h

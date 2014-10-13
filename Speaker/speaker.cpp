@@ -7,7 +7,11 @@
 #include <hs_filter.h>
 #include <pitch_shift_filter.h>
 #include <equalizer_filter.h>
+#include <agc_filter.h>
+#include <gate_filter.h>
+#include <compressor_filter.h>
 
+//#include <QFile>
 #include <QDebug>
 
 /*
@@ -18,6 +22,22 @@ void convertAudio(float sample[], float output[])
     memset(output, 0, Filter::sample_length*2*sizeof(float));
     for (short i = 0; i < Filter::sample_length; ++i)
         output[2*i] = sample[i];
+}
+
+void fromPCM(qint16 pcm[], float sample[])
+{
+    // Normalization
+    qint16 *rawp = pcm;
+    while (rawp < pcm + Filter::sample_length)
+        *sample++ = ((float) *rawp++) / norm_int16;
+}
+
+void toPCM(float sample[], qint16 pcm[])
+{
+    // Back to the INT
+    qint16 *rawp = pcm;
+    while (rawp < pcm + Filter::sample_length)
+        *rawp++ = *sample++ * norm_int16;
 }
 
 Speaker::Speaker(QObject *parent) :
@@ -47,11 +67,14 @@ Speaker::Speaker(QObject *parent) :
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
-    filters.append(new NSFilter(NSFilter::High, 10, 500));
+    filters.append(new AGCFilter);
+    filters.append(new GateFilter(0.05, 0.2, 0.1, 0.2, 0.1));
+    filters.append(new NSFilter(NSFilter::Medium));
     EqualizerFilter *eq = new EqualizerFilter;
     HSFilter *hs = new HSFilter(eq, 15, 44, 35, 0.3);
     filters.append(hs);
     filters.append(eq);
+    filters.append(new PitchShiftFilter(0.04, 4));
     // Moving to separate thread
 //    this->moveToThread(&myThread);
 //    myThread.start(QThread::TimeCriticalPriority);
@@ -95,23 +118,28 @@ void Speaker::play(QByteArray packet)
     // Put sample to accum
     accBuf.putData((qint16 *) packet.data(),
                    packet.length() / sizeof(qint16));
+
+//    QFile f("/tmp/sample.raw");
+//    f.open(QIODevice::Append);
+//    f.write(packet);
 }
 
 void Speaker::speakHeartbeat()
 {
-    // When accumulator has too low sounds - skips
-    if (!accBuf.avail(2048)) return;
-    qDebug() << "Playing...";
-    // Prepare sample
     QByteArray sample_raw(Filter::sample_length * sizeof(qint16),
                           Qt::Uninitialized);
+    // When accumulator has too low sounds - skips
+    if (!accBuf.avail(Filter::sample_length * sizeof(qint16) * 2)) return;
+    // Read while buffer large
+    while (accBuf.avail(Filter::sample_length * sizeof(qint16) * 4))
+        accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
+    qDebug() << "Playing...";
+    // Prepare sample
     accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
     float sample[Filter::sample_length];
-    // Normalization
-    qint16 *rawp = (qint16 *) sample_raw.data();
-    float *fltp = sample;
-    while ((char *) rawp < sample_raw.data() + sample_raw.length())
-        *fltp++ = ((float) *rawp++) / norm_int16;
+    // Normalisation
+    fromPCM((qint16 *)sample_raw.data(), sample);
+    qDebug() << qChecksum(sample_raw.data(), sample_raw.length());
     // Apply filters in float area
     foreach (Filter *f, filters) {
         qDebug() << "Applying:" << f->name();
@@ -121,14 +149,12 @@ void Speaker::speakHeartbeat()
     ampAnalyze(sample);
     // Resampling
     float output[Filter::sample_length * 2];
-    convertAudio(sample_raw, output);
-    // Back to the INT
-    rawp = (qint16 *) sample_raw.data();
-    fltp = sample;
-    while ((char *) rawp < sample_raw.data() + sample_raw.length())
-        *rawp++ = *fltp++ * norm_int16;
+    convertAudio(sample, output);
+    // Back to PCM
+    sample_raw.resize(Filter::sample_length*2);
+    toPCM(output, (qint16 *)sample_raw.data());
     // Play buffer
-    audio_buffer->write(output);
+    audio_buffer->write(sample_raw);
 }
 
 /*

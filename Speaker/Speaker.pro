@@ -5,7 +5,8 @@ TEMPLATE  = lib
 CONFIG   += staticlib
 
 SOURCES  += \
-    speaker.cpp
+    speaker.cpp \
+    filter.cpp
 
 HEADERS += \
     accbuffer.hpp \

@@ -47,24 +47,29 @@
 void smbFft(float *fftBuffer, long fftFrameSize, long sign);
 double smbAtan2(double x, double y);
 
-PitchShiftFilter::PitchShiftFilter(float pitch_shift, long osamp)
-    : gRover(false), osamp(osamp), pitchShift(pitch_shift), currentPitch(0), iteration(0)
+PitchShiftFilter::PitchShiftFilter(float pitch_shift_coef, long osamp)
+    : gRover(false),
+      osamp(osamp),
+      pitchShift(1),
+      pitchShiftCoef(pitch_shift_coef),
+      currentPitch(0),
+      iteration(0)
 {
-    memset(gInFIFO, 0, sample_length*sizeof(float));
-    memset(gOutFIFO, 0, sample_length*sizeof(float));
-    memset(gFFTworksp, 0, 2*sample_length*sizeof(float));
-    memset(gLastPhase, 0, (sample_length/2+1)*sizeof(float));
-    memset(gSumPhase, 0, (sample_length/2+1)*sizeof(float));
-    memset(gOutputAccum, 0, 2*sample_length*sizeof(float));
-    memset(gAnaFreq, 0, sample_length*sizeof(float));
-    memset(gAnaMagn, 0, sample_length*sizeof(float));
+    memset(gInFIFO, 0, analyze_length*sizeof(float));
+    memset(gOutFIFO, 0, analyze_length*sizeof(float));
+    memset(gFFTworksp, 0, 2*analyze_length*sizeof(float));
+    memset(gLastPhase, 0, (analyze_length/2+1)*sizeof(float));
+    memset(gSumPhase, 0, (analyze_length/2+1)*sizeof(float));
+    memset(gOutputAccum, 0, 2*analyze_length*sizeof(float));
+    memset(gAnaFreq, 0, analyze_length*sizeof(float));
+    memset(gAnaMagn, 0, analyze_length*sizeof(float));
 }
 
 PitchShiftFilter::~PitchShiftFilter()
 {
 }
 
-void PitchShiftFilter::process(float sample[])
+void PitchShiftFilter::processFilter(float sample[])
 {
     if (++iteration > PITCH_SHIFT_TIME / 32.0)
     {
@@ -72,24 +77,26 @@ void PitchShiftFilter::process(float sample[])
         iteration    = 0;
     }
 
-    float output[sample_length];
+    float input[analyze_length];
+    float output[analyze_length];
+    // Stupid resampler:
+    memset(input, 0, analyze_length * sizeof(float));
+    for (int i = 0; i < sample_length; ++i)
+        input[i * len_scaler] = sample[i];
 
     if(currentPitch) // Pitch up
     {
-        pitchShift = 1 + pitchShift;
-        smbPitchShift(sample_length, sample_length, sample, output);
-        for (short i = 0; i < sample_length; ++i)
-            sample[i] = output[i];
-        pitchShift = pitchShift - 1;
+        pitchShift = 1 + pitchShiftCoef;
+        smbPitchShift(analyze_length, analyze_length, sample, output);
     }
     else // Pitch down
     {
-       pitchShift = 1 - pitchShift;
-       smbPitchShift(sample_length, sample_length, sample, output);
-       for (short i = 0; i < sample_length; ++i)
-           sample[i] = output[i];
-       pitchShift = 1 - pitchShift;
+       pitchShift = 1 - pitchShiftCoef;
+       smbPitchShift(analyze_length, analyze_length, sample, output);
     }
+    // Back to the Sample
+    for (short i = 0; i < sample_length; ++i)
+        sample[i] = output[i * len_scaler];
 }
 
 // -----------------------------------------------------------------------------------------------------------------

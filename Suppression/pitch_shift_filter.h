@@ -9,25 +9,28 @@ static const int PITCH_SHIFT_TIME = 1200; // ms; WARN: it divided by frame lengt
 class PitchShiftFilter : public Filter
 {
 public:
-    PitchShiftFilter(float pitch_shift=0.0, long osamp=32);
+    PitchShiftFilter(float pitch_shift_coef=0.0, long osamp=32);
     ~PitchShiftFilter();
 
-    void process(float sample[]);
+    void processFilter(float sample[]);
     QString name() { return "Pitch shift"; }
 
 private:
-    float gInFIFO[sample_length];
-    float gOutFIFO[sample_length];
-    float gFFTworksp[2*sample_length];
-    float gLastPhase[sample_length/2+1];
-    float gSumPhase[sample_length/2+1];
-    float gOutputAccum[2*sample_length];
-    float gAnaFreq[sample_length];
-    float gAnaMagn[sample_length];
-    float gSynFreq[sample_length];
-    float gSynMagn[sample_length];
+    static const short len_scaler = 8;
+    static const short analyze_length = sample_length * len_scaler;
+
+    float gInFIFO[analyze_length];
+    float gOutFIFO[analyze_length];
+    float gFFTworksp[2*analyze_length];
+    float gLastPhase[analyze_length/2+1];
+    float gSumPhase[analyze_length/2+1];
+    float gOutputAccum[2*analyze_length];
+    float gAnaFreq[analyze_length];
+    float gAnaMagn[analyze_length];
+    float gSynFreq[analyze_length];
+    float gSynMagn[analyze_length];
     long gRover, osamp;
-    float pitchShift; // should be in [0; 1), 0.04 - for example
+    float pitchShift, pitchShiftCoef;
     int currentPitch, iteration;
 
     void smbPitchShift(long numSampsToProcess,

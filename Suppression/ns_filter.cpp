@@ -1,12 +1,9 @@
 #include "ns_filter.h"
 #include "noise_suppression.h"
 
-#include <cmath>
 #include <QDebug>
 
-NSFilter::NSFilter(Level level, int count, int trashold)
-    : count(count),
-      trashold(trashold)
+NSFilter::NSFilter(Level level)
 {
     qDebug() << "NSFilter(" << level << ")";
 
@@ -24,34 +21,13 @@ NSFilter::~NSFilter()
     WebRtcNs_Free(ns_ptr);
 }
 
-void NSFilter::process(float sample[])
+void NSFilter::processFilter(float sample[])
 {
     float out[sample_length];
 
     WebRtcNs_Process(ns_ptr, sample, out);
-//    postSuppression(out);
+    WebRtcNs_Process(ns_ptr, sample + Filter::sample_length / 2, out + Filter::sample_length / 2);
 
     for (short i = 0; i < sample_length; ++i)
         sample[i] = out[i];
-}
-
-void NSFilter::postSuppression(float sample[])
-{
-    long long energy; // RMS
-    for (short pos = 0; pos < sample_length; ++pos)
-    {
-        energy = 0;
-        for (short i = 0; i < count && pos + i < sample_length; ++i)
-        {
-            qDebug() << "Sample " << pos + i << ": " << sample[pos + i] << ";";
-            energy += fabs(sample[pos + i]) * fabs(sample[pos + i]);
-        }
-        energy = sqrt(energy / count);
-        qDebug() << "RMS Energy TH:" << energy;
-
-//        if (energy < trashold)
-//            for (short i = 0; i < count && pos + i < sample_length; ++i)
-//                sample[pos + i] = 0;
-        pos += count;
-    }
 }
