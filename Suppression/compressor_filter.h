@@ -1,7 +1,7 @@
 #ifndef COMPRESSOR_FILTER_H
 #define COMPRESSOR_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 
 class CompressorFilter : public Filter
 {

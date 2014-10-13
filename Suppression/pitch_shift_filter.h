@@ -1,7 +1,7 @@
 #ifndef PITCH_SHIFT_FILTER_H
 #define PITCH_SHIFT_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 
 static const int PITCH_COUNT   = 2;
 static const int PITCH_SHIFT_TIME = 1200; // ms; WARN: it divided by frame length (32 ms)

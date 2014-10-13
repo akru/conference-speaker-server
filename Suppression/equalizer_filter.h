@@ -1,7 +1,7 @@
 #ifndef EQUALIZER_FILTER_H
 #define EQUALIZER_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 #include "windows_private.h"
 
 #ifndef M_PI

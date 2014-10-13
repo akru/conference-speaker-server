@@ -1,7 +1,7 @@
 #ifndef NS_FILTER_H
 #define NS_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 //#include "../Speaker/sample.h"
 #include "noise_suppression.h"
 

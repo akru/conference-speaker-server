@@ -1,7 +1,7 @@
 #ifndef GATE_FILTER_H
 #define GATE_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 
 class GateFilter : public Filter
 {

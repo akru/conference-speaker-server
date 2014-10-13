@@ -1,7 +1,7 @@
 #ifndef AGC_FILTER_H
 #define AGC_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 
 class AGCFilter : public Filter
 {

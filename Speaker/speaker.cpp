@@ -36,7 +36,7 @@ void toPCM(float sample[], qint16 pcm[])
 {
     // Back to the INT
     qint16 *rawp = pcm;
-    while (rawp < pcm + Filter::sample_length)
+    while (rawp < pcm + Filter::sample_length*2)
         *rawp++ = *sample++ * norm_int16;
 }
 
@@ -151,10 +151,10 @@ void Speaker::speakHeartbeat()
     float output[Filter::sample_length * 2];
     convertAudio(sample, output);
     // Back to PCM
-    sample_raw.resize(Filter::sample_length*2);
-    toPCM(output, (qint16 *)sample_raw.data());
+    QByteArray sample_out(Filter::sample_length*2*sizeof(qint16), Qt::Uninitialized);
+    toPCM(output, (qint16 *)sample_out.data());
     // Play buffer
-    audio_buffer->write(sample_raw);
+    audio_buffer->write(sample_out);
 }
 
 /*

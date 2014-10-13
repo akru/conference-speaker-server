@@ -1,7 +1,7 @@
 #ifndef HS_FILTER_H
 #define HS_FILTER_H
 
-#include "../Speaker/filter.h"
+#include "filter.h"
 #include "equalizer_filter.h"
 #include <cmath>
 
