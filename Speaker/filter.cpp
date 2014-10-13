@@ -1,9 +1,15 @@
 #include "filter.h"
+#include <QCoreApplication>
 
 #ifdef QT_DEBUG
     #include <QDebug>
     #include <cmath>
 #endif
+
+QString Filter::settingsFiltename()
+{
+    return QCoreApplication::applicationDirPath() + "/settings.ini";
+}
 
 void Filter::enable(bool e)
 {

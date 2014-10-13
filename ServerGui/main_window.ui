@@ -43,7 +43,16 @@ QListWidget::item {
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0" columnstretch="0,0,0">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>16</number>
+    </property>
+    <property name="topMargin">
+     <number>16</number>
+    </property>
+    <property name="rightMargin">
+     <number>16</number>
+    </property>
+    <property name="bottomMargin">
      <number>16</number>
     </property>
     <item row="2" column="0" colspan="3">
@@ -207,15 +216,24 @@ font: 14pt;
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>280</width>
-         <height>139</height>
+         <width>281</width>
+         <height>155</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
        </layout>
@@ -250,15 +268,24 @@ font: 14pt;
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>280</width>
-         <height>300</height>
+         <width>281</width>
+         <height>311</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
        </layout>
@@ -273,7 +300,7 @@ font: 14pt;
      <x>0</x>
      <y>0</y>
      <width>944</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -293,6 +320,7 @@ font: 14pt;
      <string>Edit</string>
     </property>
     <addaction name="actionSettings"/>
+    <addaction name="actionSound_processing"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -321,6 +349,11 @@ font: 14pt;
    </property>
    <property name="shortcut">
     <string>Alt+S</string>
+   </property>
+  </action>
+  <action name="actionSound_processing">
+   <property name="text">
+    <string>Sound processing</string>
    </property>
   </action>
  </widget>

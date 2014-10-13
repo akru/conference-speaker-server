@@ -9,11 +9,12 @@ static const int PITCH_SHIFT_TIME = 1200; // ms; WARN: it divided by frame lengt
 class PitchShiftFilter : public Filter
 {
 public:
-    PitchShiftFilter(float pitch_shift_coef=0.0, long osamp=32);
+    PitchShiftFilter();
     ~PitchShiftFilter();
 
     void processFilter(float sample[]);
     QString name() { return "Pitch shift"; }
+    void reloadSettings();
 
 private:
     static const short len_scaler = 8;

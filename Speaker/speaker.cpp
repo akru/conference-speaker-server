@@ -14,28 +14,15 @@
 //#include <QFile>
 #include <QDebug>
 
-#ifdef MACOSX
-Sample convertAudio(Sample &sample)
+/*
+ * Dummy resampler: 22050 -> 44100
+ */
+void convertAudio(float sample[], float output[])
 {
-    QByteArray output;
-    QDataStream ds(&output, QIODevice::WriteOnly);
-    qint8 *dataPointer = (qint8 *) sample.data();
-    while (dataPointer < (qint8 *) sample.data() + sample.length())
-    {
-        // One wave is 8kHz
-        qint8 wave1 = *dataPointer++;
-        qint8 wave2 = *dataPointer++;
-        // x6 waves give 48kHz
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-        ds << wave1 << wave2;
-    }
-    return Sample(output);
+    memset(output, 0, Filter::sample_length*2*sizeof(float));
+    for (short i = 0; i < Filter::sample_length; ++i)
+        output[2*i] = sample[i];
 }
-#endif
 
 void fromPCM(qint16 pcm[], float sample[])
 {
@@ -62,11 +49,7 @@ Speaker::Speaker(QObject *parent) :
     // Set up the format, eg.
     format->setSampleSize(16);
     format->setChannelCount(1);
-#ifdef MACOSX
-    format->setSampleRate(48000);
-#else
-    format->setSampleRate(Filter::sample_rate);
-#endif
+    format->setSampleRate(44100);
     format->setCodec("audio/pcm");
     format->setSampleType(QAudioFormat::SignedInt);
     format->setByteOrder(QAudioFormat::LittleEndian);
@@ -83,59 +66,26 @@ Speaker::Speaker(QObject *parent) :
     // Open audio device
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
-#ifndef QT_DEBUG
     // Append filters
     filters.append(new AGCFilter);
-    filters.append(new GateFilter(0.05, 0.2, 0.1, 0.2, 0.1));
-    filters.append(new NSFilter(NSFilter::Medium, 10, 500);
+    filters.append(new GateFilter);
+    filters.append(new NSFilter);
     EqualizerFilter *eq = new EqualizerFilter;
-    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
-    // Append filters
+    HSFilter *hs = new HSFilter(eq);
     filters.append(hs);
     filters.append(eq);
-    filters.append(new PitchShiftFilter(0.04, 4));
-#else
-    filters.append(new AGCFilter);
-    filters.append(new GateFilter(0.05, 0.2, 0.1, 0.2, 0.1));
-//    filters.append(new CompressorFilter(true,
-//                                        true,
-//                                        0.25,
-//                                        0.2,
-//                                        1.0,
-//                                        10,
-//                                        0.5,
-//                                        12.0,
-//                                        60,
-//                                        0.01));
-    filters.append(new NSFilter(NSFilter::Medium));
-
-//    EqualizerFilter *eq = new EqualizerFilter;
-//    HSFilter *hs = new HSFilter(eq, 15, 40, 0, 0.3);
-//    // Append filters
-//    filters.append(hs);
-//    filters.append(eq);
-//    filters.append(new PitchShiftFilter(0.04, 4));
-//    debug_dialog = new DebugDialog(eq, hs);
-//    debug_dialog->show();
-//    QTimer *t = new QTimer;
-//    t->setInterval(500);
-//    connect(t, SIGNAL(timeout()), SLOT(showDebug()));
-//    t->start();
-#endif
+    filters.append(new PitchShiftFilter);
     // Moving to separate thread
 //    this->moveToThread(&myThread);
 //    myThread.start(QThread::TimeCriticalPriority);
     // Starting heartbeat timer
     connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
-    heartbeat.setInterval(Filter::sample_length * 1000.0 / Filter::sample_rate);
+    heartbeat.setInterval(Filter::sample_length * 999.0 / Filter::sample_rate);
     heartbeat.start();
 }
 
 Speaker::~Speaker()
 {
-#ifdef QT_DEBUG
-    delete debug_dialog;
-#endif
 //    myThread.terminate();
 //    myThread.wait();
 
@@ -155,14 +105,16 @@ void Speaker::setVolume(qreal volume)
     Q_ASSERT(audio);
     Q_ASSERT(volume >= 0 && volume <= 1);
 
-    audio->setVolume(volume);
+    if(volume == 0)
+        audio->setVolume(volume);
+    else{
+        audio->setVolume(volume*1.2);
+    }
 }
 
 void Speaker::play(QByteArray packet)
 {
     Q_ASSERT(audio_buffer);
-    // Analyze sample amplitude
-    ampAnalyze(packet);
     // Put sample to accum
     accBuf.putData((qint16 *) packet.data(),
                    packet.length() / sizeof(qint16));
@@ -193,13 +145,15 @@ void Speaker::speakHeartbeat()
         qDebug() << "Applying:" << f->name();
         f->process(sample);
     }
+    // Analyze sample amplitude
+    ampAnalyze(sample);
+    // Resampling
+    float output[Filter::sample_length * 2];
+    convertAudio(sample, output);
     // Back to PCM
-    toPCM(sample, (qint16 *)sample_raw.data());
-    qDebug() << qChecksum(sample_raw.data(), sample_raw.length());
+    sample_raw.resize(Filter::sample_length*2);
+    toPCM(output, (qint16 *)sample_raw.data());
     // Play buffer
-#ifdef MACOSX
-    sample = convertAudio(sample_raw);
-#endif
     audio_buffer->write(sample_raw);
 }
 
@@ -217,18 +171,23 @@ void Speaker::speakHeartbeat()
  * This function returns number from 0 to 100.
  * That shows current sample average amplitude.
  */
-void Speaker::ampAnalyze(const QByteArray &sample)
+void Speaker::ampAnalyze(const float sample[])
 {
-    Q_ASSERT(sample.length());
     // Variable init
-    const qint16 *dataPointer = (const qint16 *) sample.data();
-    double avgAmp = 0;
-    int count = sample.length() / 2;
+    float avgAmp = 0;
+    int count = Filter::sample_length;
     // Sum all amps from sample
-    while ((char *) dataPointer < sample.data() + count)
-        avgAmp += abs(*dataPointer++);
+    for (short i = 0; i < Filter::sample_length; ++i)
+        avgAmp += fabs(sample[i]);
     // Divize sum by count and normalize it
-    avgAmp = avgAmp / count / 10000;
+    avgAmp = avgAmp / count;
     // Return average amplitude in percents
     emit audioAmpUpdated(avgAmp * 100);
+}
+
+void Speaker::reloadFilterSettings()
+{
+    foreach (Filter *f, filters) {
+        f->reloadSettings();
+    }
 }

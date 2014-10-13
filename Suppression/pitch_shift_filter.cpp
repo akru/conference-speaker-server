@@ -39,6 +39,8 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
+#include <QSettings>
+#include <QDebug>
 
 #define M_PI 3.14159265358979323846
 
@@ -47,11 +49,9 @@
 void smbFft(float *fftBuffer, long fftFrameSize, long sign);
 double smbAtan2(double x, double y);
 
-PitchShiftFilter::PitchShiftFilter(float pitch_shift_coef, long osamp)
+PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
-      osamp(osamp),
       pitchShift(1),
-      pitchShiftCoef(pitch_shift_coef),
       currentPitch(0),
       iteration(0)
 {
@@ -63,10 +63,21 @@ PitchShiftFilter::PitchShiftFilter(float pitch_shift_coef, long osamp)
     memset(gOutputAccum, 0, 2*analyze_length*sizeof(float));
     memset(gAnaFreq, 0, analyze_length*sizeof(float));
     memset(gAnaMagn, 0, analyze_length*sizeof(float));
+
+    reloadSettings();
 }
 
 PitchShiftFilter::~PitchShiftFilter()
 {
+}
+
+void PitchShiftFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("ps-enable", true).toBool());
+    pitchShiftCoef = s.value("ps-coef", 0.04).toFloat();
+    osamp = s.value("ps-osamp", 32).toFloat();
+    qDebug() << "PS settings reloaded";
 }
 
 void PitchShiftFilter::processFilter(float sample[])

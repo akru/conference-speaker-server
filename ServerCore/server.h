@@ -6,6 +6,7 @@
 #include "user_information.h"
 #include "connection.h"
 #include "receiver.h"
+#include "licensing.h"
 
 class Server : public QObject
 {
@@ -28,12 +29,14 @@ public slots:
     void dropUser(QString address);
     void denyVote(QString address);
     void acceptVote(QString address);
+    void reloadFilterSettings();
 
 signals:
     void registrationRequest(QString address, UserInformation info);
     void channelRequest(QString address, UserInformation info);
     void channelCloseRequest(QString address);
     void voteRequest(QString address, bool type);
+    void filterSettingsUpdated();
 
 private slots:
     void newConnection();
@@ -50,6 +53,10 @@ private:
     QMap<QString, Receiver *>      channels;
     // Connection by address map
     QMap<QString, Connection *>    clients;
+#ifndef QT_DEBUG
+    // Licensing policy
+    Licensing                      license;
+#endif
 };
 
 #endif // SERVER_H

@@ -15,11 +15,14 @@ class DebugDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit DebugDialog(Filter *eq, Filter *hs, QWidget *parent = 0);
+    explicit DebugDialog(QWidget *parent = 0);
     ~DebugDialog();
 
+signals:
+    void filterSettingsUpdated();
+
 private slots:
-    void on_applyButton_clicked();
+    void on_saveButton_clicked();
 
 private:
     Ui::DebugDialog *ui;

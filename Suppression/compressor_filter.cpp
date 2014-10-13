@@ -2,29 +2,13 @@
 #include <cmath>
 
 #include <QDebug>
+#include <QSettings>
 
 #define INT16_DIV (1<<15)
 
-CompressorFilter::CompressorFilter(bool normalize,
-                                   bool use_peak,
-                                   float threshold,
-                                   float attack_time,
-                                   float decay_time,
-                                   float ratio,
-                                   float compression,
-                                   float threshold_db,
-                                   float noise_floor_db,
-                                   float noise_floor)
-    : mNormalize(normalize),
-      mUsePeak(use_peak),
-      mThreshold(threshold),
-      mAttackTime(attack_time), // seconds
-      mDecayTime(decay_time),   // seconds
-      mRatio(ratio),            // positive number > 1.0
-      mCompression(compression),
-      mThresholdDB(threshold_db),
-      mNoiseFloorDB(noise_floor_db),
-      mNoiseFloor(noise_floor),
+CompressorFilter::CompressorFilter()
+    : mThreshold(0.25),
+      mNoiseFloor(0.01),
       mCircle(0),
       mFollow1(new float[sample_length]),
       mFollow2(new float[sample_length]),
@@ -43,6 +27,39 @@ CompressorFilter::~CompressorFilter()
     delete [] mFollow2;
     delete [] mSampleIn;
     delete [] mSampleOut;
+}
+
+void CompressorFilter::setParams(bool normalize,
+                                 bool use_peak,
+                                 float attack_time,
+                                 float decay_time,
+                                 float ratio,
+                                 float compression,
+                                 float threshold_db,
+                                 float noise_floor_db)
+{
+    mNormalize = normalize;
+    mUsePeak = use_peak;
+    mAttackTime = attack_time; // seconds
+    mDecayTime = decay_time;   // seconds
+    mRatio = ratio;            // positive number > 1.0
+    mCompression = compression;
+    mThresholdDB = threshold_db;
+    mNoiseFloorDB = noise_floor_db;
+}
+
+void CompressorFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("compressor-enable", true).toBool());
+    setParams(s.value("compressor-normalize",true).toBool(),
+              s.value("compressor-peak", false).toBool(),
+              s.value("compressor-attack", 0.2).toFloat(),
+              s.value("compressor-decay", 1.0).toFloat(),
+              s.value("compressor-ratio", 2).toFloat(),
+              s.value("compressor-compression", 0.5).toFloat(),
+              s.value("compressor-threshold", -12).toFloat(),
+              s.value("compressor-noise", -40).toFloat());
 }
 
 bool CompressorFilter::NewTrackPass1()

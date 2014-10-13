@@ -8,6 +8,7 @@
 #include <channel_response.h>
 #include <registration_request.h>
 #include <user_information.h>
+#include <QDebug>
 
 Server::Server(QString &address, QObject *parent)
     : QObject(parent), server(new QTcpServer)
@@ -33,6 +34,15 @@ void Server::newConnection()
 {
     // Get first connection
     QTcpSocket *sock = server->nextPendingConnection();
+#ifndef QT_DEBUG
+    // Licensing policy for max connections
+    if (license.getMaxConnections() &&
+            clients.size() >= license.getMaxConnections())
+    {
+        sock->close();
+        return;
+    }
+#endif
     while (sock)
     {
         if (!clients.contains(sock->peerAddress().toString()))
@@ -193,6 +203,9 @@ void Server::openChannel(QString address)
             // Allocate voice receiver
             try {
                 Receiver *r = new Receiver(server->serverAddress());
+                // Connect all
+                connect(this, SIGNAL(filterSettingsUpdated()),
+                        r,    SLOT(reloadFilterSettings()));
                 // Append to channel map
                 channels.insert(address, r);
                 // Make success response
@@ -260,4 +273,9 @@ void Server::denyVote(QString address)
     Response res(Request::VOTE_YES, Response::ERROR, "Access denied");
     QJsonObject result = res.toJson();
     clients[address]->write(result);
+}
+
+void Server::reloadFilterSettings()
+{
+    emit filterSettingsUpdated();
 }

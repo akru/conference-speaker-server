@@ -31,6 +31,10 @@ public slots:
     {
         speaker.setVolume(volume);
     }
+    void reloadFilterSettings()
+    {
+        speaker.reloadFilterSettings();
+    }
 
 private slots:
     void sockReadyRead();

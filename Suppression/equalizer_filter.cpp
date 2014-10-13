@@ -3,18 +3,19 @@
 
 #include <cmath>
 #include <QDebug>
+#include <QSettings>
 
 #define B_SPLINE_EQ
 
 static const quint32 bands[8] = {
-    EqualizerFilter::hz_to_index * 0,
-    EqualizerFilter::hz_to_index * 250,
-    EqualizerFilter::hz_to_index * 500,
-    EqualizerFilter::hz_to_index * 1000,
-    EqualizerFilter::hz_to_index * 3000,
-    EqualizerFilter::hz_to_index * 5000,
-    EqualizerFilter::hz_to_index * 8000,
-    EqualizerFilter::hz_to_index * 10000
+    Equalizer::hz_to_index * 0,
+    Equalizer::hz_to_index * 250,
+    Equalizer::hz_to_index * 500,
+    Equalizer::hz_to_index * 1000,
+    Equalizer::hz_to_index * 3000,
+    Equalizer::hz_to_index * 5000,
+    Equalizer::hz_to_index * 8000,
+    Equalizer::hz_to_index * 10000
 };
 
 
@@ -99,26 +100,40 @@ void interpolate(float *samples, quint16 length,
 #endif
 }
 
-EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
+EqualizerFilter::EqualizerFilter(float X, const float *W)
     : first_iteration(true),
-      X(X / fft_size * 2), W(W)
+      X(X / Equalizer::fft_size * 2), W(W)
 {
-    memset(overlap, 0, sizeof(float) * overlap_size);
-    memset(buffer,  0, sizeof(float) * sample_length * 2);
-    memset(ip, 0, (fft_size * 2 >> 1) * sizeof(float));
-    memset(wfft, 0, (fft_size * 2 >> 1) * sizeof(float));
+    memset(overlap, 0, sizeof(float) * Equalizer::overlap_size);
+    memset(buffer,  0, sizeof(float) * Filter::sample_length * 2);
+    memset(ip, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
+    memset(wfft, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
 
-    setFullBand(fbH);
+    reloadSettings();
 }
 
 EqualizerFilter::~EqualizerFilter()
 {
 }
 
+void EqualizerFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("eq-enable", true).toBool());
+    setUserBand(s.value("eq-slider-1", 50).toInt(),
+                 s.value("eq-slider-2", 50).toInt(),
+                 s.value("eq-slider-3", 50).toInt(),
+                 s.value("eq-slider-4", 50).toInt(),
+                 s.value("eq-slider-5", 50).toInt(),
+                 s.value("eq-slider-6", 50).toInt(),
+                 s.value("eq-slider-7", 50).toInt());
+    qDebug() << "Equalize settings reloaded";
+}
+
 void EqualizerFilter::setUserBand(short B1, short B2, short B3,
                                   short B4, short B5, short B6, short B7)
 {
-    float uBandH[h_size], ys[8];
+    float uBandH[Equalizer::h_size], ys[8];
     /* Static indexes for 16kHz freq */
     const quint32 *xs = bands;
     static const float scale = 0.02;
@@ -128,12 +143,12 @@ void EqualizerFilter::setUserBand(short B1, short B2, short B3,
     ys[4] = B4 * scale; ys[5] = B5 * scale; ys[6] = B6 * scale;
     ys[7] = B7 * scale;
     // Interpolate values
-    interpolate(uBandH, h_size, xs, ys, 8);
+    interpolate(uBandH, Equalizer::h_size, xs, ys, 8);
     // Debug output
-    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6 << B7;
-    for (short i = 0; i < h_size; ++i)
+//    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6 << B7;
+    for (short i = 0; i < Equalizer::h_size; ++i)
 //        qDebug() << "H [" << i << "] =" << sixBandH[i];
-        qDebug() << uBandH[i];
+//        qDebug() << uBandH[i];
     // Set new H
     setFullBand(uBandH);
 }
@@ -142,9 +157,9 @@ void EqualizerFilter::setFullBand(const float fbH[])
 {
     // Copy new H
     if (fbH)
-        memcpy(H, fbH, h_size * sizeof(float));
+        memcpy(H, fbH, Equalizer::h_size * sizeof(float));
     else
-        for (short i = 0; i < h_size; ++i)
+        for (short i = 0; i < Equalizer::h_size; ++i)
             H[i] = 1;
 }
 
@@ -154,32 +169,32 @@ void EqualizerFilter::processFilter(float sample[])
     {
         first_iteration = false;
         // Copy to input buffer
-        memcpy(buffer, sample, sample_length * sizeof(float));
+        memcpy(buffer, sample, Filter::sample_length * sizeof(float));
     }
     else
     {
         // Copy to input buf
-        memcpy(buffer + sample_length, sample, sample_length * sizeof(float));
+        memcpy(buffer + Filter::sample_length, sample, Filter::sample_length * sizeof(float));
         // Process pass1
         dsp_logic();
         //preserve the needed input for the next window's overlap
-        memcpy(sample, buffer, R * sizeof(float));
-        memmove(buffer, buffer + R, (sample_length * 2 - R) * sizeof(float));
+        memcpy(sample, buffer, Equalizer::R * sizeof(float));
+        memmove(buffer, buffer + Equalizer::R, (Filter::sample_length * 2 - Equalizer::R) * sizeof(float));
         // Process pass2
         dsp_logic();
         //preserve the needed input for the next window's overlap
-        memcpy(sample + R, buffer, overlap_size * sizeof(float));
-        memmove(buffer, buffer + R, (sample_length * 2 - R) * sizeof(float));
+        memcpy(sample + Equalizer::R, buffer, Equalizer::overlap_size * sizeof(float));
+        memmove(buffer, buffer + Equalizer::R, (Filter::sample_length * 2 - Equalizer::R) * sizeof(float));
     }
 }
 
 void EqualizerFilter::dsp_logic()
 {
 
-    float output_window[fft_size];
+    float output_window[Equalizer::fft_size];
     //use a linear-phase sliding STFT and overlap-add method (for each channel)
     //window the data
-    for(short j = 0; j < window_size; ++j) {
+    for(short j = 0; j < Equalizer::window_size; ++j) {
 //        qDebug() << "B[" << j << "]=" << buffer[j];
         output_window[j] = X * W[j] * buffer[j];
 //        qDebug() << "W[" << j << "]=" << output_window[j];
@@ -188,15 +203,15 @@ void EqualizerFilter::dsp_logic()
 //    memset(work_buffer + window_size, 0, (fft_size - window_size) * sizeof(float));
     //Processing is done here!
     //do fft
-    rdft(fft_size, 1, output_window, ip, wfft);
+    rdft(Equalizer::fft_size, 1, output_window, ip, wfft);
     //perform filtering
-    for(short j = 0; j < fft_size; j+=2) {
+    for(short j = 0; j < Equalizer::fft_size; j+=2) {
         output_window[j]   *= H[j/2];
         output_window[j+1] *= H[j/2];
-        qDebug() << "H["<<j/2<<"]="<<H[j/2];
+//        qDebug() << "H["<<j/2<<"]="<<H[j/2];
     }
     //inverse fft
-    rdft(fft_size, -1, output_window, ip, wfft);
+    rdft(Equalizer::fft_size, -1, output_window, ip, wfft);
     ////debug: tests overlapping add
     ////and negates ALL PREVIOUS processing
     ////yields a perfect reconstruction if COLA is held
@@ -205,9 +220,9 @@ void EqualizerFilter::dsp_logic()
     //}
 
     //overlap add and preserve overlap component from this window (linear phase)
-    for(short j = 0; j < overlap_size; ++j) {
+    for(short j = 0; j < Equalizer::overlap_size; ++j) {
         buffer[j] = output_window[j] + overlap[j];
-        overlap[j] = output_window[R + j];
+        overlap[j] = output_window[Equalizer::R + j];
 
 //        qDebug() << "W2[" << j << "]=" << output_window[j];
     }
