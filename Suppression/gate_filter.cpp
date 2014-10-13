@@ -7,7 +7,9 @@ GateFilter::GateFilter(float raiseTHdB,
                        float holdTime,
                        float releaseTime)
     : raiseTHdB(raiseTHdB),
+      raiseTH(pow(10.0, raiseTHdB/20.0)),
       fallTHdB(fallTHdB),
+      fallTH(pow(10.0, fallTHdB/20.0)),
       attackTime(attackTime),
       holdTime(holdTime),
       releaseTime(releaseTime),
@@ -33,13 +35,11 @@ float GateFilter::gateLogic(float s)
 {    
     switch (state) {
     case Closed:
-        float raiseTH = pow(10.0, raiseTHdB/20);
         if (fabs(s) > raiseTH)
             state = Opened;
         break;
 
     case Opened:
-        float fallTH = pow(10.0, fallTHdB/20);
         if (fabs(s) < fallTH)
         {
             holdCtr = 0;
@@ -52,7 +52,6 @@ float GateFilter::gateLogic(float s)
         break;
 
     case Holding:
-        float raiseTH = pow(10.0, raiseTHdB/20);
         if (fabs(s) > raiseTH)
             state = Opened;
         else

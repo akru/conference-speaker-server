@@ -34,6 +34,8 @@ private:
     GateState state;
     float scaleVal;
 
+    float raiseTH;
+    float fallTH;
     float scaleUpStep;
     float scaleDownStep;
     unsigned int holdCtr;
