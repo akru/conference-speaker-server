@@ -56,6 +56,10 @@ DebugDialog::DebugDialog(QWidget *parent) :
     ui->cCompressionSpinBox->setValue(s.value("compressor-compression", 0.5).toFloat());
     ui->cThresholdSpinBox->setValue(s.value("compressor-threshold", -12).toFloat());
     ui->cNoiseSpinBox->setValue(s.value("compressor-noise", -40).toFloat());
+
+    ui->psBox->setChecked(s.value("ps-enable", true).toBool());
+    ui->psCoef->setValue(s.value("ps-coef", 0.04).toFloat());
+    ui->psOsamp->setValue(s.value("ps-osamp", 32).toFloat());
 }
 
 DebugDialog::~DebugDialog()
@@ -110,6 +114,10 @@ void DebugDialog::on_saveButton_clicked()
     s.setValue("compressor-compression", ui->cCompressionSpinBox->value());
     s.setValue("compressor-threshold", ui->cThresholdSpinBox->value());
     s.setValue("compressor-noise", ui->cNoiseSpinBox->value());
+
+    s.setValue("ps-enable", ui->psBox->isChecked());
+    s.setValue("ps-coef", ui->psCoef->value());
+    s.setValue("ps-osamp", ui->psOsamp->value());
 
     emit filterSettingsUpdated();
 }
