@@ -11,6 +11,7 @@ public:
 
     void processFilter(float sample[]);
     QString name() { return "AGC"; }
+    void reloadSettings() {}
 
 private:
     float maxAmp;

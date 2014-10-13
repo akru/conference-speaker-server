@@ -30,13 +30,12 @@ static const float filter_step = 0.1;
 class HSFilter : public Filter
 {
 public:
-    HSFilter(EqualizerFilter *eq,
-             float PAPR_TH = 0, float PHPR_TH = 0,
-             float PNPR_TH = 0, float IMSD_TH = 0);
+    HSFilter(EqualizerFilter *eq);
     ~HSFilter();
 
     void processFilter(float sample[]);
     QString name() { return "Howling suppression"; }
+    void reloadSettings();
 
     inline void setTH(float PAPR_TH_, float PHPR_TH_,
                       float PNPR_TH_, float IMSD_TH_)

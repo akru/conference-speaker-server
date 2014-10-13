@@ -1,26 +1,44 @@
 #include "gate_filter.h"
 #include <cmath>
+#include <QSettings>
+#include <QDebug>
 
-GateFilter::GateFilter(float raiseTH,
-                       float fallTH,
-                       float attackTime,
-                       float holdTime,
-                       float releaseTime)
-    : raiseTH(raiseTH),
-      fallTH(fallTH),
-      attackTime(attackTime),
-      holdTime(holdTime),
-      releaseTime(releaseTime),
-      state(Closed),
+GateFilter::GateFilter()
+    : state(Closed),
       scaleVal(0),
-      scaleUpStep(1.0 / attackTime / sample_rate),
-      scaleDownStep(1.0 / releaseTime / sample_rate),
       holdCtr(0)
 {
 }
 
 GateFilter::~GateFilter()
 {
+}
+
+void GateFilter::setParams(float raiseTH,
+                           float fallTH,
+                           float attackTime,
+                           float holdTime,
+                           float releaseTime)
+{
+    this->raiseTH = raiseTH;
+    this->fallTH = fallTH;
+    this->attackTime = attackTime;
+    this->holdTime = holdTime;
+    this->releaseTime = releaseTime;
+    scaleUpStep = 1.0 / attackTime / sample_rate;
+    scaleDownStep = 1.0 / releaseTime / sample_rate;
+}
+
+void GateFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("gate-enable", true).toBool());
+    setParams(s.value("gate-raise", 0.05).toFloat(),
+              s.value("gate-fall", 0.2).toFloat(),
+              s.value("gate-attack", 0.1).toFloat(),
+              s.value("gate-hold", 0.2).toFloat(),
+              s.value("gate-release", 0.1).toFloat());
+    qDebug() << "Gate settings reloaded";
 }
 
 void GateFilter::processFilter(float sample[])

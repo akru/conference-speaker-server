@@ -195,6 +195,9 @@ void MainWindow::updateServerInfo(ServerInformation info)
     connect(this, SIGNAL(channelRequestDiscarded(QString)),
             server, SLOT(denyChannel(QString)));
 
+    connect(&filter_setup, SIGNAL(filterSettingsUpdated()),
+            server,        SLOT(reloadFilterSettings()));
+
     // Update headers
     ui->labelName->setText(info.name);
     ui->statusBar->showMessage(statusBarConfigured);
@@ -208,4 +211,9 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     settings.show();
+}
+
+void MainWindow::on_actionSound_processing_triggered()
+{
+    filter_setup.show();
 }

@@ -13,15 +13,18 @@ class GateFilter : public Filter
     };
 
 public:
-    GateFilter(float raiseTH,
-               float fallTH,
-               float attackTime,
-               float holdTime,
-               float releaseTime);
+    GateFilter();
     ~GateFilter();
+
+    void setParams(float raiseTH,
+                   float fallTH,
+                   float attackTime,
+                   float holdTime,
+                   float releaseTime);
 
     void processFilter(float sample[]);
     QString name() { return "Gate"; }
+    void reloadSettings();
 
 protected:
     float raiseTH;

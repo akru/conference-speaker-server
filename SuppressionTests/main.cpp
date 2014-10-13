@@ -16,7 +16,7 @@
 int main()
 {
 
-    NSFilter nsf(NSFilter::High);
+    NSFilter nsf;
 //    PitchShiftFilter psf(1.04, 4);
 
     float eqs[Filter::sample_length];
@@ -27,11 +27,9 @@ int main()
 //        qDebug() << "H[" << i << "]=" <<eqs[i];
     }
 
-    EqualizerFilter eq(1,                //multiplier
-                       eqs,                 //The freq. magnitude scalers filter
-                       kBlackmanWindow256   //The windowing function
-                      );
-    HSFilter hsf(&eq, 15, 15, 13, 0.8);
+    EqualizerFilter eq;
+    HSFilter hsf(&eq);
+    hsf.setTH(15, 15, 13, 0.8);
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);

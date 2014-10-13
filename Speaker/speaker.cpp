@@ -68,13 +68,13 @@ Speaker::Speaker(QObject *parent) :
     audio_buffer = audio->start();
     // Append filters
     filters.append(new AGCFilter);
-    filters.append(new GateFilter(0.05, 0.2, 0.1, 0.2, 0.1));
-    filters.append(new NSFilter(NSFilter::Medium));
+    filters.append(new GateFilter);
+    filters.append(new NSFilter);
     EqualizerFilter *eq = new EqualizerFilter;
-    HSFilter *hs = new HSFilter(eq, 15, 44, 35, 0.3);
+    HSFilter *hs = new HSFilter(eq);
     filters.append(hs);
     filters.append(eq);
-    filters.append(new PitchShiftFilter(0.04, 4));
+    filters.append(new PitchShiftFilter);
     // Moving to separate thread
 //    this->moveToThread(&myThread);
 //    myThread.start(QThread::TimeCriticalPriority);
@@ -183,4 +183,11 @@ void Speaker::ampAnalyze(const float sample[])
     avgAmp = avgAmp / count;
     // Return average amplitude in percents
     emit audioAmpUpdated(avgAmp * 100);
+}
+
+void Speaker::reloadFilterSettings()
+{
+    foreach (Filter *f, filters) {
+        f->reloadSettings();
+    }
 }

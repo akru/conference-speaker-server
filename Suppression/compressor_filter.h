@@ -6,21 +6,22 @@
 class CompressorFilter : public Filter
 {
 public:
-    CompressorFilter(bool  normalize=true,
-                     bool  use_peak=true,
-                     float threshold=0.25,
-                     float attack_time=0.2,
-                     float decay_time=1.0,
-                     float ratio=2,
-                     float compression=0.5,
-                     float threshold_db=-12.0,
-                     float noise_floor_db=-40,
-                     float noise_floor=0.01);
+    CompressorFilter();
     ~CompressorFilter();
+
+    void setParams(bool  normalize=true,
+                   bool  use_peak=true,
+                   float attack_time=0.2,
+                   float decay_time=1.0,
+                   float ratio=2,
+                   float compression=0.5,
+                   float threshold_db=-12.0,
+                   float noise_floor_db=-40);
 
 
     void processFilter(float sample[]);
     QString name() { return "Compressor"; }
+    void reloadSettings();
 
 private:
     bool      TwoBufferProcessPass1(float *buffer1, float *buffer2);

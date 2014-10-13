@@ -32,6 +32,7 @@ signals:
 public slots:
     void setVolume(qreal volume);
     void play(QByteArray packet);
+    void reloadFilterSettings();
 
 private slots:
     void ampAnalyze(const float sample[]);

@@ -13,6 +13,7 @@
 #include "request_widget.h"
 #include "client_widget.h"
 #include "about_dialog.h"
+#include "debug_dialog.h"
 #include "vote_widget.h"
 #include "broadcaster.h"
 #include "receiver.h"
@@ -47,12 +48,14 @@ private slots:
     void dropRequest(QString address);
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
+    void on_actionSound_processing_triggered();
 
     void updateServerInfo(ServerInformation info);
 
 private:
     Ui::MainWindow *ui;
     SettingsDialog settings;
+    DebugDialog filter_setup;
     AboutDialog about;
     VoteWidget voting;
 

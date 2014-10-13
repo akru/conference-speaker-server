@@ -2,15 +2,13 @@
 #include "noise_suppression.h"
 
 #include <QDebug>
+#include <QSettings>
 
-NSFilter::NSFilter(Level level)
+NSFilter::NSFilter()
 {
-    qDebug() << "NSFilter(" << level << ")";
-
     if (!WebRtcNs_Create(&ns_ptr))
     {
         WebRtcNs_Init(ns_ptr, sample_rate);
-        WebRtcNs_set_policy(ns_ptr, level);
     }
     else
         qWarning() << "Unable to create noise supression filter";
@@ -19,6 +17,23 @@ NSFilter::NSFilter(Level level)
 NSFilter::~NSFilter()
 {
     WebRtcNs_Free(ns_ptr);
+}
+
+void NSFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("ns-enable", true).toBool());
+    QString level = s.value("ns-level", "low").toString();
+    if (level == "low")
+        setPolicy(Low);
+    else
+    {
+        if (level == "medium")
+            setPolicy(Medium);
+        else
+            setPolicy(High);
+    }
+    qDebug() << "NS settings reloaded";
 }
 
 void NSFilter::processFilter(float sample[])

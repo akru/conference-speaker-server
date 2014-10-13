@@ -29,12 +29,14 @@ public slots:
     void dropUser(QString address);
     void denyVote(QString address);
     void acceptVote(QString address);
+    void reloadFilterSettings();
 
 signals:
     void registrationRequest(QString address, UserInformation info);
     void channelRequest(QString address, UserInformation info);
     void channelCloseRequest(QString address);
     void voteRequest(QString address, bool type);
+    void filterSettingsUpdated();
 
 private slots:
     void newConnection();

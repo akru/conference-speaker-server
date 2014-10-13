@@ -3,13 +3,10 @@
 
 #include <cstdio>
 #include <QDebug>
+#include <QSettings>
 
-HSFilter::HSFilter(EqualizerFilter *eq,
-                   float PAPR_TH, float PHPR_TH,
-                   float PNPR_TH, float IMSD_TH)
-    : eq(eq),
-      PAPR_TH(PAPR_TH), PHPR_TH(PHPR_TH),
-      PNPR_TH(PNPR_TH), IMSD_TH(IMSD_TH)
+HSFilter::HSFilter(EqualizerFilter *eq)
+    : eq(eq)
 {
     Q_ASSERT(eq);
     // Initialize fft work arrays.
@@ -25,6 +22,16 @@ HSFilter::HSFilter(EqualizerFilter *eq,
 
 HSFilter::~HSFilter()
 {
+}
+
+void HSFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("hs-enable", true).toBool());
+    setTH(s.value("hs-papr", 1000).toFloat(),
+          s.value("hs-phpr", 1000).toFloat(),
+          s.value("hs-pnpr", 1000).toFloat(),
+          s.value("hs-ismd", 1000).toFloat());
 }
 
 void HSFilter::processFilter(float sample[])
@@ -62,7 +69,7 @@ short HSFilter::analyze_howling(short howling_freq[], const float input[])
     float fin[HS::fft_input_length];
     // Convert input data to float and apply window
     for (short i = 0; i < Filter::sample_length; ++i)
-        fin[i] = input[i] * kBlackmanWindow256[i];
+        fin[i] = input[i] * kBlackmanWindow512[i];
     memset(fin + Filter::sample_length, 0,
            sizeof(float) * (HS::fft_input_length - Filter::sample_length));
 

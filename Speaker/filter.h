@@ -25,6 +25,14 @@ public:
      */
     virtual QString name() = 0;
     /*
+     * Settings reloader.
+     */
+    virtual void reloadSettings() = 0;
+    /*
+     * Settings filename getter.
+     */
+    QString settingsFiltename();
+    /*
      * Enable filter.
      */
     void enable(bool e=true);

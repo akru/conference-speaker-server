@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <QDebug>
+#include <QSettings>
 
 #define B_SPLINE_EQ
 
@@ -99,7 +100,7 @@ void interpolate(float *samples, quint16 length,
 #endif
 }
 
-EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
+EqualizerFilter::EqualizerFilter(float X, const float *W)
     : first_iteration(true),
       X(X / Equalizer::fft_size * 2), W(W)
 {
@@ -108,11 +109,25 @@ EqualizerFilter::EqualizerFilter(float X, const float *fbH, const float *W)
     memset(ip, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
     memset(wfft, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
 
-    setFullBand(fbH);
+    reloadSettings();
 }
 
 EqualizerFilter::~EqualizerFilter()
 {
+}
+
+void EqualizerFilter::reloadSettings()
+{
+    QSettings s(settingsFiltename(), QSettings::IniFormat);
+    enable(s.value("eq-enable", true).toBool());
+    setUserBand(s.value("eq-slider-1", 50).toInt(),
+                 s.value("eq-slider-2", 50).toInt(),
+                 s.value("eq-slider-3", 50).toInt(),
+                 s.value("eq-slider-4", 50).toInt(),
+                 s.value("eq-slider-5", 50).toInt(),
+                 s.value("eq-slider-6", 50).toInt(),
+                 s.value("eq-slider-7", 50).toInt());
+    qDebug() << "Equalize settings reloaded";
 }
 
 void EqualizerFilter::setUserBand(short B1, short B2, short B3,

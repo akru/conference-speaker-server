@@ -6,89 +6,35 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>635</width>
-    <height>300</height>
+    <width>739</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" rowspan="3">
-    <widget class="QGroupBox" name="groupBox_2">
+   <item row="5" column="5">
+    <widget class="QPushButton" name="saveButton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="6">
+    <widget class="QGroupBox" name="eqBox">
      <property name="title">
       <string>Equalizer</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
-        <widget class="QWidget" name="tab">
-         <attribute name="title">
-          <string>Low/High</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>HIGH</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QDial" name="dial_2">
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>MID</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>LOW</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QDial" name="dial">
-            <property name="maximum">
-             <number>99</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="invertedAppearance">
-             <bool>false</bool>
-            </property>
-            <property name="invertedControls">
-             <bool>false</bool>
-            </property>
-            <property name="wrapping">
-             <bool>false</bool>
-            </property>
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDial" name="dial_3">
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
           <string>User row</string>
@@ -241,24 +187,13 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="applyButton">
-     <property name="text">
-      <string>Apply</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="saveButton">
-     <property name="text">
-      <string>Save</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
+   <item row="0" column="4" rowspan="2" colspan="2">
+    <widget class="QGroupBox" name="hsBox">
      <property name="title">
-      <string>Criteries</string>
+      <string>Howling suppression</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="2" column="0">
@@ -408,18 +343,221 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="3" column="2" rowspan="2">
+    <widget class="QGroupBox" name="psBox">
+     <property name="title">
+      <string>Pitch shift</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
-    </spacer>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>coef</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>osamp</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="psCoef"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="psOsamp"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="4" rowspan="2" colspan="2">
+    <widget class="QGroupBox" name="gateBox">
+     <property name="title">
+      <string>Gate</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="raiseSpinBox"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Raise TH</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="fallSpinBox"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="attackSpinBox"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="holdSpinBox"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="releaseSpinBox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Fall TH</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Attach time</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>Hold time</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Release time</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="3" rowspan="2">
+    <widget class="QGroupBox" name="nsBox">
+     <property name="title">
+      <string>Noise suppression</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="highRadioButton">
+        <property name="text">
+         <string>High</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="mediumRadioButton">
+        <property name="text">
+         <string>Medium</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="lowRadioButton">
+        <property name="text">
+         <string>Low</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="2" rowspan="3" colspan="2">
+    <widget class="QGroupBox" name="compressorBox">
+     <property name="title">
+      <string>Compressor</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="normalizeCheckBox">
+        <property name="text">
+         <string>Normalize</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_19">
+        <property name="text">
+         <string>Attack time</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="cAttackSpinBox"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="cDecaySpinBox"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string>Decay time</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="cRatioSpinBox"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>Ratio</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_21">
+        <property name="text">
+         <string>Compression</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QDoubleSpinBox" name="cCompressionSpinBox"/>
+      </item>
+      <item row="8" column="1">
+       <widget class="QDoubleSpinBox" name="cThresholdSpinBox"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_23">
+        <property name="text">
+         <string>Threshold db</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_24">
+        <property name="text">
+         <string>Noise floor db</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QDoubleSpinBox" name="cNoiseSpinBox"/>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="peakCheckBox">
+        <property name="text">
+         <string>Peak</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

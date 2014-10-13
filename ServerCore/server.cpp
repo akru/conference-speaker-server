@@ -203,6 +203,9 @@ void Server::openChannel(QString address)
             // Allocate voice receiver
             try {
                 Receiver *r = new Receiver(server->serverAddress());
+                // Connect all
+                connect(this, SIGNAL(filterSettingsUpdated()),
+                        r,    SLOT(reloadFilterSettings()));
                 // Append to channel map
                 channels.insert(address, r);
                 // Make success response
@@ -270,4 +273,9 @@ void Server::denyVote(QString address)
     Response res(Request::VOTE_YES, Response::ERROR, "Access denied");
     QJsonObject result = res.toJson();
     clients[address]->write(result);
+}
+
+void Server::reloadFilterSettings()
+{
+    emit filterSettingsUpdated();
 }

@@ -15,11 +15,17 @@ public:
         High
     };
 
-    NSFilter(Level level);
+    NSFilter();
     ~NSFilter();
+
+    void setPolicy(Level level)
+    {
+        WebRtcNs_set_policy(ns_ptr, level);
+    }
 
     void processFilter(float sample[]);
     QString name() { return "Noise suppression"; }
+    void reloadSettings();
 
 private:
     NsHandle *ns_ptr;
