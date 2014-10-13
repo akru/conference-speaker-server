@@ -1,13 +1,13 @@
 #include "gate_filter.h"
 #include <cmath>
 
-GateFilter::GateFilter(float raiseTH,
-                       float fallTH,
+GateFilter::GateFilter(float raiseTHdB,
+                       float fallTHdB,
                        float attackTime,
                        float holdTime,
                        float releaseTime)
-    : raiseTH(raiseTH),
-      fallTH(fallTH),
+    : raiseTHdB(raiseTHdB),
+      fallTHdB(fallTHdB),
       attackTime(attackTime),
       holdTime(holdTime),
       releaseTime(releaseTime),
@@ -30,14 +30,16 @@ void GateFilter::processFilter(float sample[])
 }
 
 float GateFilter::gateLogic(float s)
-{
+{    
     switch (state) {
     case Closed:
+        float raiseTH = pow(10.0, raiseTHdB/20);
         if (fabs(s) > raiseTH)
             state = Opened;
         break;
 
     case Opened:
+        float fallTH = pow(10.0, fallTHdB/20);
         if (fabs(s) < fallTH)
         {
             holdCtr = 0;
@@ -50,6 +52,7 @@ float GateFilter::gateLogic(float s)
         break;
 
     case Holding:
+        float raiseTH = pow(10.0, raiseTHdB/20);
         if (fabs(s) > raiseTH)
             state = Opened;
         else

@@ -13,8 +13,8 @@ class GateFilter : public Filter
     };
 
 public:
-    GateFilter(float raiseTH,
-               float fallTH,
+    GateFilter(float raiseTHdB,
+               float fallTHdB,
                float attackTime,
                float holdTime,
                float releaseTime);
@@ -24,8 +24,8 @@ public:
     QString name() { return "Gate"; }
 
 protected:
-    float raiseTH;
-    float fallTH;
+    float raiseTHdB;
+    float fallTHdB;
     float attackTime;
     float holdTime;
     float releaseTime;
