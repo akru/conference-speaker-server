@@ -98,12 +98,12 @@ void PitchShiftFilter::processFilter(float sample[])
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
-        smbPitchShift(analyze_length, analyze_length, sample, output);
+        smbPitchShift(analyze_length, analyze_length, input, output);
     }
     else // Pitch down
     {
        pitchShift = 1 - pitchShiftCoef;
-       smbPitchShift(analyze_length, analyze_length, sample, output);
+       smbPitchShift(analyze_length, analyze_length, input, output);
     }
     // Back to the Sample
     for (short i = 0; i < sample_length; ++i)

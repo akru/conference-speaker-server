@@ -21,7 +21,7 @@ void GateFilter::setParams(float raiseTH,
                            float releaseTime)
 {
     this->raiseTH = pow(10.0, raiseTH/20.0);
-    this->fallTH = pow(10.0, raiseTH/20.0);
+    this->fallTH = pow(10.0, fallTH/20.0);
     this->attackTime = attackTime;
     this->holdTime = holdTime;
     this->releaseTime = releaseTime;

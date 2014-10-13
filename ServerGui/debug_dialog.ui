@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>739</width>
-    <height>420</height>
+    <width>926</width>
+    <height>498</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -385,7 +385,14 @@
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="raiseSpinBox"/>
+       <widget class="QDoubleSpinBox" name="raiseSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_7">
@@ -395,16 +402,44 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="fallSpinBox"/>
+       <widget class="QDoubleSpinBox" name="fallSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="attackSpinBox"/>
+       <widget class="QDoubleSpinBox" name="attackSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="holdSpinBox"/>
+       <widget class="QDoubleSpinBox" name="holdSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QDoubleSpinBox" name="releaseSpinBox"/>
+       <widget class="QDoubleSpinBox" name="releaseSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_15">
@@ -530,7 +565,11 @@
        <widget class="QDoubleSpinBox" name="cCompressionSpinBox"/>
       </item>
       <item row="8" column="1">
-       <widget class="QDoubleSpinBox" name="cThresholdSpinBox"/>
+       <widget class="QDoubleSpinBox" name="cThresholdSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="8" column="0">
        <widget class="QLabel" name="label_23">
@@ -547,7 +586,11 @@
        </widget>
       </item>
       <item row="9" column="1">
-       <widget class="QDoubleSpinBox" name="cNoiseSpinBox"/>
+       <widget class="QDoubleSpinBox" name="cNoiseSpinBox">
+        <property name="minimum">
+         <double>-100.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0" colspan="2">
        <widget class="QCheckBox" name="peakCheckBox">

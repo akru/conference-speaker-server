@@ -5,7 +5,7 @@
 #include <QObject>
 //#include <QThread>
 #include <QTimer>
-#include "filter.h"
+#include "../Suppression/filter.h"
 #include "accbuffer.hpp"
 
 class QAudioOutput;
