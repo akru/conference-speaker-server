@@ -8,11 +8,6 @@
 #include "filter.h"
 #include "accbuffer.hpp"
 
-#ifdef QT_DEBUG
-#include "debug_dialog.h"
-#include <hs_filter.h>
-#endif
-
 class QAudioOutput;
 class QAudioFormat;
 class QIODevice;
@@ -39,7 +34,7 @@ public slots:
     void play(QByteArray packet);
 
 private slots:
-    void ampAnalyze(const QByteArray &sample);
+    void ampAnalyze(const float sample[]);
     void speakHeartbeat();
 
 private:
@@ -53,9 +48,6 @@ private:
 
 //    QThread         myThread;
     QTimer          heartbeat;
-#ifdef QT_DEBUG
-    DebugDialog     *debug_dialog;
-#endif
 };
 
 #endif // SPEAKER_H

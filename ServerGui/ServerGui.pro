@@ -35,6 +35,10 @@ FORMS    += \
 RESOURCES += \
     resource.qrc
 
+TRANSLATIONS += \
+    csgui_en.ts \
+    csgui_ru.ts
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ServerCore/release/ -lServerCore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ServerCore/debug/ -lServerCore
 else:unix: LIBS += -L$$OUT_PWD/../ServerCore/ -lServerCore
