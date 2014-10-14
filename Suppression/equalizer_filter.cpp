@@ -200,7 +200,8 @@ void EqualizerFilter::dsp_logic()
 //        qDebug() << "W[" << j << "]=" << output_window[j];
     }
     //zero pad the remaining fft window
-//    memset(work_buffer + window_size, 0, (fft_size - window_size) * sizeof(float));
+    memset(output_window + Equalizer::window_size, 0,
+           (Equalizer::fft_size - Equalizer::window_size) * sizeof(float));
     //Processing is done here!
     //do fft
     rdft(Equalizer::fft_size, 1, output_window, ip, wfft);
@@ -212,6 +213,9 @@ void EqualizerFilter::dsp_logic()
     }
     //inverse fft
     rdft(Equalizer::fft_size, -1, output_window, ip, wfft);
+    // Dummy resampler
+    for (short j = 1; j < Equalizer::window_size; ++j)
+        output_window[j] = output_window[j * Equalizer::zero_scaler];
     ////debug: tests overlapping add
     ////and negates ALL PREVIOUS processing
     ////yields a perfect reconstruction if COLA is held
