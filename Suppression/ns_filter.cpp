@@ -9,6 +9,7 @@ NSFilter::NSFilter()
     if (!WebRtcNs_Create(&ns_ptr))
     {
         WebRtcNs_Init(ns_ptr, sample_rate);
+        reloadSettings();
     }
     else
         qWarning() << "Unable to create noise supression filter";

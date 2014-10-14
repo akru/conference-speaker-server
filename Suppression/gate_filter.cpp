@@ -8,6 +8,7 @@ GateFilter::GateFilter()
       scaleVal(0),
       holdCtr(0)
 {
+    reloadSettings();
 }
 
 GateFilter::~GateFilter()

@@ -21,11 +21,11 @@ static const float index_to_rad = 2.0 * M_PI * Filter::sample_rate / analyze_len
 static const float hz_to_index = analyze_length * 2.0 / Filter::sample_rate;
 static const float rad_to_index = analyze_length / 2.0 / M_PI / Filter::sample_rate;
 static const short minimal_freq = 50;
-static const short maximal_freq = 10000;
+static const short maximal_freq = 11025;
 static const float filter_step = 0.1;
 }
 
-//#define HS_DEBUG
+#define HS_DEBUG
 
 class HSFilter : public Filter
 {

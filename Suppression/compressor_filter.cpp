@@ -18,6 +18,7 @@ CompressorFilter::CompressorFilter()
       first_start(true)
 {
     NewTrackPass1();
+    reloadSettings();
 }
 
 CompressorFilter::~CompressorFilter()

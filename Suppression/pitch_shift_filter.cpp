@@ -88,26 +88,26 @@ void PitchShiftFilter::processFilter(float sample[])
         iteration    = 0;
     }
 
-    float input[analyze_length];
-    float output[analyze_length];
+//    float input[analyze_length];
+    float output[sample_length];
     // Stupid resampler:
-    memset(input, 0, analyze_length * sizeof(float));
-    for (int i = 0; i < sample_length; ++i)
-        input[i * len_scaler] = sample[i];
+//    memset(input, 0, analyze_length * sizeof(float));
+//    for (int i = 0; i < sample_length; ++i)
+//        input[i * len_scaler] = sample[i];
 
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
-        smbPitchShift(analyze_length, analyze_length, input, output);
+        smbPitchShift(sample_length, sample_length, sample, output);
     }
     else // Pitch down
     {
        pitchShift = 1 - pitchShiftCoef;
-       smbPitchShift(analyze_length, analyze_length, input, output);
+       smbPitchShift(sample_length, sample_length, sample, output);
     }
     // Back to the Sample
     for (short i = 0; i < sample_length; ++i)
-        sample[i] = output[i * len_scaler];
+        sample[i] = output[i];
 }
 
 // -----------------------------------------------------------------------------------------------------------------
