@@ -131,56 +131,6 @@ font: 14pt;
     <item row="4" column="0" rowspan="2">
      <layout class="QVBoxLayout" name="channelBox"/>
     </item>
-    <item row="5" column="1">
-     <widget class="QGroupBox" name="voteBox">
-      <property name="minimumSize">
-       <size>
-        <width>300</width>
-        <height>150</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>300</width>
-        <height>150</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QGroupBox {
-     background-color: white;
-     border: 2px solid white;
-     border-radius: 5px;
-     margin-top: 3ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top left; /* position at the top center */
-     padding: 0 3px;
- }</string>
-      </property>
-      <property name="title">
-       <string>Take a vote:</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>8</number>
-       </property>
-       <property name="topMargin">
-        <number>8</number>
-       </property>
-       <property name="rightMargin">
-        <number>8</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
-    </item>
     <item row="3" column="0">
      <widget class="QLabel" name="chatLabel">
       <property name="text">
@@ -217,7 +167,7 @@ font: 14pt;
          <x>0</x>
          <y>0</y>
          <width>281</width>
-         <height>155</height>
+         <height>305</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -321,6 +271,7 @@ font: 14pt;
     </property>
     <addaction name="actionSettings"/>
     <addaction name="actionSound_processing"/>
+    <addaction name="actionVoting"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -354,6 +305,14 @@ font: 14pt;
   <action name="actionSound_processing">
    <property name="text">
     <string>Sound processing</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionVoting">
+   <property name="text">
+    <string>Voting</string>
    </property>
   </action>
  </widget>

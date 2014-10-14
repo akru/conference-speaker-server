@@ -2,8 +2,10 @@
 #define VOTE_WIDGET_H
 
 #include <QWidget>
-#include <QList>
-#include "connection.h"
+#include <QLineEdit>
+
+#include <voting_invite.h>
+#include <voting.h>
 
 namespace Ui {
 class VoteWidget;
@@ -18,28 +20,19 @@ public:
     ~VoteWidget();
 
 signals:
-    void voteDenied(QString);
-    void voteAccepted(QString);
+    void voteNew(VotingInvite invite);
+    void voteStop();
 
 public slots:
-    void appendClient();
-    void dropClient();
-    void vote(QString address, bool type);
+    void updateResults(VoteResults results);
 
 private slots:
-    void setCount(int count);
-    void updateYesL(int count);
-    void updateNoL(int count);
-    void on_voteButton_clicked();
-
-private:
-    void appendYes();
-    void appendNo();
+    void on_plusButton_clicked();
+    void on_pushButton_toggled(bool checked);
 
 private:
     Ui::VoteWidget *ui;
-    QList<QString> voters;
-    int count;
+    QList<QLineEdit*> answers;
 };
 
 #endif // VOTE_WIDGET_H

@@ -1,5 +1,4 @@
 #include "receiver.h"
-
 #include <QHostAddress>
 
 Receiver::Receiver(QHostAddress address, QObject *parent)

@@ -5,10 +5,10 @@ QJsonObject Response::toJson() const
 {
     QJsonObject obj = Request(type).toJson();
     switch (result) {
-    case SUCCESS:
+    case Success:
         obj.insert("result", QString("success"));
         break;
-    case ERROR:
+    case Error:
         obj.insert("result", QString("error"));
         obj.insert("message", message);
         break;
@@ -26,12 +26,12 @@ Response Response::fromJson(const QJsonObject &json)
         throw(BadPacket());
 
     if (res.toString() == "success")
-        return Response(req.type, SUCCESS);
+        return Response(req.type, Success);
     else
     {
         if (msg.isUndefined())
             throw(BadPacket());
         else
-            return Response(req.type, ERROR, msg.toString());
+            return Response(req.type, Error, msg.toString());
     }
 }

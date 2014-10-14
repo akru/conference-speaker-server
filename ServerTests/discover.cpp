@@ -9,7 +9,7 @@ Discover::Discover(QObject *parent)
     QHostAddress addr = QNetworkInterface::allInterfaces()[0]
             .addressEntries()[0].broadcast();
     qDebug() << "sock bind:"
-             << sock.bind(addr, SERVER_INFORMATION_PORT);
+             << sock.bind(addr, SERVER_DISCOVER_PORT);
     connect(&sock, SIGNAL(readyRead()), SLOT(readPacket()));
 }
 
@@ -25,7 +25,7 @@ void Discover::readPacket()
     // Parse packet
     try {
         packet = QJsonDocument::fromJson(readBuffer).object();
-        server = ServerInformation::fromJson(packet);
+        server = ServerInformation::fromJson(packet.take("info").toObject());
     } catch (BadPacket) {
         qDebug() << "Discover :: Bad packet:" << readBuffer;
         return;

@@ -1,36 +1,51 @@
 #include "server.h"
+#include "broadcaster.h"
 #include "connection.h"
+#include "receiver.h"
+#include "voting.h"
+
+#include <QTcpServer>
 #include <QTcpSocket>
 #include <QJsonDocument>
+
 #include <cs_packet.h>
 #include <request.h>
 #include <response.h>
 #include <channel_response.h>
 #include <registration_request.h>
 #include <user_information.h>
+
 #include <QDebug>
 
-Server::Server(QString &address, QObject *parent)
-    : QObject(parent), server(new QTcpServer)
+Server::Server(const ServerInformation &info, QObject *parent)
+    : QObject(parent),
+      server(new QTcpServer(this)),
+      broadcaster(new Broadcaster(this)),
+      voting(0)
 {
-    connect(server, SIGNAL(newConnection()), SLOT(newConnection()));
-    connect(this, SIGNAL(registrationRequest(QString,UserInformation)),
-                  SLOT(registerUser(QString,UserInformation)));
-    connect(this, SIGNAL(channelCloseRequest(QString)), SLOT(closeChannel(QString)));
+    broadcaster->setServerInformation(info);
 
-    QHostAddress hostAddress = QHostAddress(address);
+    connect(server, SIGNAL(newConnection()), SLOT(connectionNew()));
+
+    connect(this,
+            SIGNAL(userRegistrationRequest(QString,UserInformation)),
+            SLOT(userRegister(QString,UserInformation)));
+    connect(this,
+            SIGNAL(channelCloseRequest(QString)),
+            SLOT(channelClose(QString)));
+
+    QHostAddress hostAddress = QHostAddress(info.address);
     // Listening port
-    qDebug() << "Listening" << address << SERVER_CONNECTION_PORT <<
+    qDebug() << "Listening" << info.address << SERVER_CONNECTION_PORT <<
     server->listen(hostAddress, SERVER_CONNECTION_PORT);
 }
 
 Server::~Server()
 {
     server->close();
-    delete server;
 }
 
-void Server::newConnection()
+void Server::connectionNew()
 {
     // Get first connection
     QTcpSocket *sock = server->nextPendingConnection();
@@ -52,10 +67,12 @@ void Server::newConnection()
             // Create connection instance
             Connection *c = new Connection(sock, this);
             // Connect to incoming data handler
-            connect(c, SIGNAL(readyRead(Connection*)),
+            connect(c,
+                    SIGNAL(readyRead(Connection*)),
                     SLOT(connectionReadyRead(Connection*)));
             // Connect to connection destroyer
-            connect(c, SIGNAL(disconnected(Connection*)),
+            connect(c,
+                    SIGNAL(disconnected(Connection*)),
                     SLOT(connectionClose(Connection*)));
             // Store connection pointer
             clients[c->getAddress()] = c;
@@ -109,29 +126,18 @@ void Server::connectionReadyRead(Connection *client)
         Request          req = Request::fromJson(packet);
         switch (req.type)
         {
-        case Request::REGISTRATION:
+        case Request::Registration:
             qDebug() << "New registration request from" << client->getAddress();
-            emit registrationRequest(client->getAddress(),
+            emit userRegistrationRequest(client->getAddress(),
                  RegistrationRequest::fromJson(packet).user);
             break;
-        case Request::CHANNEL:
+        case Request::Channel:
             qDebug() << "New channel request from" << client->getAddress();
             emit channelRequest(client->getAddress(), users[client->getAddress()]);
             break;
-        case Request::CHANNEL_CLOSE:
+        case Request::ChannelClose:
             qDebug() << "New channel close request from" << client->getAddress();
             emit channelCloseRequest(client->getAddress());
-            break;
-        case Request::VOTE_YES:
-            qDebug() << "New vote yes request from" << client->getAddress();
-            if (users.contains(client->getAddress()))
-                emit voteRequest(client->getAddress(), true);
-            else
-                denyVote(client->getAddress());
-            break;
-        case Request::VOTE_NO:
-            qDebug() << "New vote no request from" << client->getAddress();
-            emit voteRequest(client->getAddress(), false);
             break;
         }
     } catch (BadPacket) {
@@ -143,7 +149,7 @@ void Server::connectionReadyRead(Connection *client)
     }
 }
 
-void Server::registerUser(QString address, UserInformation info)
+void Server::userRegister(QString address, UserInformation info)
 {
     Q_ASSERT(clients.contains(address));
 
@@ -152,30 +158,50 @@ void Server::registerUser(QString address, UserInformation info)
     if (!users.contains(address))
     {
         users.insert(address, info);
-        res = Response(Request::REGISTRATION, Response::SUCCESS);
+        res = Response(Request::Registration, Response::Success);
         emit userConnected(address, info);
         qDebug() << "Success registered user:" << info.name;
     }
     else
     {
         qDebug() << "Double registration:" << address;
-        res = Response(Request::REGISTRATION,
-                       Response::ERROR, "IP already registered");
+        res = Response(Request::Registration,
+                       Response::Error, "IP already registered");
     }
+    // Write response
     clients[address]->write(res.toJson());
 }
 
-void Server::denyChannel(QString address)
+void Server::userDrop(QString address)
+{
+    qDebug() << "Drop user at address" << address;
+    if (channels.contains(address))
+    {
+        delete channels[address];
+        channels.remove(address);
+    }
+    if (users.contains(address))
+        users.remove(address);
+    if (clients.contains(address))
+    {
+        delete clients[address];
+        clients.remove(address);
+    }
+    emit userDisconnected(address);
+}
+
+
+void Server::channelDeny(QString address)
 {
     Q_ASSERT(clients.contains(address));
 
     qDebug() << "Channel request denied";
-    Response res(Request::CHANNEL, Response::ERROR, "Access denied");
+    Response res(Request::Channel, Response::Error, "Access denied");
     QJsonObject result = res.toJson();
     clients[address]->write(result);
 }
 
-void Server::openChannel(QString address)
+void Server::channelOpen(QString address)
 {
     Q_ASSERT(clients.contains(address));
 
@@ -184,7 +210,7 @@ void Server::openChannel(QString address)
     if (!users.contains(address))
     {
         qDebug() << "Unregistered:" << address;
-        Response res(Request::CHANNEL, Response::ERROR, "Please register first");
+        Response res(Request::Channel, Response::Error, "Please register first");
         result = res.toJson();
     }
     else
@@ -204,7 +230,7 @@ void Server::openChannel(QString address)
             try {
                 Receiver *r = new Receiver(server->serverAddress());
                 // Connect all
-                connect(this, SIGNAL(filterSettingsUpdated()),
+                connect(this, SIGNAL(channelSettingsUpdated()),
                         r,    SLOT(reloadFilterSettings()));
                 // Append to channel map
                 channels.insert(address, r);
@@ -215,7 +241,7 @@ void Server::openChannel(QString address)
                 emit channelConnected(address, users[address], r);
             } catch(...) {
                 qDebug() << "Can not open the channel";
-                Response res(Request::CHANNEL, Response::ERROR, "Server fault");
+                Response res(Request::Channel, Response::Error, "Server fault");
                 result = res.toJson();
             }
         }
@@ -223,25 +249,7 @@ void Server::openChannel(QString address)
     clients[address]->write(result);
 }
 
-void Server::dropUser(QString address)
-{
-    qDebug() << "Drop user at address" << address;
-    if (channels.contains(address))
-    {
-        delete channels[address];
-        channels.remove(address);
-    }
-    if (users.contains(address))
-        users.remove(address);
-    if (clients.contains(address))
-    {
-        delete clients[address];
-        clients.remove(address);
-    }
-    emit userDisconnected(address);
-}
-
-void Server::closeChannel(QString address)
+void Server::channelClose(QString address)
 {
     qDebug() << "Close channel at address" << address;
     if(channels.contains(address))
@@ -255,27 +263,54 @@ void Server::closeChannel(QString address)
     }
 }
 
-void Server::acceptVote(QString address)
-{
-    Q_ASSERT(clients.contains(address));
 
-    qDebug() << "Channel request accepted";
-    Response res(Request::VOTE_YES, Response::SUCCESS); // TODO: Vote request
-    QJsonObject result = res.toJson();
-    clients[address]->write(result);
+void Server::channelReloadSettings()
+{
+    emit channelSettingsUpdated();
 }
 
-void Server::denyVote(QString address)
+void Server::voteNew(VotingInvite invite)
 {
-    Q_ASSERT(clients.contains(address));
-
-    qDebug() << "Vote request denied";
-    Response res(Request::VOTE_YES, Response::ERROR, "Access denied");
-    QJsonObject result = res.toJson();
-    clients[address]->write(result);
+    // Recreate voting by invite
+    delete voting;
+    voting = new Voting(invite, this);
+    // Connect signals
+    connect(this,   SIGNAL(voteRequest(QString,QJsonValue)),
+            voting, SLOT(vote(QString,QJsonObject)));
+    connect(voting,
+            SIGNAL(accepted(QString)),
+            SLOT(voteAccept(QString)));
+    connect(voting,
+            SIGNAL(denied(QString,QString)),
+            SLOT(voteDeny(QString,QString)));
+    connect(voting,
+            SIGNAL(resultsUpdated(VoteResults)),
+            SLOT(voteReadyResults(VoteResults)));
+    // Set broadcasting message
+    broadcaster->setVotingInvite(invite);
 }
 
-void Server::reloadFilterSettings()
+void Server::voteStop()
 {
-    emit filterSettingsUpdated();
+    delete voting; voting = 0;
+    broadcaster->unsetVotingInvite();
+}
+
+void Server::voteAccept(QString address)
+{
+    Q_ASSERT(clients.contains(address));
+    Response res(Request::Vote, Response::Success);
+    clients[address]->write(res.toJson());
+}
+
+void Server::voteDeny(QString address, QString error)
+{
+    Q_ASSERT(clients.contains(address));
+    Response res(Request::Vote, Response::Error, error);
+    clients[address]->write(res.toJson());
+}
+
+void Server::voteReadyResults(VoteResults results)
+{
+    emit voteResultsUpdated(results);
 }

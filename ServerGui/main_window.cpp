@@ -24,15 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QFontDatabase::addApplicationFont(":/res/fonts/GothicBold.ttf");
     // Setup UI
     ui->setupUi(this);
-    // Setup voting
-    ui->voteBox->layout()->addWidget(&voting);
-    voting.show();
     // Restart server with new info
-    connect(&settings, SIGNAL(newServerInfo(ServerInformation)),
+    connect(&settings,
+            SIGNAL(newServerInfo(ServerInformation)),
             SLOT(updateServerInfo(ServerInformation)));
-    // Reload broadcaster server information
-    connect(&settings, SIGNAL(newServerInfo(ServerInformation)),
-            &broadcaster, SLOT(setServerInformation(ServerInformation)));
     // Load server settings
     settings.loadSettings();
     // Set scroll boxes alignments
@@ -70,8 +65,6 @@ void MainWindow::appendClient(QString address, UserInformation info)
     w->show();
     // Ban handler
     connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
-    // Update vote info
-    voting.appendClient();
     // Update header
     int countClients = ui->clientBox->layout()->count();
     ui->clientLabel->setText(clientsHeader.arg(countClients));
@@ -92,8 +85,6 @@ void MainWindow::dropClient(QString address)
     {
         dropChannel(address);
     }
-    // Update vote info
-    voting.dropClient();
     // Update header
     int countClients = ui->clientBox->layout()->count();
     ui->clientLabel->setText(clientsHeader.arg(countClients));
@@ -108,9 +99,10 @@ void MainWindow::appendChannel(QString address, UserInformation info, Receiver *
     ui->channelBox->addWidget(c);
     c->show();
 
-    connect(c, SIGNAL(closeChannelClicked(QString)),
+    connect(c,      SIGNAL(closeChannelClicked(QString)),
             server, SLOT(closeChannel(QString)));
-    connect(c, SIGNAL(closeChannelClicked(QString)),
+    connect(c,
+            SIGNAL(closeChannelClicked(QString)),
             SLOT(dropChannel(QString)));
     // Update header
     ui->chatLabel->setText(
@@ -167,36 +159,42 @@ void MainWindow::dropRequest(QString address)
 void MainWindow::updateServerInfo(ServerInformation info)
 {
     delete server;
-    server = new Server(info.address);
+    server = new Server(info);
 
-    connect(server, SIGNAL(userConnected(QString,UserInformation)),
+    connect(server,
+            SIGNAL(userConnected(QString,UserInformation)),
             SLOT(appendClient(QString,UserInformation)));
-    connect(server, SIGNAL(userDisconnected(QString)),
+    connect(server,
+            SIGNAL(userDisconnected(QString)),
             SLOT(dropClient(QString)));
 
-    connect(server, SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
+    connect(server,
+            SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
             SLOT(appendChannel(QString,UserInformation,Receiver*)));
-    connect(server, SIGNAL(channelCloseRequest(QString)),
+    connect(server,
+            SIGNAL(channelCloseRequest(QString)),
             SLOT(dropRequest(QString)));
-    connect(server, SIGNAL(channelDisconnected(QString)),
+    connect(server,
+            SIGNAL(channelDisconnected(QString)),
             SLOT(dropChannel(QString)));
 
-    connect(server, SIGNAL(voteRequest(QString,bool)),
-            &voting, SLOT(vote(QString,bool)));
-    connect(&voting, SIGNAL(voteAccepted(QString)),
-            server, SLOT(acceptVote(QString)));
-    connect(&voting, SIGNAL(voteDenied(QString)),
-            server, SLOT(denyVote(QString)));
+    connect(server,  SIGNAL(voteResultsUpdated(VoteResults)),
+            &voting, SLOT(updateResults(VoteResults)));
+    connect(&voting, SIGNAL(voteNew(VotingInvite)),
+            server,  SLOT(voteNew(VotingInvite)));
+    connect(&voting, SIGNAL(voteStop()),
+            server,  SLOT(voteStop()));
 
-    connect(server, SIGNAL(channelRequest(QString,UserInformation)),
+    connect(server,
+            SIGNAL(channelRequest(QString,UserInformation)),
             SLOT(channelRequest(QString,UserInformation)));
-    connect(this, SIGNAL(channelRequestAccepted(QString)),
-            server, SLOT(openChannel(QString)));
-    connect(this, SIGNAL(channelRequestDiscarded(QString)),
-            server, SLOT(denyChannel(QString)));
+    connect(this,   SIGNAL(channelRequestAccepted(QString)),
+            server, SLOT(channelOpen(QString)));
+    connect(this,   SIGNAL(channelRequestDiscarded(QString)),
+            server, SLOT(channelDeny(QString)));
 
     connect(&filter_setup, SIGNAL(filterSettingsUpdated()),
-            server,        SLOT(reloadFilterSettings()));
+            server,        SLOT(channelReloadSettings()));
 
     // Update headers
     ui->labelName->setText(info.name);
@@ -217,4 +215,9 @@ void MainWindow::on_actionSettings_triggered()
 void MainWindow::on_actionSound_processing_triggered()
 {
     filter_setup.show();
+}
+
+void MainWindow::on_actionVoting_triggered()
+{
+    voting.show();
 }

@@ -15,7 +15,6 @@
 #include "about_dialog.h"
 #include "debug_dialog.h"
 #include "vote_widget.h"
-#include "broadcaster.h"
 #include "receiver.h"
 #include "server.h"
 
@@ -49,18 +48,19 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
     void on_actionSound_processing_triggered();
+    void on_actionVoting_triggered();
 
     void updateServerInfo(ServerInformation info);
 
+
 private:
     Ui::MainWindow *ui;
-    SettingsDialog settings;
-    DebugDialog filter_setup;
-    AboutDialog about;
-    VoteWidget voting;
+    Server         *server;
 
-    Server *server;
-    Broadcaster broadcaster;
+    SettingsDialog settings;
+    DebugDialog    filter_setup;
+    AboutDialog    about;
+    VoteWidget     voting;
 
     QMap<QString, ClientWidget*>  clients;
     QMap<QString, RequestWidget*> requests;

@@ -1,7 +1,8 @@
 #include "broadcaster.h"
 #include <cs_packet.h>
-#include <QJsonDocument>
 #include <QNetworkInterface>
+#include <QTimer>
+#include <QUuid>
 
 Broadcaster::Broadcaster(QObject *parent)
     : QObject(parent)
@@ -14,24 +15,47 @@ Broadcaster::Broadcaster(QObject *parent)
             addreses.append(addr.broadcast());
         }
     }
-
-    t.setInterval(BROADCASTER_TIME_INTERVAL);
-    connect(&t, SIGNAL(timeout()), SLOT(sendInformation()));
-    t.start();
+    // Set server UUID
+    message.insert("uuid", QUuid::createUuid().toString());
+    // Setup broadcasting interval
+    QTimer *t = new QTimer(this);
+    t->setInterval(BROADCASTER_TIME_INTERVAL);
+    connect(t, SIGNAL(timeout()), SLOT(sendInformation()));
+    t->start();
 }
 
 void Broadcaster::setServerInformation(ServerInformation info)
 {
-    QJsonObject packet = info.toJson();
-    serverPacket = QJsonDocument(packet).toJson();
-    qDebug() << "New server info:" << QJsonDocument(packet).toJson();
+    // Update message
+    message.insert("info", info.toJson());
+    // Update cache
+    packetCache = QJsonDocument(message).toJson();
+    qDebug() << "New broadcast message:" << packetCache;
+}
+
+void Broadcaster::setVotingInvite(VotingInvite invite)
+{
+    // Update message
+    message.insert("vote", invite.toJson());
+    // Update cache
+    packetCache = QJsonDocument(message).toJson();
+    qDebug() << "New broadcast message:" << packetCache;
+}
+
+void Broadcaster::unsetVotingInvite()
+{
+    // Update message
+    message.remove("vote");
+    // Update cache
+    packetCache = QJsonDocument(message).toJson();
+    qDebug() << "New broadcast message:" << packetCache;
 }
 
 void Broadcaster::sendInformation()
 {
+
     foreach (const QHostAddress &addr, addreses) {
-        if (serverPacket.size())
-            sock.writeDatagram(serverPacket,
-                                addr, SERVER_INFORMATION_PORT);
+        if (packetCache.size())
+            sock.writeDatagram(packetCache, addr, SERVER_DISCOVER_PORT);
     }
 }

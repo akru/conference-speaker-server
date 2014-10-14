@@ -5,20 +5,17 @@ QJsonObject Request::toJson() const
 {
     QJsonObject obj;
     switch (type) {
-    case REGISTRATION:
+    case Registration:
         obj.insert("request", QString("registration"));
         break;
-    case CHANNEL:
+    case Channel:
         obj.insert("request", QString("channel"));
         break;
-    case CHANNEL_CLOSE:
+    case ChannelClose:
         obj.insert("request", QString("channel_close"));
         break;
-    case VOTE_YES:
-        obj.insert("request", QString("vote_yes"));
-        break;
-    case VOTE_NO:
-        obj.insert("request", QString("vote_no"));
+    case Vote:
+        obj.insert("request", QString("vote"));
         break;
     }
     return obj;
@@ -31,15 +28,13 @@ Request Request::fromJson(const QJsonObject &json)
         throw(BadPacket());
 
     if (type.toString() == "registration")
-        return Request(REGISTRATION);
-    if (type.toString() == "channel")
-        return Request(CHANNEL);
+        return Request(Registration);
+    if (type.toString() == "channel_open")
+        return Request(Channel);
     if (type.toString() == "channel_close")
-        return Request(CHANNEL_CLOSE);
-    if (type.toString() == "vote_yes")
-        return Request(VOTE_YES);
-    if (type.toString() == "vote_no")
-        return Request(VOTE_NO);
+        return Request(ChannelClose);
+    if (type.toString() == "vote")
+        return Request(Vote);
 
     throw(BadPacket());
 }

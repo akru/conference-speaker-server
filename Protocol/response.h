@@ -7,12 +7,12 @@
 struct Response
 {
     enum Result {
-        SUCCESS,
-        ERROR
+        Success,
+        Error
     };
 
-    Response(Request::Type type = Request::REGISTRATION,
-             Result result = ERROR,
+    Response(Request::Type type = Request::Registration,
+             Result result = Error,
              QString msg = "")
         : type(type),
           result(result),

@@ -2,51 +2,68 @@
 #define SERVER_H
 
 #include <QMap>
-#include <QTcpServer>
-#include "user_information.h"
-#include "connection.h"
-#include "receiver.h"
+#include <QObject>
+#include <user_information.h>
+#include <server_information.h>
+#include <voting_invite.h>
 #include "licensing.h"
+#include "voting.h"
+
+class QTcpServer;
+class Connection;
+class Broadcaster;
+class Receiver;
 
 class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(QString &address,
-                    QObject *parent = 0);
+    explicit Server(const ServerInformation &info, QObject *parent = 0);
     ~Server();
 
 signals:
     void userConnected(QString address, UserInformation info);
     void userDisconnected(QString address);
+    void userRegistrationRequest(QString address, UserInformation info);
+
     void channelConnected(QString address, UserInformation user, Receiver *channel);
     void channelDisconnected(QString address);
-
-public slots:
-    void denyChannel(QString address);
-    void openChannel(QString address);
-    void closeChannel(QString address);
-    void dropUser(QString address);
-    void denyVote(QString address);
-    void acceptVote(QString address);
-    void reloadFilterSettings();
-
-signals:
-    void registrationRequest(QString address, UserInformation info);
     void channelRequest(QString address, UserInformation info);
     void channelCloseRequest(QString address);
-    void voteRequest(QString address, bool type);
-    void filterSettingsUpdated();
+    void channelSettingsUpdated();
+
+    void voteRequest(QString address, QJsonObject request);
+    void voteResultsUpdated(VoteResults results);
+
+public slots:
+    void userDrop(QString address);
+
+    void channelDeny(QString address);
+    void channelOpen(QString address);
+    void channelClose(QString address);
+    void channelReloadSettings();
+
+    void voteNew(VotingInvite invite);
+    void voteStop();
 
 private slots:
-    void newConnection();
+    void connectionNew();
     void connectionReadyRead(Connection *client);
     void connectionClose(Connection *client);
-    void registerUser(QString address, UserInformation info);
+
+    void userRegister(QString address, UserInformation info);
+
+    void voteAccept(QString address);
+    void voteDeny(QString address, QString error);
+    void voteReadyResults(VoteResults results);
 
 private:
     // TCP server instance
     QTcpServer                    *server;
+    // Broadcaster instance
+    Broadcaster                   *broadcaster;
+    // Voting instance
+    Voting                        *voting;
     // User information by address map
     QMap<QString, UserInformation> users;
     // Channel information by address map

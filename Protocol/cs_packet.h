@@ -8,7 +8,7 @@ class BadPacket
         : public std::exception
 {};
 
-const quint16 SERVER_INFORMATION_PORT = 35000;
-const quint16 SERVER_CONNECTION_PORT  = 35001;
+static const quint16 SERVER_DISCOVER_PORT    = 35000;
+static const quint16 SERVER_CONNECTION_PORT  = 35001;
 
 #endif // CS_PACKET_H

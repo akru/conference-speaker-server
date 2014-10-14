@@ -6,13 +6,12 @@
 struct Request
 {
     enum Type {
-        REGISTRATION,
-        CHANNEL,
-        CHANNEL_CLOSE,
-        VOTE_YES,
-        VOTE_NO
+        Registration,
+        Channel,
+        ChannelClose,
+        Vote
     };
-    Request(Type type = REGISTRATION)
+    Request(Type type = Registration)
         : type(type)
     {}
 

@@ -9,14 +9,16 @@ HEADERS += \
     connection.h \
     receiver.h \
     server.h \
-    licensing.h
+    licensing.h \
+    voting.h
 
 SOURCES += \
     broadcaster.cpp \
     connection.cpp \
     receiver.cpp \
     server.cpp \
-    licensing.cpp
+    licensing.cpp \
+    voting.cpp
 
 INCLUDEPATH += $$PWD/../Protocol $$PWD/../Speaker
 DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker

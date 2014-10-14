@@ -8,7 +8,7 @@
 struct RegistrationRequest : public Request
 {
     RegistrationRequest(UserInformation user = UserInformation())
-        : Request(Request::REGISTRATION),
+        : Request(Request::Registration),
           user(user)
     {}
 

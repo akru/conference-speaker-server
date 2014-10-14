@@ -3,12 +3,11 @@
 
 VoteWidget::VoteWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::VoteWidget),
-    count(0)
+    ui(new Ui::VoteWidget)
 {
     ui->setupUi(this);
-    connect(ui->yesBar, SIGNAL(valueChanged(int)), SLOT(updateYesL(int)));
-    connect(ui->noBar, SIGNAL(valueChanged(int)), SLOT(updateNoL(int)));
+    on_plusButton_clicked();
+    on_plusButton_clicked();
 }
 
 VoteWidget::~VoteWidget()
@@ -16,80 +15,41 @@ VoteWidget::~VoteWidget()
     delete ui;
 }
 
-void VoteWidget::appendClient()
+void VoteWidget::updateResults(VoteResults results)
 {
-    setCount(count + 1);
+
 }
 
-void VoteWidget::dropClient()
+void VoteWidget::on_plusButton_clicked()
 {
-    setCount(count - 1);
+    QString name = QString("A%1:").arg(ui->customLayout->rowCount()+1);
+    answers.append(new QLineEdit(this));
+    ui->customLayout->addRow(name, answers.last());
 }
 
-void VoteWidget::updateYesL(int count)
+void VoteWidget::on_pushButton_toggled(bool checked)
 {
-    ui->yesL->setText(QString::number(count) + "%");
-}
-
-void VoteWidget::updateNoL(int count)
-{
-    ui->noL->setText(QString::number(count) + "%");
-}
-
-void VoteWidget::vote(QString address, bool type)
-{
-    if (voters.contains(address))
-        // Emit denied signal when double vote
-        emit voteDenied(address);
+    if (!checked)
+    {
+        emit voteStop();
+        ui->pushButton->setText(tr("Start"));
+    }
     else
     {
-        // Append voter to list
-        voters.append(address);
-        // Increment counter value
-        if (type)
-            appendYes();
+        if (ui->simpleRB->isChecked())
+            // Simple case
+            emit voteNew(VotingInvite(ui->questionEdit->text()));
         else
-            appendNo();
-        // Emit accepted signal
-        emit voteAccepted(address);
+        {
+            QStringList answersText;
+            foreach (QLineEdit *l, answers) {
+                answersText.append(l->text());
+            }
+            // Custom case
+            emit voteNew(VotingInvite(ui->questionEdit->text(),
+                                      VotingInvite::Custom,
+                                      answersText));
+        }
+        ui->pushButton->setText(tr("Stop"));
     }
-}
-
-void VoteWidget::setCount(int count)
-{
-    float scale = this->count;
-    scale /= count;                             // Calculate scale param
-
-    int yesVal = ui->yesBar->value() * scale ;  // Change yes base
-    int noVal = ui->noBar->value() * scale;     // Change no base
-
-    ui->yesBar->setValue(yesVal);
-    ui->noBar->setValue(noVal);
-
-    this->count = count;                        // Store new count
-}
-
-void VoteWidget::appendYes()
-{
-    if (voters.count() < count)
-    {
-        int oneByPerc = 1.0 / count * 100;
-        ui->yesBar->setValue(ui->yesBar->value() + oneByPerc);
-    }
-}
-
-void VoteWidget::appendNo()
-{
-    if (voters.count() < count)
-    {
-        int oneByPerc = 1.0 / count * 100;
-        ui->noBar->setValue(ui->noBar->value() + oneByPerc);
-    }
-}
-
-void VoteWidget::on_voteButton_clicked()
-{
-    voters.clear();
-    ui->yesBar->setValue(0);
-    ui->noBar->setValue(0);
 }
