@@ -40,7 +40,7 @@ public:
         memcpy(data, head, data_size * sizeof(T));
         tail -= data_size;
         used -= data_size;
-        memcpy(head, head + data_size, used * sizeof(T)); // Shift
+        memmove(head, head + data_size, used * sizeof(T)); // Shift
     }
 
 private:
