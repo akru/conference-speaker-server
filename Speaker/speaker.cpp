@@ -37,7 +37,10 @@ void toPCM(float sample[], qint16 pcm[])
     // Back to the INT
     qint16 *rawp = pcm;
     while (rawp < pcm + Filter::sample_length*2)
-        *rawp++ = *sample++ * norm_int16;
+    {
+        *rawp++ = fabs(*sample) >= 1.0 ? norm_int16 - 100 : *sample * norm_int16;
+        ++sample;
+    }
 }
 
 Speaker::Speaker(QObject *parent) :

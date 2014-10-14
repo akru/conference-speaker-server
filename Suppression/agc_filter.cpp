@@ -4,6 +4,7 @@
 AGCFilter::AGCFilter()
     : maxAmp(0), firstSample(true)
 {
+    enable(true);
 }
 
 AGCFilter::~AGCFilter()
