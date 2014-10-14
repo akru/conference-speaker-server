@@ -22,6 +22,8 @@ public:
     bool isConfigured() const { return configured; }
     ServerInformation serverInfo() const { return info; }
 
+    void updateAddressSelect();
+
 signals:
     void newServerInfo(ServerInformation info);
 

@@ -210,6 +210,7 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_actionSettings_triggered()
 {
+    settings.updateAddressSelect();
     settings.show();
 }
 

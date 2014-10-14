@@ -16,15 +16,23 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
             QApplication::applicationDirPath() + "/settings.ini";
     qDebug() << "Settings file:" << settingsFileName;
 
-    foreach (const QHostAddress &address, addrList) {
-        ui->addressSelect->addItem(address.toString());
-    }
+    updateAddressSelect();
     connect(this, SIGNAL(accepted()), SLOT(genServerInfo()));
 }
 
 SettingsDialog::~SettingsDialog()
 {
     delete ui;
+}
+
+void SettingsDialog::updateAddressSelect()
+{
+    ui->addressSelect->clear();
+    foreach (const QHostAddress &address, addrList) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol
+                && !address.isLoopback())
+        ui->addressSelect->addItem(address.toString());
+    }
 }
 
 void SettingsDialog::genServerInfo()
