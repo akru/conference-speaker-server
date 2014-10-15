@@ -4,8 +4,7 @@ Voting::Voting(const VotingInvite &invite,
                QObject *parent)
     : QObject(parent)
 {
-    results.uuid = invite.uuid;
-    results.mode = invite.mode;
+    results.invite = invite;
 
     switch (invite.mode) {
     case VotingInvite::Simple:
@@ -21,6 +20,11 @@ Voting::Voting(const VotingInvite &invite,
     }
 }
 
+Voting::~Voting()
+{
+    emit resultsUpdated(results);
+}
+
 void Voting::vote(QString address, QJsonObject request)
 {
     if (voters.contains(address))
@@ -30,7 +34,7 @@ void Voting::vote(QString address, QJsonObject request)
     }
 
     QJsonValue uuid = request["uuid"];
-    if (uuid.isUndefined() || QUuid(uuid.toString()) != results.uuid)
+    if (uuid.isUndefined() || QUuid(uuid.toString()) != results.invite.uuid)
     {
         emit denied(address, "mismatch vote id");
         return;
@@ -43,7 +47,7 @@ void Voting::vote(QString address, QJsonObject request)
         return;
     }
 
-    switch (results.mode) {
+    switch (results.invite.mode) {
     case VotingInvite::Simple:
         if (!answer.isBool())
         {
