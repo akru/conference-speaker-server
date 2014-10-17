@@ -43,3 +43,7 @@ HEADERS  += \
     gate_filter.h \
     agc_filter.h \
     filter.h
+
+INCLUDEPATH += $$PWD/../3rdParty/Soxr
+INCLUDEPATH += $$PWD/../3rdParty
+DEPENDPATH  += $$PWD/../3rdParty/Soxr
