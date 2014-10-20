@@ -19,9 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
     server(0)
 {
     // Loading fonts
-    QFontDatabase::addApplicationFont(":/res/fonts/BauhausC-Demibold.ttf");
+//    QFontDatabase::addApplicationFont(":/res/fonts/BauhausC-Demibold.ttf");
     //QFontDatabase::addApplicationFont(":/res/fonts/Gothic.ttf");
-    QFontDatabase::addApplicationFont(":/res/fonts/GothicBold.ttf");
+//    QFontDatabase::addApplicationFont(":/res/fonts/GothicBold.ttf");
     // Setup UI
     ui->setupUi(this);
     // Restart server with new info
