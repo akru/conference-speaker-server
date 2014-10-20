@@ -1,4 +1,5 @@
 #include "ampanalyze_filter.h"
+#include <cmath>
 
 /*
  * Average amplitude analyzer.

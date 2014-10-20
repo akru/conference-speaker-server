@@ -6,6 +6,8 @@
 static const int PITCH_COUNT   = 2;
 static const int PITCH_SHIFT_TIME = 1200; // ms; WARN: it divided by frame length (32 ms)
 
+typedef struct soxr * soxr_t;
+
 class PitchShiftFilter : public Filter
 {
 public:
@@ -33,6 +35,10 @@ private:
     long gRover, osamp;
     float pitchShift, pitchShiftCoef;
     int currentPitch, iteration;
+
+    // Improved resampler using SoX
+    soxr_t widener;
+    soxr_t zipper;
 
     void smbPitchShift(long numSampsToProcess,
                        long fftFrameSize,

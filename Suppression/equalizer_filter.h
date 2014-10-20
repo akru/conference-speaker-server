@@ -19,6 +19,8 @@ static const int h_size       = fft_size / 2;
 static const float hz_to_index = 2.0f * h_size / Filter::sample_rate;
 }
 
+typedef struct soxr * soxr_t;
+
 class EqualizerFilter : public Filter
 {
 public:
@@ -53,6 +55,9 @@ private:
     float buffer[Filter::sample_length * 2];
     float wfft[Equalizer::fft_size * 2 >> 1];
     int   ip[Equalizer::fft_size * 2 >> 1];
+
+    // Improved resampler using SoX
+    soxr_t          resampler;
 
     void dsp_logic();
 };

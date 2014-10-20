@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <QSettings>
 #include <QDebug>
+#include <soxr.h>
 
 #define M_PI 3.14159265358979323846
 
@@ -63,6 +64,26 @@ PitchShiftFilter::PitchShiftFilter()
     memset(gOutputAccum, 0, 2*analyze_length*sizeof(float));
     memset(gAnaFreq, 0, analyze_length*sizeof(float));
     memset(gAnaMagn, 0, analyze_length*sizeof(float));
+
+    // Resampling for high-res STFT while pitch shifting
+    soxr_error_t error;
+
+    // Create widener
+    soxr_io_spec_t io_spec_w = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
+    widener = soxr_create(Filter::sample_rate, Filter::sample_rate * len_scaler,
+                            1, &error, &io_spec_w, NULL, NULL);
+    if (error) {
+        qWarning() << "SoX widener at pitch_shifter has an error: " << error;
+        return;
+    }
+    // Create zipper
+    soxr_io_spec_t io_spec_z = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
+    zipper = soxr_create(Filter::sample_rate * len_scaler, Filter::sample_rate,
+                            1, &error, &io_spec_z, NULL, NULL);
+    if (error) {
+        qWarning() << "SoX zipper at pitch_shifter has an error: " << error;
+        return;
+    }
 
     reloadSettings();
 }
@@ -88,26 +109,41 @@ void PitchShiftFilter::processFilter(float sample[])
         iteration    = 0;
     }
 
-//    float input[analyze_length];
-    float output[sample_length];
+    float input[analyze_length];
+    float output[analyze_length];
+
     // Stupid resampler:
 //    memset(input, 0, analyze_length * sizeof(float));
 //    for (int i = 0; i < sample_length; ++i)
 //        input[i * len_scaler] = sample[i];
 
+    // Scaling up for analyze
+    size_t idone, odone;
+    soxr_process(widener,
+                 sample,     sample_length,     &idone,
+                 input,     analyze_length,     &odone);
+//    qDebug() << "idone:" << idone << "odone:" << odone;
+
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
-        smbPitchShift(sample_length, sample_length, sample, output);
+        smbPitchShift(analyze_length, analyze_length / 4, input, output);
     }
     else // Pitch down
     {
        pitchShift = 1 - pitchShiftCoef;
-       smbPitchShift(sample_length, sample_length, sample, output);
+       smbPitchShift(analyze_length, analyze_length / 4, input, output);
     }
+
     // Back to the Sample
-    for (short i = 0; i < sample_length; ++i)
-        sample[i] = output[i];
+//    for (short i = 0; i < sample_length; ++i)
+//        sample[i] = output[i];
+
+    // Resampling to actual freq 22050 Hz
+    soxr_process(zipper,
+                 output,   analyze_length,  &idone,
+                 sample,    sample_length,  &odone);
+//    qDebug() << "idone:" << idone << "odone:" << odone;
 }
 
 // -----------------------------------------------------------------------------------------------------------------
