@@ -16,13 +16,13 @@ static const short w_length = (fft_input_length * 2 >> 1);
 static const short dft_buffer_count = 5;
 static const int   dft_buffer_len = dft_buffer_count * analyze_length;
 static const short freq_count_max = 20;
-static const float index_to_hz = Filter::sample_rate / 2.0 / analyze_length;
-static const float index_to_rad = 2.0 * M_PI * Filter::sample_rate / analyze_length;
-static const float hz_to_index = analyze_length * 2.0 / Filter::sample_rate;
-static const float rad_to_index = analyze_length / 2.0 / M_PI / Filter::sample_rate;
+static const float index_to_hz = Filter::sample_rate / 2.0f / analyze_length;
+static const float index_to_rad = 2.0f * M_PI * Filter::sample_rate / analyze_length;
+static const float hz_to_index = analyze_length * 2.0f / Filter::sample_rate;
+static const float rad_to_index = analyze_length / 2.0f / M_PI / Filter::sample_rate;
 static const short minimal_freq = 50;
 static const short maximal_freq = 11025;
-static const float filter_step = 0.1;
+static const float filter_step = 0.1f;
 }
 
 #define HS_DEBUG

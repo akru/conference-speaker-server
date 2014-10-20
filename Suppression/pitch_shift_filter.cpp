@@ -47,7 +47,7 @@
 #include "pitch_shift_filter.h"
 
 void smbFft(float *fftBuffer, long fftFrameSize, long sign);
-double smbAtan2(double x, double y);
+float smbAtan2(float x, float y);
 
 PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
@@ -124,15 +124,15 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 	Author: (c)1999-2009 Stephan M. Bernsee <smb [AT] dspdimension [DOT] com>
 */
 {
-	double magn, phase, tmp, window, real, imag;
-	double freqPerBin, expct;
+    float magn, phase, tmp, window, real, imag;
+    float freqPerBin, expct;
 	long i,k, qpd, index, inFifoLatency, stepSize, fftFrameSize2;
 
 	/* set up some handy variables */
 	fftFrameSize2 = fftFrameSize/2;
 	stepSize = fftFrameSize/osamp;
-    freqPerBin = sample_rate/(double)fftFrameSize;
-	expct = 2.*M_PI*(double)stepSize/(double)fftFrameSize;
+    freqPerBin = sample_rate/(float)fftFrameSize;
+    expct = 2.*M_PI*(float)stepSize/(float)fftFrameSize;
 	inFifoLatency = fftFrameSize-stepSize;
 	if (gRover == false) gRover = inFifoLatency;
 
@@ -150,7 +150,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 			/* do windowing and re,im interleave */
 			for (k = 0; k < fftFrameSize;k++) {
-				window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
+                window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
 				gFFTworksp[2*k] = gInFIFO[k] * window;
 				gFFTworksp[2*k+1] = 0.;
 			}
@@ -176,19 +176,19 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				gLastPhase[k] = phase;
 
 				/* subtract expected phase difference */
-				tmp -= (double)k*expct;
+                tmp -= (float)k*expct;
 
 				/* map delta phase into +/- Pi interval */
 				qpd = tmp/M_PI;
 				if (qpd >= 0) qpd += qpd&1;
 				else qpd -= qpd&1;
-				tmp -= M_PI*(double)qpd;
+                tmp -= M_PI*(float)qpd;
 
 				/* get deviation from bin frequency from the +/- Pi interval */
 				tmp = osamp*tmp/(2.*M_PI);
 
 				/* compute the k-th partials' true frequency */
-				tmp = (double)k*freqPerBin + tmp*freqPerBin;
+                tmp = (float)k*freqPerBin + tmp*freqPerBin;
 
 				/* store magnitude and true frequency in analysis arrays */
 				gAnaMagn[k] = magn;
@@ -198,8 +198,8 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 			/* ***************** PROCESSING ******************* */
 			/* this does the actual pitch shifting */
-			memset(gSynMagn, 0, fftFrameSize*sizeof(float));
-			memset(gSynFreq, 0, fftFrameSize*sizeof(float));
+            memset(gSynMagn, 0, fftFrameSize*sizeof(float));
+            memset(gSynFreq, 0, fftFrameSize*sizeof(float));
 			for (k = 0; k <= fftFrameSize2; k++) { 
 				index = k*pitchShift;
 				if (index <= fftFrameSize2) { 
@@ -217,7 +217,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				tmp = gSynFreq[k];
 
 				/* subtract bin mid frequency */
-				tmp -= (double)k*freqPerBin;
+                tmp -= (float)k*freqPerBin;
 
 				/* get bin deviation from freq deviation */
 				tmp /= freqPerBin;
@@ -226,7 +226,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				tmp = 2.*M_PI*tmp/osamp;
 
 				/* add the overlap phase advance back in */
-				tmp += (double)k*expct;
+                tmp += (float)k*expct;
 
 				/* accumulate delta phase to get bin phase */
 				gSumPhase[k] += tmp;
@@ -245,13 +245,13 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 			/* do windowing and add to output accumulator */ 
 			for(k=0; k < fftFrameSize; k++) {
-				window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
+                window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
 				gOutputAccum[k] += 2.*window*gFFTworksp[2*k]/(fftFrameSize2*osamp);
 			}
 			for (k = 0; k < stepSize; k++) gOutFIFO[k] = gOutputAccum[k];
 
 			/* shift accumulator */
-			memmove(gOutputAccum, gOutputAccum+stepSize, fftFrameSize*sizeof(float));
+            memmove(gOutputAccum, gOutputAccum+stepSize, fftFrameSize*sizeof(float));
 
 			/* move input FIFO */
 			for (k = 0; k < inFifoLatency; k++) gInFIFO[k] = gInFIFO[k+stepSize];
@@ -275,8 +275,8 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign)
 	of the frequencies of interest is in fftBuffer[0...fftFrameSize].
 */
 {
-	float wr, wi, arg, *p1, *p2, temp;
-	float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
+    float wr, wi, arg, *p1, *p2, temp;
+    float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
 	long i, bitm, j, le, le2, k;
 
 	for (i = 2; i < 2*fftFrameSize-2; i += 2) {
@@ -338,9 +338,9 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign)
 */
 
 
-double smbAtan2(double x, double y)
+float smbAtan2(float x, float y)
 {
-  double signx;
+  float signx;
   if (x > 0.) signx = 1.;  
   else signx = -1.;
   

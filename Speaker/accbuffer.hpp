@@ -22,6 +22,17 @@ public:
         return used >= data_size;
     }
 
+    void purity(int data_size)
+    {
+        if (data_size >= used)
+            return;
+
+        int shift = used - data_size;
+        tail -= shift;
+        used  = data_size;
+        memmove(head, head + shift, used * sizeof(T)); // Shift
+    }
+
     void putData(T data[], int data_size)
     {
         if (data_size + used > size)
@@ -37,7 +48,8 @@ public:
         if (data_size > used)
             return;
 
-        memcpy(data, head, data_size * sizeof(T));
+        if (data)
+            memcpy(data, head, data_size * sizeof(T));
         tail -= data_size;
         used -= data_size;
         memmove(head, head + data_size, used * sizeof(T)); // Shift

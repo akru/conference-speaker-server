@@ -29,7 +29,7 @@ int main()
 
     EqualizerFilter eq;
     HSFilter hsf(&eq);
-    hsf.setTH(15, 15, 13, 0.8);
+    hsf.setTH(15, 15, 13, 0.8f);
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);

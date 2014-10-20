@@ -5,14 +5,14 @@
 #include <QObject>
 //#include <QThread>
 #include <QTimer>
-#include "../Suppression/filter.h"
+#include <filter.h>
+#include <ampanalyze_filter.h>
 #include "accbuffer.hpp"
 
 class QAudioOutput;
 class QAudioFormat;
 class QIODevice;
-
-static const quint16 norm_int16 = 32768;
+typedef struct soxr * soxr_t;
 
 class Speaker : public QObject
 {
@@ -31,24 +31,29 @@ signals:
 
 public slots:
     void setVolume(qreal volume);
-    void play(QByteArray packet);
+    void incomingData(QByteArray packet);
     void reloadFilterSettings();
 
 private slots:
-    void ampAnalyze(const float sample[]);
     void speakHeartbeat();
+    void play(const QByteArray &sample);
 
 private:
+    static const int formatSampleRate = 44100;
+
     bool            disabled;
     QAudioFormat    *format;
     QAudioOutput    *audio;
     QIODevice       *audio_buffer;
 
-    QList<Filter *> filters;
+    AmpAnalyzeFilter *amp;
+    QList<Filter *>   filters;
     AccBuffer<qint16> accBuf;
 
 //    QThread         myThread;
     QTimer          heartbeat;
+    // Improved resampler using SoX
+    soxr_t          resampler;
 };
 
 #endif // SPEAKER_H

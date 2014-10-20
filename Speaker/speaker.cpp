@@ -10,38 +10,10 @@
 #include <agc_filter.h>
 #include <gate_filter.h>
 #include <compressor_filter.h>
+#include <soxr.h>
 
 //#include <QFile>
 #include <QDebug>
-
-/*
- * Dummy resampler: 22050 -> 44100
- */
-void convertAudio(float sample[], float output[])
-{
-    memset(output, 0, Filter::sample_length*2*sizeof(float));
-    for (short i = 0; i < Filter::sample_length; ++i)
-        output[2*i] = sample[i];
-}
-
-void fromPCM(qint16 pcm[], float sample[])
-{
-    // Normalization
-    qint16 *rawp = pcm;
-    while (rawp < pcm + Filter::sample_length)
-        *sample++ = ((float) *rawp++) / norm_int16;
-}
-
-void toPCM(float sample[], qint16 pcm[])
-{
-    // Back to the INT
-    qint16 *rawp = pcm;
-    while (rawp < pcm + Filter::sample_length*2)
-    {
-        *rawp++ = fabs(*sample) >= 1.0 ? norm_int16 - 100 : *sample * norm_int16;
-        ++sample;
-    }
-}
 
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
@@ -52,7 +24,7 @@ Speaker::Speaker(QObject *parent) :
     // Set up the format, eg.
     format->setSampleSize(16);
     format->setChannelCount(1);
-    format->setSampleRate(44100);
+    format->setSampleRate(formatSampleRate);
     format->setCodec("audio/pcm");
     format->setSampleType(QAudioFormat::SignedInt);
     format->setByteOrder(QAudioFormat::LittleEndian);
@@ -65,11 +37,22 @@ Speaker::Speaker(QObject *parent) :
         disabled = true;
         return;
     }
-
+    // Create stream resampler
+    soxr_error_t error;
+    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_INT16_I, SOXR_INT16_I);
+    resampler = soxr_create(Filter::sample_rate, formatSampleRate,
+                            1, &error, &io_spec, NULL, NULL);
+    if (error) {
+        qWarning() << "SoX has an error" << error;
+        disabled = true;
+        return;
+    }
     // Open audio device
     audio = new QAudioOutput(info, *format);
     audio_buffer = audio->start();
     // Append filters
+    amp = new AmpAnalyzeFilter;
+    filters.append(amp);
     filters.append(new AGCFilter);
     filters.append(new GateFilter);
     filters.append(new NSFilter);
@@ -115,9 +98,8 @@ void Speaker::setVolume(qreal volume)
     }
 }
 
-void Speaker::play(QByteArray packet)
+void Speaker::incomingData(QByteArray packet)
 {
-    Q_ASSERT(audio_buffer);
     // Put sample to accum
     accBuf.putData((qint16 *) packet.data(),
                    packet.length() / sizeof(qint16));
@@ -133,64 +115,33 @@ void Speaker::speakHeartbeat()
                           Qt::Uninitialized);
     // When accumulator has too low sounds - skips
     if (!accBuf.avail(Filter::sample_length * sizeof(qint16) * 2)) return;
-    // Read while buffer large
-    while (accBuf.avail(Filter::sample_length * sizeof(qint16) * 4))
-        accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
-    qDebug() << "Playing...";
+    // Drop too old samples from acc
+    accBuf.purity(Filter::sample_length * sizeof(qint16) * 4);
     // Prepare sample
     accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
-    float sample[Filter::sample_length];
-    // Normalisation
-    fromPCM((qint16 *)sample_raw.data(), sample);
-    qDebug() << qChecksum(sample_raw.data(), sample_raw.length());
-    // Apply filters in float area
-    foreach (Filter *f, filters) {
-        qDebug() << "Applying:" << f->name();
-        f->process(sample);
-    }
-    // Analyze sample amplitude
-    ampAnalyze(sample);
-    // Resampling
-    float output[Filter::sample_length * 2];
-    convertAudio(sample, output);
-    // Back to PCM
-    QByteArray sample_out(Filter::sample_length*2*sizeof(qint16), Qt::Uninitialized);
-    toPCM(output, (qint16 *)sample_out.data());
+    // Apply filters
+    Filter::applyFilters(filters, sample_raw);
+    // Emit amplitude signal
+    emit audioAmpUpdated(amp->getAmp());
+    // Resampling & play
+    play(sample_raw);
+}
+
+void Speaker::play(const QByteArray &sample)
+{
+    QByteArray sample_out(Filter::sample_length * 4, Qt::Uninitialized);
+    size_t idone, odone;
+    // Resampling to output freq
+    soxr_process(resampler,
+                 sample.data(),     sample.length(),     &idone,
+                 sample_out.data(), sample_out.length(), &odone);
+    qDebug() << "idone:" << idone << "odone:" << odone;
     // Play buffer
     audio_buffer->write(sample_out);
 }
 
-/*
- * Average amplitude analyzer.
- * Formula:
- *   A = (a1 + a2 + ... + aN) / N / 10000
- * where A is normalized average amplitude,
- * aN is custom amplutude from sample
- * and N is count of amplitudes.
- *
- * Sample is a array of 16bit signed integers.
- * PCM 16bit sample.
- *
- * This function returns number from 0 to 100.
- * That shows current sample average amplitude.
- */
-void Speaker::ampAnalyze(const float sample[])
-{
-    // Variable init
-    float avgAmp = 0;
-    int count = Filter::sample_length;
-    // Sum all amps from sample
-    for (short i = 0; i < Filter::sample_length; ++i)
-        avgAmp += fabs(sample[i]);
-    // Divize sum by count and normalize it
-    avgAmp = avgAmp / count;
-    // Return average amplitude in percents
-    emit audioAmpUpdated(avgAmp * 100);
-}
 
 void Speaker::reloadFilterSettings()
 {
-    foreach (Filter *f, filters) {
-        f->reloadSettings();
-    }
+    Filter::reloadSettings(filters);
 }

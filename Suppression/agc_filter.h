@@ -15,9 +15,9 @@ public:
 
 private:
     float maxAmp;
-    bool  firstSample;
-    void  analyzeMax(float sample[]);
-    void  gainSample(float sample[]);
+    bool   firstSample;
+    void   analyzeMax(float sample[]);
+    void   gainSample(float sample[]);
 };
 
 #endif // AGC_FILTER_H

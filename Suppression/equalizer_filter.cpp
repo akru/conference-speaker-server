@@ -31,8 +31,8 @@ void interpolate(float *samples, quint16 length,
                  const quint32 *xs, const float *ys, quint16 n_points)
 {
 #ifdef B_SPLINE_EQ // B-Spline interpolation
-    double dist, span;
-    double value = 0.0;
+    float dist, span;
+    float value = 0.0;
     int minF = 0;
 
     for(quint16 i = 0; i < length; ++i)

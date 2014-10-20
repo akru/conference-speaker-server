@@ -11,5 +11,5 @@ HEADERS += \
     accbuffer.hpp \
     speaker.h
 
-INCLUDEPATH += $$PWD/../Suppression
-DEPENDPATH  += $$PWD/../Suppression
+INCLUDEPATH += $$PWD/../Suppression $$PWD/../3rd-party/Soxr
+DEPENDPATH  += $$PWD/../Suppression $$PWD/../3rd-party/Soxr
