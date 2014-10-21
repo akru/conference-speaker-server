@@ -25,7 +25,7 @@ void Filter::process(float sample[])
     for (short i = 0; i < sample_length; ++i)
         rms += sample[i] * sample[i];
     rms = sqrt(rms) / sample_length;
-    qDebug() << "Input RMS: " << rms;
+    qDebug() << name() << "input RMS: " << rms;
 #endif
 
     if (enabled)
@@ -36,7 +36,7 @@ void Filter::process(float sample[])
     for (short i = 0; i < sample_length; ++i)
         rms += sample[i] * sample[i];
     rms = sqrt(rms) / sample_length;
-    qDebug() << "Output RMS: " << rms;
+    qDebug() << name() << "output RMS: " << rms;
 #endif
 }
 
@@ -44,7 +44,7 @@ void Filter::fromPCM(qint16 pcm[], float sample[])
 {
     // Normalization
     for (short i = 0; i < sample_length; ++i)
-        sample[i] = pcm[i] / norm_int16;
+        sample[i] = ((float)pcm[i]) / norm_int16;
 }
 
 void Filter::toPCM(float sample[], qint16 pcm[])
@@ -52,7 +52,7 @@ void Filter::toPCM(float sample[], qint16 pcm[])
     // Back to the RAW
     for (short i = 0; i < sample_length; ++i)
         pcm[i] = fabs(sample[i]) >= 1.0
-                  ? sample[i] / sample[i] * (norm_int16 - 100)
+                  ? sample[i] / sample[i] * (norm_int16 - 10)
                   : sample[i] * norm_int16;
 }
 

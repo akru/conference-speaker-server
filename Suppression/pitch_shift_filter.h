@@ -19,7 +19,7 @@ public:
     void reloadSettings();
 
 private:
-    static const short len_scaler = 8;
+    static const short len_scaler = 2;
     static const short analyze_length = sample_length * len_scaler;
 
     float gInFIFO[analyze_length];

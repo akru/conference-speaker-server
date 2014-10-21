@@ -69,17 +69,17 @@ PitchShiftFilter::PitchShiftFilter()
     soxr_error_t error;
 
     // Create widener
-    soxr_io_spec_t io_spec_w = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
+    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
+    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_VHQ, 0);
     widener = soxr_create(Filter::sample_rate, Filter::sample_rate * len_scaler,
-                            1, &error, &io_spec_w, NULL, NULL);
+                            1, &error, &io_spec, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX widener at pitch_shifter has an error: " << error;
         return;
     }
     // Create zipper
-    soxr_io_spec_t io_spec_z = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
     zipper = soxr_create(Filter::sample_rate * len_scaler, Filter::sample_rate,
-                            1, &error, &io_spec_z, NULL, NULL);
+                            1, &error, &io_spec, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX zipper at pitch_shifter has an error: " << error;
         return;
@@ -112,6 +112,9 @@ void PitchShiftFilter::processFilter(float sample[])
     float input[analyze_length];
     float output[analyze_length];
 
+    for (short i = 0; i < sample_length; ++i)
+        sample[i] = fabs(sample[i]);
+
     // Stupid resampler:
 //    memset(input, 0, analyze_length * sizeof(float));
 //    for (int i = 0; i < sample_length; ++i)
@@ -119,10 +122,11 @@ void PitchShiftFilter::processFilter(float sample[])
 
     // Scaling up for analyze
     size_t idone, odone;
-    soxr_process(widener,
-                 sample,     sample_length,     &idone,
+    soxr_error_t e = soxr_process(widener,
+                 sample,    sample_length,      &idone,
                  input,     analyze_length,     &odone);
-//    qDebug() << "idone:" << idone << "odone:" << odone;
+    if (e) qDebug() << e;
+    qDebug() << "idone:" << idone << "odone:" << odone;
 
     if(currentPitch) // Pitch up
     {
@@ -143,7 +147,7 @@ void PitchShiftFilter::processFilter(float sample[])
     soxr_process(zipper,
                  output,   analyze_length,  &idone,
                  sample,    sample_length,  &odone);
-//    qDebug() << "idone:" << idone << "odone:" << odone;
+    qDebug() << "idone:" << idone << "odone:" << odone;
 }
 
 // -----------------------------------------------------------------------------------------------------------------

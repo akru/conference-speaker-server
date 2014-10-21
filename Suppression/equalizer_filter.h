@@ -12,7 +12,7 @@ namespace Equalizer {
 static const int window_size  = Filter::sample_length;
 static const int R            = window_size / 2;
 static const int overlap_size = window_size - R;
-static const int zero_scaler  = 2;
+static const int zero_scaler  = 8;
 static const int fft_size     = Filter::sample_length * zero_scaler;
 static const int h_size       = fft_size / 2;
 // Freq to index converter for H
