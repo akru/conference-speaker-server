@@ -40,8 +40,9 @@ Speaker::Speaker(QObject *parent) :
     // Create stream resampler
     soxr_error_t error;
     soxr_io_spec_t io_spec = soxr_io_spec(SOXR_INT16_I, SOXR_INT16_I);
+    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_VHQ, 0);
     resampler = soxr_create(Filter::sample_rate, formatSampleRate,
-                            1, &error, &io_spec, NULL, NULL);
+                            1, &error, &io_spec, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX has an error" << error;
         disabled = true;
@@ -56,6 +57,7 @@ Speaker::Speaker(QObject *parent) :
     filters.append(new AGCFilter);
     filters.append(new GateFilter);
     filters.append(new NSFilter);
+    filters.append(new CompressorFilter);
     EqualizerFilter *eq = new EqualizerFilter;
     HSFilter *hs = new HSFilter(eq);
     filters.append(hs);
@@ -133,8 +135,8 @@ void Speaker::play(const QByteArray &sample)
     size_t idone, odone;
     // Resampling to output freq
     soxr_process(resampler,
-                 sample.data(),     sample.length(),     &idone,
-                 sample_out.data(), sample_out.length(), &odone);
+                 sample.data(),     Filter::sample_length,   &idone,
+                 sample_out.data(), Filter::sample_length*2, &odone);
     qDebug() << "idone:" << idone << "odone:" << odone;
     // Play buffer
     audio_buffer->write(sample_out);
