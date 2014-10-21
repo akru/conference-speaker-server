@@ -1,10 +1,9 @@
 #include "filter.h"
 #include <QCoreApplication>
 
-#ifdef QT_DEBUG
-    #include <QDebug>
-    #include <cmath>
-#endif
+#include <QDebug>
+#include <cmath>
+
 
 static const quint16 norm_int16 = 32768;
 
@@ -22,10 +21,16 @@ void Filter::process(float sample[])
 {
 #ifdef QT_DEBUG
     float rms = 0;
-    for (short i = 0; i < sample_length; ++i)
+    bool distortion = false;
+    for (short i = 0; i < sample_length; ++i) {
+        if(sample[i] >= 1.0)
+            distortion = true;
         rms += sample[i] * sample[i];
+    }
     rms = sqrt(rms) / sample_length;
     qDebug() << name() << "input RMS: " << rms;
+        if(distortion)
+            qDebug() << name() << "input bigger that one!";
 #endif
 
     if (enabled)
@@ -33,10 +38,18 @@ void Filter::process(float sample[])
 
 #ifdef QT_DEBUG
     rms = 0;
-    for (short i = 0; i < sample_length; ++i)
+    distortion = false;
+    for (short i = 0; i < sample_length; ++i){
+        if(sample[i] >= 1.0)
+            distortion = true;
         rms += sample[i] * sample[i];
+    }
     rms = sqrt(rms) / sample_length;
     qDebug() << name() << "output RMS: " << rms;
+
+    for (short i = 0; i < sample_length; ++i)
+        if(distortion)
+            qDebug() << name() << "output bigger that one!";
 #endif
 }
 
@@ -50,10 +63,16 @@ void Filter::fromPCM(qint16 pcm[], float sample[])
 void Filter::toPCM(float sample[], qint16 pcm[])
 {
     // Back to the RAW
-    for (short i = 0; i < sample_length; ++i)
+    bool distortion = false;
+    for (short i = 0; i < sample_length; ++i) {
+        if(sample[i] > 1.0)
+            distortion = true;
+        if(distortion)
+            qDebug() << "Distortion detected!";
         pcm[i] = fabs(sample[i]) >= 1.0
                   ? sample[i] / sample[i] * (norm_int16 - 10)
                   : sample[i] * norm_int16;
+    }
 }
 
 void Filter::applyFilters(QList<Filter *> &filters, QByteArray &raw_sample)

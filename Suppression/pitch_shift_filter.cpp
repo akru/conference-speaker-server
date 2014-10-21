@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <QSettings>
 #include <QDebug>
+#include <QTime>
 #include <soxr.h>
 
 #define M_PI 3.14159265358979323846
@@ -65,21 +66,21 @@ PitchShiftFilter::PitchShiftFilter()
     memset(gAnaFreq, 0, analyze_length*sizeof(float));
     memset(gAnaMagn, 0, analyze_length*sizeof(float));
 
-    // Resampling for high-res STFT while pitch shifting
+//    // Resampling for high-res STFT while pitch shifting
     soxr_error_t error;
 
     // Create widener
-    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
-    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_VHQ, 0);
-    widener = soxr_create(Filter::sample_rate, Filter::sample_rate * len_scaler,
-                            1, &error, &io_spec, &q_spec, NULL);
+    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_HQ, 0);
+    widener = soxr_create(sample_rate, analyze_rate,
+                          1, &error, NULL, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX widener at pitch_shifter has an error: " << error;
         return;
     }
+
     // Create zipper
-    zipper = soxr_create(Filter::sample_rate * len_scaler, Filter::sample_rate,
-                            1, &error, &io_spec, &q_spec, NULL);
+    zipper = soxr_create(analyze_rate, sample_rate,
+                         1, &error, NULL, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX zipper at pitch_shifter has an error: " << error;
         return;
@@ -112,9 +113,6 @@ void PitchShiftFilter::processFilter(float sample[])
     float input[analyze_length];
     float output[analyze_length];
 
-    for (short i = 0; i < sample_length; ++i)
-        sample[i] = fabs(sample[i]);
-
     // Stupid resampler:
 //    memset(input, 0, analyze_length * sizeof(float));
 //    for (int i = 0; i < sample_length; ++i)
@@ -122,12 +120,16 @@ void PitchShiftFilter::processFilter(float sample[])
 
     // Scaling up for analyze
     size_t idone, odone;
-    soxr_error_t e = soxr_process(widener,
+    QTime rt = QTime::currentTime();
+    soxr_process(widener,
                  sample,    sample_length,      &idone,
                  input,     analyze_length,     &odone);
-    if (e) qDebug() << e;
-    qDebug() << "idone:" << idone << "odone:" << odone;
+    qDebug() << "PS widener engine" << soxr_engine(widener)
+             << "delay" << soxr_delay(widener)
+             << "idone:" << idone << "odone:" << odone;
+    qDebug() << "resampler time" << rt.elapsed() << "ms";
 
+    QTime t = QTime::currentTime();
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
@@ -138,16 +140,15 @@ void PitchShiftFilter::processFilter(float sample[])
        pitchShift = 1 - pitchShiftCoef;
        smbPitchShift(analyze_length, analyze_length / 4, input, output);
     }
-
-    // Back to the Sample
-//    for (short i = 0; i < sample_length; ++i)
-//        sample[i] = output[i];
+    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
 
     // Resampling to actual freq 22050 Hz
     soxr_process(zipper,
-                 output,   analyze_length,  &idone,
-                 sample,    sample_length,  &odone);
-    qDebug() << "idone:" << idone << "odone:" << odone;
+                 input,    analyze_length,      &idone,
+                 sample,     sample_length,      &odone);
+    qDebug() << "PS zipper engine" << soxr_engine(zipper)
+             << "delay" << soxr_delay(zipper)
+             << "idone:" << idone << "odone:" << odone;
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -171,7 +172,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 	/* set up some handy variables */
 	fftFrameSize2 = fftFrameSize/2;
 	stepSize = fftFrameSize/osamp;
-    freqPerBin = sample_rate/(float)fftFrameSize;
+    freqPerBin = analyze_rate/(float)fftFrameSize;
     expct = 2.*M_PI*(float)stepSize/(float)fftFrameSize;
 	inFifoLatency = fftFrameSize-stepSize;
 	if (gRover == false) gRover = inFifoLatency;

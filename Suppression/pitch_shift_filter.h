@@ -19,8 +19,9 @@ public:
     void reloadSettings();
 
 private:
-    static const short len_scaler = 2;
+    static const short len_scaler = 4;
     static const short analyze_length = sample_length * len_scaler;
+    static const int   analyze_rate   = sample_rate * len_scaler;
 
     float gInFIFO[analyze_length];
     float gOutFIFO[analyze_length];
@@ -37,8 +38,7 @@ private:
     int currentPitch, iteration;
 
     // Improved resampler using SoX
-    soxr_t widener;
-    soxr_t zipper;
+    soxr_t widener, zipper;
 
     void smbPitchShift(long numSampsToProcess,
                        long fftFrameSize,

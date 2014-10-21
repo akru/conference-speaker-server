@@ -40,7 +40,7 @@ Speaker::Speaker(QObject *parent) :
     // Create stream resampler
     soxr_error_t error;
     soxr_io_spec_t io_spec = soxr_io_spec(SOXR_INT16_I, SOXR_INT16_I);
-    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_VHQ, 0);
+    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_HQ, 0);
     resampler = soxr_create(Filter::sample_rate, formatSampleRate,
                             1, &error, &io_spec, &q_spec, NULL);
     if (error) {
@@ -137,11 +137,11 @@ void Speaker::play(const QByteArray &sample)
     soxr_process(resampler,
                  sample.data(),     Filter::sample_length,   &idone,
                  sample_out.data(), Filter::sample_length*2, &odone);
-    qDebug() << "idone:" << idone << "odone:" << odone;
+    qDebug() << "Speaker resampler:" << soxr_engine(resampler)
+             << "delay" << soxr_delay(resampler);
     // Play buffer
     audio_buffer->write(sample_out);
 }
-
 
 void Speaker::reloadFilterSettings()
 {
