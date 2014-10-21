@@ -15,9 +15,9 @@ SOURCES += \
     fft4g.c \
     filter.c \
     lsr.c \
-#    pffft32.c \
-#    pffft32s.c \
-#    pffft.c \
+    pffft32.c \
+    pffft32s.c \
+    pffft.c \
     rate32.c \
     rate32s.c \
     rate64.c \

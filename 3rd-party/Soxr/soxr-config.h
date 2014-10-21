@@ -13,6 +13,7 @@
 //#define WORDS_BIGENDIAN       1
 
 #include <limits.h>
+#include <stdint.h>
 
 #undef bool
 #undef false
