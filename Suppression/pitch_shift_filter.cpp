@@ -52,6 +52,7 @@
 
 void smbFft(float *fftBuffer, long fftFrameSize, long sign);
 float smbAtan2(float x, float y);
+//double smbAtan2(double x, double y);
 
 PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
@@ -117,8 +118,8 @@ void PitchShiftFilter::processFilter(float sample[])
         //avg 8 - 13 ms with PS time 800
     }
 
-//    float input[analyze_length];
-    float output[sample_length];
+    float input[analyze_length];
+    float output[analyze_length];
 
 //    for (int i = 0; i < sample_length; ++i)
 //    {
@@ -132,48 +133,64 @@ void PitchShiftFilter::processFilter(float sample[])
 //        input[i * len_scaler] = sample[i];
 
       // Scaling up for analyze
-//    size_t idone, odone;
+    size_t idone, odone;
 //    QTime rt = QTime::currentTime();
-//    soxr_process(widener,
-//                 sample,    sample_length,      &idone,
-//                 input,     analyze_length,     &odone);
-//    qDebug() << "PS widener engine" << soxr_engine(widener)
-//             << "delay" << soxr_delay(widener)
-//             << "idone:" << idone << "odone:" << odone;
-//    qDebug() << "resampler time" << rt.elapsed() << "ms";
+    soxr_process(widener,
+                 sample,    sample_length,      &idone,
+                 input,     analyze_length,     &odone);
+    qDebug() << "PS widener engine" << soxr_engine(widener)
+             << "delay" << soxr_delay(widener)
+             << "idone:" << idone << "odone:" << odone;
 
-//    QTime t = QTime::currentTime();
+    for(short i = 0; i < analyze_length; i++){
+        if(input[i] != input[i]) {
+            input[i] = 0.;
+            qDebug() << "Got a NaN after resampling!";
+        }
+    }
+//    qDebug() << "resampler time" << rt.elapsed() << "ms";
+    bool nnan = false;
+    for(short i = 0; i < analyze_length; i++){
+        if(input[i] != input[i]) {
+            nnan = true;
+        }
+    }
+    if(nnan){
+        qDebug() << "NAN NANNANNANNAN NANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNAN";
+    }
+
+    QTime t = QTime::currentTime();
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
-//        smbPitchShift(analyze_length, 512, input, output);
-        smbPitchShift(sample_length, sample_length, sample, output);
+        smbPitchShift(analyze_length, analyze_length, input, output);
+//        smbPitchShift(sample_length, sample_length, sample, output);
         qDebug() << "Pitch up";
     }
     else // Pitch down
     {
        pitchShift = 1 - pitchShiftCoef;
-//       smbPitchShift(analyze_length, 512, input, output);
-       smbPitchShift(sample_length, sample_length, sample, output);
+       smbPitchShift(analyze_length, analyze_length, input, output);
+//       smbPitchShift(sample_length, sample_length, sample, output);
                     qDebug() << "Pitch down";
     }
-//    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
+    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
 
 //    for (int i = 0; i < analyze_length; i++)
 //        output[i] = input[i];
-    for (int i = 0; i < sample_length; i++)
-        sample[i] = output[i];
+//    for (int i = 0; i < sample_length; ++i)
+//        sample[i] = output[i];
 
     // Resampling to actual freq 22050 Hz
-//    soxr_process(zipper,
-//                 output,    analyze_length,      &idone,
-//                 sample,     sample_length,      &odone);
+    soxr_process(zipper,
+                 output,    analyze_length,      &idone,
+                 sample,     sample_length,      &odone);
 //    qDebug() << "PS zipper engine" << soxr_engine(zipper)
 //             << "delay" << soxr_delay(zipper)
 //             << "idone:" << idone << "odone:" << odone;
 }
 
-s// -----------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------
 void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
                                      long fftFrameSize,
                                      float *indata,
@@ -187,13 +204,17 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 {
     float magn, phase, tmp, window, real, imag;
     float freqPerBin, expct;
+//    double magn, phase, tmp, window, real, imag;
+//    double freqPerBin, expct;
 	long i,k, qpd, index, inFifoLatency, stepSize, fftFrameSize2;
 
 	/* set up some handy variables */
 	fftFrameSize2 = fftFrameSize/2;
 	stepSize = fftFrameSize/osamp;
-    freqPerBin = sample_rate/(float)fftFrameSize;
-//    freqPerBin = analyze_rate/(float)fftFrameSize;
+//    freqPerBin = sample_rate/(double)fftFrameSize;
+//    freqPerBin = sample_rate/(float)fftFrameSize;
+    freqPerBin = analyze_rate/(float)fftFrameSize;
+//    expct = 2.*M_PI*(double)stepSize/(double)fftFrameSize;
     expct = 2.*M_PI*(float)stepSize/(float)fftFrameSize;
 	inFifoLatency = fftFrameSize-stepSize;
 	if (gRover == false) gRover = inFifoLatency;
@@ -213,6 +234,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			/* do windowing and re,im interleave */
             for (k = 0; k < fftFrameSize;k++) {
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
+//                window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
                 gFFTworksp[2*k] = gInFIFO[k] * window;
                 gFFTworksp[2*k+1] = 0.;
             }
@@ -239,18 +261,21 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				gLastPhase[k] = phase;
 
 				/* subtract expected phase difference */
+//                tmp -= (double)k*expct;
                 tmp -= (float)k*expct;
 
 				/* map delta phase into +/- Pi interval */
 				qpd = tmp/M_PI;
 				if (qpd >= 0) qpd += qpd&1;
 				else qpd -= qpd&1;
+//                tmp -= M_PI*(double)qpd;
                 tmp -= M_PI*(float)qpd;
 
 				/* get deviation from bin frequency from the +/- Pi interval */
 				tmp = osamp*tmp/(2.*M_PI);
 
 				/* compute the k-th partials' true frequency */
+//                tmp = (double)k*freqPerBin + tmp*freqPerBin;
                 tmp = (float)k*freqPerBin + tmp*freqPerBin;
 
 				/* store magnitude and true frequency in analysis arrays */
@@ -280,6 +305,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				tmp = gSynFreq[k];
 
 				/* subtract bin mid frequency */
+//                tmp -= (double)k*freqPerBin;
                 tmp -= (float)k*freqPerBin;
 
 				/* get bin deviation from freq deviation */
@@ -289,7 +315,8 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				tmp = 2.*M_PI*tmp/osamp;
 
 				/* add the overlap phase advance back in */
-                tmp += (float)k*expct;
+//                tmp += (double)k*expct;
+                tmp += (float)k*expct;s
 
 				/* accumulate delta phase to get bin phase */
 				gSumPhase[k] += tmp;
@@ -305,7 +332,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
             /* do inverse transform */
             smbFft(gFFTworksp, fftFrameSize, 1);
-//            cdft(fftFrameSize, 1, gFFTworksp, ip, wfft);
+//            cdft(fftFrameSize*2, 1, gFFTworksp, ip, wfft);
 //            for (k = 0; k <= fftFrameSize*2 - 1; k++) {
 //                gFFTworksp[k] *= 1.0 / fftFrameSize;
 //            }
@@ -313,7 +340,8 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			/* do windowing and add to output accumulator */ 
 			for(k=0; k < fftFrameSize; k++) {
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
-                gOutputAccum[k] += 2.*window*gFFTworksp[k]/(fftFrameSize2*osamp);
+//                window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
+                gOutputAccum[k] += 2.*window*gFFTworksp[2*k]/(fftFrameSize2*osamp);
 			}
 			for (k = 0; k < stepSize; k++) gOutFIFO[k] = gOutputAccum[k];
 
@@ -328,19 +356,18 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 // -----------------------------------------------------------------------------------------------------------------
 
-
 void smbFft(float *fftBuffer, long fftFrameSize, long sign)
-
-//    FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
-//    Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
-//    time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
-//    and returns the cosine and sine parts in an interleaved manner, ie.
-//    fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
-//    must be a power of 2. It expects a complex input signal (see footnote 2),
-//    ie. when working with 'common' audio signals our input signal has to be
-//    passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
-//    of the frequencies of interest is in fftBuffer[0...fftFrameSize].
-
+/*
+    FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
+    Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
+    time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
+    and returns the cosine and sine parts in an interleaved manner, ie.
+    fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
+    must be a power of 2. It expects a complex input signal (see footnote 2),
+    ie. when working with 'common' audio signals our input signal has to be
+    passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
+    of the frequencies of interest is in fftBuffer[0...fftFrameSize].
+*/
 {
     float wr, wi, arg, *p1, *p2, temp;
     float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
@@ -404,9 +431,10 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign)
     
 */
 
-
+//double smbAtan2(double x, double y)
 float smbAtan2(float x, float y)
 {
+//  double signx;
   float signx;
   if (x > 0.) signx = 1.;  
   else signx = -1.;
