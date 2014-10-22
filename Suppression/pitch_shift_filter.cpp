@@ -43,7 +43,9 @@
 #include <QDebug>
 #include <QTime>
 #include <soxr.h>
+#include "fft4g.h"
 
+#undef M_PI
 #define M_PI 3.14159265358979323846
 
 #include "pitch_shift_filter.h"
@@ -65,8 +67,10 @@ PitchShiftFilter::PitchShiftFilter()
     memset(gOutputAccum, 0, 2*analyze_length*sizeof(float));
     memset(gAnaFreq, 0, analyze_length*sizeof(float));
     memset(gAnaMagn, 0, analyze_length*sizeof(float));
+    memset(ip, 0, (analyze_length * 2 >> 1)*sizeof(float));
+    memset(wfft, 0, (analyze_length * 2 >> 1)*sizeof(float));
 
-//    // Resampling for high-res STFT while pitch shifting
+    // Resampling for high-res STFT while pitch shifting
     soxr_error_t error;
 
     // Create widener
@@ -104,56 +108,72 @@ void PitchShiftFilter::reloadSettings()
 
 void PitchShiftFilter::processFilter(float sample[])
 {
-    if (++iteration > PITCH_SHIFT_TIME / 32.0)
+//    QTime t = QTime::currentTime();
+    if (++iteration > ( (float)PITCH_SHIFT_TIME / ((float)sample_length / (float)sample_rate)) )
     {
         currentPitch = (currentPitch + 1) % PITCH_COUNT;
         iteration    = 0;
+//        qDebug() << "PS Elapsed" << t.elapsed() << "ms";
+        //avg 8 - 13 ms with PS time 800
     }
 
-    float input[analyze_length];
-    float output[analyze_length];
+//    float input[analyze_length];
+    float output[sample_length];
 
-    // Stupid resampler:
+//    for (int i = 0; i < sample_length; ++i)
+//    {
+//        if(sample[i] < -1.0 && sample[i] >= 1.0)
+//            qDebug() << "PS RANGE DEFLORATED!!!";
+//    }
+
+      // Stupid resampler:
 //    memset(input, 0, analyze_length * sizeof(float));
 //    for (int i = 0; i < sample_length; ++i)
 //        input[i * len_scaler] = sample[i];
 
-    // Scaling up for analyze
-    size_t idone, odone;
-    QTime rt = QTime::currentTime();
-    soxr_process(widener,
-                 sample,    sample_length,      &idone,
-                 input,     analyze_length,     &odone);
-    qDebug() << "PS widener engine" << soxr_engine(widener)
-             << "delay" << soxr_delay(widener)
-             << "idone:" << idone << "odone:" << odone;
-    qDebug() << "resampler time" << rt.elapsed() << "ms";
+      // Scaling up for analyze
+//    size_t idone, odone;
+//    QTime rt = QTime::currentTime();
+//    soxr_process(widener,
+//                 sample,    sample_length,      &idone,
+//                 input,     analyze_length,     &odone);
+//    qDebug() << "PS widener engine" << soxr_engine(widener)
+//             << "delay" << soxr_delay(widener)
+//             << "idone:" << idone << "odone:" << odone;
+//    qDebug() << "resampler time" << rt.elapsed() << "ms";
 
-    QTime t = QTime::currentTime();
+//    QTime t = QTime::currentTime();
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
-        smbPitchShift(analyze_length, analyze_length / 4, input, output);
+//        smbPitchShift(analyze_length, 512, input, output);
+        smbPitchShift(sample_length, sample_length, sample, output);
+        qDebug() << "Pitch up";
     }
     else // Pitch down
     {
        pitchShift = 1 - pitchShiftCoef;
-       smbPitchShift(analyze_length, analyze_length / 4, input, output);
+//       smbPitchShift(analyze_length, 512, input, output);
+       smbPitchShift(sample_length, sample_length, sample, output);
+                    qDebug() << "Pitch down";
     }
-    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
+//    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
+
+//    for (int i = 0; i < analyze_length; i++)
+//        output[i] = input[i];
+    for (int i = 0; i < sample_length; i++)
+        sample[i] = output[i];
 
     // Resampling to actual freq 22050 Hz
-    soxr_process(zipper,
-                 input,    analyze_length,      &idone,
-                 sample,     sample_length,      &odone);
-    qDebug() << "PS zipper engine" << soxr_engine(zipper)
-             << "delay" << soxr_delay(zipper)
-             << "idone:" << idone << "odone:" << odone;
+//    soxr_process(zipper,
+//                 output,    analyze_length,      &idone,
+//                 sample,     sample_length,      &odone);
+//    qDebug() << "PS zipper engine" << soxr_engine(zipper)
+//             << "delay" << soxr_delay(zipper)
+//             << "idone:" << idone << "odone:" << odone;
 }
 
-// -----------------------------------------------------------------------------------------------------------------
-
-
+s// -----------------------------------------------------------------------------------------------------------------
 void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
                                      long fftFrameSize,
                                      float *indata,
@@ -172,7 +192,8 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 	/* set up some handy variables */
 	fftFrameSize2 = fftFrameSize/2;
 	stepSize = fftFrameSize/osamp;
-    freqPerBin = analyze_rate/(float)fftFrameSize;
+    freqPerBin = sample_rate/(float)fftFrameSize;
+//    freqPerBin = analyze_rate/(float)fftFrameSize;
     expct = 2.*M_PI*(float)stepSize/(float)fftFrameSize;
 	inFifoLatency = fftFrameSize-stepSize;
 	if (gRover == false) gRover = inFifoLatency;
@@ -190,16 +211,17 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			gRover = inFifoLatency;
 
 			/* do windowing and re,im interleave */
-			for (k = 0; k < fftFrameSize;k++) {
+            for (k = 0; k < fftFrameSize;k++) {
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
-				gFFTworksp[2*k] = gInFIFO[k] * window;
-				gFFTworksp[2*k+1] = 0.;
-			}
-
+                gFFTworksp[2*k] = gInFIFO[k] * window;
+                gFFTworksp[2*k+1] = 0.;
+            }
+            // avg. time for all windowing somwhere between 5 ms to frame
 
 			/* ***************** ANALYSIS ******************* */
 			/* do transform */
-			smbFft(gFFTworksp, fftFrameSize, -1);
+//            cdft(fftFrameSize*2, -1, gFFTworksp, ip, wfft);
+            smbFft(gFFTworksp, fftFrameSize, -1);
 
 			/* this is the analysis step */
 			for (k = 0; k <= fftFrameSize2; k++) {
@@ -281,13 +303,17 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			/* zero negative frequencies */
 			for (k = fftFrameSize+2; k < 2*fftFrameSize; k++) gFFTworksp[k] = 0.;
 
-			/* do inverse transform */
-			smbFft(gFFTworksp, fftFrameSize, 1);
+            /* do inverse transform */
+            smbFft(gFFTworksp, fftFrameSize, 1);
+//            cdft(fftFrameSize, 1, gFFTworksp, ip, wfft);
+//            for (k = 0; k <= fftFrameSize*2 - 1; k++) {
+//                gFFTworksp[k] *= 1.0 / fftFrameSize;
+//            }
 
 			/* do windowing and add to output accumulator */ 
 			for(k=0; k < fftFrameSize; k++) {
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
-				gOutputAccum[k] += 2.*window*gFFTworksp[2*k]/(fftFrameSize2*osamp);
+                gOutputAccum[k] += 2.*window*gFFTworksp[k]/(fftFrameSize2*osamp);
 			}
 			for (k = 0; k < stepSize; k++) gOutFIFO[k] = gOutputAccum[k];
 
@@ -304,58 +330,58 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 
 void smbFft(float *fftBuffer, long fftFrameSize, long sign)
-/* 
-	FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
-	Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
-	time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
-	and returns the cosine and sine parts in an interleaved manner, ie.
-	fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
-	must be a power of 2. It expects a complex input signal (see footnote 2),
-	ie. when working with 'common' audio signals our input signal has to be
-	passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
-	of the frequencies of interest is in fftBuffer[0...fftFrameSize].
-*/
+
+//    FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
+//    Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
+//    time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
+//    and returns the cosine and sine parts in an interleaved manner, ie.
+//    fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
+//    must be a power of 2. It expects a complex input signal (see footnote 2),
+//    ie. when working with 'common' audio signals our input signal has to be
+//    passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
+//    of the frequencies of interest is in fftBuffer[0...fftFrameSize].
+
 {
     float wr, wi, arg, *p1, *p2, temp;
     float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
-	long i, bitm, j, le, le2, k;
+    long i, bitm, j, le, le2, k;
 
-	for (i = 2; i < 2*fftFrameSize-2; i += 2) {
-		for (bitm = 2, j = 0; bitm < 2*fftFrameSize; bitm <<= 1) {
-			if (i & bitm) j++;
-			j <<= 1;
-		}
-		if (i < j) {
-			p1 = fftBuffer+i; p2 = fftBuffer+j;
-			temp = *p1; *(p1++) = *p2;
-			*(p2++) = temp; temp = *p1;
-			*p1 = *p2; *p2 = temp;
-		}
-	}
-	for (k = 0, le = 2; k < (long)(log(fftFrameSize)/log(2.)+.5); k++) {
-		le <<= 1;
-		le2 = le>>1;
-		ur = 1.0;
-		ui = 0.0;
-		arg = M_PI / (le2>>1);
-		wr = cos(arg);
-		wi = sign*sin(arg);
-		for (j = 0; j < le2; j += 2) {
-			p1r = fftBuffer+j; p1i = p1r+1;
-			p2r = p1r+le2; p2i = p2r+1;
-			for (i = j; i < 2*fftFrameSize; i += le) {
-				tr = *p2r * ur - *p2i * ui;
-				ti = *p2r * ui + *p2i * ur;
-				*p2r = *p1r - tr; *p2i = *p1i - ti;
-				*p1r += tr; *p1i += ti;
-				p1r += le; p1i += le;
-				p2r += le; p2i += le;
-			}
-			tr = ur*wr - ui*wi;
-			ui = ur*wi + ui*wr;
-			ur = tr;
-		}
-	}
+    for (i = 2; i < 2*fftFrameSize-2; i += 2) {
+        for (bitm = 2, j = 0; bitm < 2*fftFrameSize; bitm <<= 1) {
+            if (i & bitm) j++;
+            j <<= 1;
+        }
+        if (i < j) {
+            p1 = fftBuffer+i; p2 = fftBuffer+j;
+            temp = *p1; *(p1++) = *p2;
+            *(p2++) = temp; temp = *p1;
+            *p1 = *p2; *p2 = temp;
+        }
+    }
+    for (k = 0, le = 2; k < (long)(log(fftFrameSize)/log(2.)+.5); k++) {
+        le <<= 1;
+        le2 = le>>1;
+        ur = 1.0;
+        ui = 0.0;
+        arg = M_PI / (le2>>1);
+        wr = cos(arg);
+        wi = sign*sin(arg);
+        for (j = 0; j < le2; j += 2) {
+            p1r = fftBuffer+j; p1i = p1r+1;
+            p2r = p1r+le2; p2i = p2r+1;
+            for (i = j; i < 2*fftFrameSize; i += le) {
+                tr = *p2r * ur - *p2i * ui;
+                ti = *p2r * ui + *p2i * ur;
+                *p2r = *p1r - tr; *p2i = *p1i - ti;
+                *p1r += tr; *p1i += ti;
+                p1r += le; p1i += le;
+                p2r += le; p2i += le;
+            }
+            tr = ur*wr - ui*wi;
+            ui = ur*wi + ui*wr;
+            ur = tr;
+        }
+    }
 }
 
 

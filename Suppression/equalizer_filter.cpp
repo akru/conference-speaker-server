@@ -225,6 +225,7 @@ void EqualizerFilter::dsp_logic()
     }
     //inverse fft
     cdft(Equalizer::fft_size, -1, output_window, ip, wfft);
+    // TODO: NORMING
 /*
     // Dummy resampler
     for (short j = 1; j < Equalizer::window_size; ++j)

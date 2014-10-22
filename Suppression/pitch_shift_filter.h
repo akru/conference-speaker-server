@@ -4,7 +4,7 @@
 #include "filter.h"
 
 static const int PITCH_COUNT   = 2;
-static const int PITCH_SHIFT_TIME = 1200; // ms; WARN: it divided by frame length (32 ms)
+static const int PITCH_SHIFT_TIME = 800; // ms; WARN: it divided by frame length (32 ms)
 
 typedef struct soxr * soxr_t;
 
@@ -36,6 +36,9 @@ private:
     long gRover, osamp;
     float pitchShift, pitchShiftCoef;
     int currentPitch, iteration;
+
+    float wfft[analyze_length * 2 >> 1];
+    int   ip[analyze_length * 2 >> 1];
 
     // Improved resampler using SoX
     soxr_t widener, zipper;
