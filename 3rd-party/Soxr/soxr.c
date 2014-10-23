@@ -630,25 +630,21 @@ extern void lsx_safe_cdft_f(int,int,float*);
 void rdft(int n, int sign, double *work)
 {
     lsx_safe_rdft(n, sign, work);
-    LSX_UNPACK(work, n);
 }
 
 void rdftf(int n, int sign, float *work)
 {
     lsx_safe_rdft_f(n, sign, work);
-    LSX_UNPACK(work, n);
 }
 
 void cdft(int n, int sign, double *work)
 {
     lsx_safe_cdft(n, sign, work);
-    LSX_UNPACK(work, n);
 }
 
 void cdftf(int n, int sign, float *work)
 {
     lsx_safe_cdft_f(n, sign, work);
-    LSX_UNPACK(work, n);
 }
 
 soxr_error_t soxr_set_error(soxr_t p, soxr_error_t error)
