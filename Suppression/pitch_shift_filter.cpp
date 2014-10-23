@@ -57,9 +57,8 @@ float smbAtan2(float x, float y);
 PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
       pitchShift(1),
-      currentPitch(0),
-      iteration(0)
-{
+      currentPitch(0)
+{ 
     memset(gInFIFO, 0, analyze_length*sizeof(float));
     memset(gOutFIFO, 0, analyze_length*sizeof(float));
     memset(gFFTworksp, 0, 2*analyze_length*sizeof(float));
@@ -90,7 +89,7 @@ PitchShiftFilter::PitchShiftFilter()
         qWarning() << "SoX zipper at pitch_shifter has an error: " << error;
         return;
     }
-
+    shift_time.start();
     reloadSettings();
 }
 
@@ -110,10 +109,10 @@ void PitchShiftFilter::reloadSettings()
 void PitchShiftFilter::processFilter(float sample[])
 {
 //    QTime t = QTime::currentTime();
-    if (++iteration > ( (float)PITCH_SHIFT_TIME / ((float)sample_length / (float)sample_rate)) )
+    if (shift_time.elapsed() > PITCH_SHIFT_TIME)
     {
+        shift_time.restart();
         currentPitch = (currentPitch + 1) % PITCH_COUNT;
-        iteration    = 0;
 //        qDebug() << "PS Elapsed" << t.elapsed() << "ms";
         //avg 8 - 13 ms with PS time 800
     }
@@ -149,15 +148,24 @@ void PitchShiftFilter::processFilter(float sample[])
         }
     }
 //    qDebug() << "resampler time" << rt.elapsed() << "ms";
+
+    // Any NaNs?
     bool nnan = false;
-    for(short i = 0; i < analyze_length; i++){
-        if(input[i] != input[i]) {
+    for(short i = 0; i < analyze_length; i++)
+        if(input[i] != input[i])
             nnan = true;
-        }
-    }
-    if(nnan){
-        qDebug() << "NAN NANNANNANNAN NANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNANNAN";
-    }
+    if(nnan)
+        qDebug() << "-------------------------------> NaN <----------------------------------";
+
+    // Looking for negatives in the frame
+//    bool negative = false;
+//    // What is in the frame?
+//    for(short i = 0; i < analyze_length; i++)
+//        if(input[i] < 0.)
+//            negative = true;
+//    if(negative) {
+//        qDebug() << "Negative!";
+//    } else if(!negative){ qDebug() << "No negative!"; }
 
     QTime t = QTime::currentTime();
     if(currentPitch) // Pitch up
@@ -176,6 +184,11 @@ void PitchShiftFilter::processFilter(float sample[])
     }
     qDebug() << "PS Elapsed" << t.elapsed() << "ms";
 
+    for (int i = 0; i < analyze_length; i++)
+        if(output[i] >= 1.0 || output[i] < -1.0)
+            qDebug() << "PS after pitchShift: sample is bigger than 1.0!";
+
+
 //    for (int i = 0; i < analyze_length; i++)
 //        output[i] = input[i];
 //    for (int i = 0; i < sample_length; ++i)
@@ -188,6 +201,9 @@ void PitchShiftFilter::processFilter(float sample[])
 //    qDebug() << "PS zipper engine" << soxr_engine(zipper)
 //             << "delay" << soxr_delay(zipper)
 //             << "idone:" << idone << "odone:" << odone;
+    for (int i = 0; i < sample_length; i++)
+        if(sample[i] >= 1.0 || sample[i] < -1.0)
+            qDebug() << "PS after zipper: sample is bigger than 1.0!";
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -240,9 +256,18 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
             }
             // avg. time for all windowing somwhere between 5 ms to frame
 
+            /*
+            // prepare gFFTworksp for rdft proc
+            for (k = 0; k < fftFrameSize; k++)
+                gFFTworksp[k] = gFFTworksp[2*k];
+
+            for (k = fftFrameSize+1; k < fftFrameSize*2; k++)
+                gFFTworksp[k] = 0.;
+            */
+
 			/* ***************** ANALYSIS ******************* */
 			/* do transform */
-//            cdft(fftFrameSize*2, -1, gFFTworksp, ip, wfft);
+//            rdft(fftFrameSize, 1, gFFTworksp, ip, wfft);
             smbFft(gFFTworksp, fftFrameSize, -1);
 
 			/* this is the analysis step */
@@ -316,7 +341,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 
 				/* add the overlap phase advance back in */
 //                tmp += (double)k*expct;
-                tmp += (float)k*expct;s
+                tmp += (float)k*expct;
 
 				/* accumulate delta phase to get bin phase */
 				gSumPhase[k] += tmp;
@@ -328,13 +353,13 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			} 
 
 			/* zero negative frequencies */
-			for (k = fftFrameSize+2; k < 2*fftFrameSize; k++) gFFTworksp[k] = 0.;
+            for (k = fftFrameSize+2; k < 2*fftFrameSize; k++) gFFTworksp[k] = 0.;
 
             /* do inverse transform */
             smbFft(gFFTworksp, fftFrameSize, 1);
-//            cdft(fftFrameSize*2, 1, gFFTworksp, ip, wfft);
-//            for (k = 0; k <= fftFrameSize*2 - 1; k++) {
-//                gFFTworksp[k] *= 1.0 / fftFrameSize;
+//            rdft(fftFrameSize, -1, gFFTworksp, ip, wfft); // if size = fftFrameSize*2 - it will use negative freqs
+//            for (k = 0; k <= fftFrameSize - 1; k++) {
+//                gFFTworksp[k] *= 2.0 / fftFrameSize;
 //            }
 
 			/* do windowing and add to output accumulator */ 
@@ -342,6 +367,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
 //                window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
                 gOutputAccum[k] += 2.*window*gFFTworksp[2*k]/(fftFrameSize2*osamp);
+//                gOutputAccum[k] += 2.*window*gFFTworksp[k]/(fftFrameSize2*osamp);
 			}
 			for (k = 0; k < stepSize; k++) gOutFIFO[k] = gOutputAccum[k];
 
