@@ -5,13 +5,13 @@
 #include <QFontDatabase>
 #include <QFile>
 
-const QString clientsHeader = "Clients: <b style=\"color: #00A0E3\">(%1)</b>";
-const QString wantsHeader = "Wants to ask: <b style=\"color: #00A0E3\">(%1)</b>";
-const QString chatHeader = "Chat: <b style=\"color: #00A0E3\">(%1)</b>";
+const char * clientsHeader = "Clients: <b style=\"color: #00A0E3\">(%1)</b>";
+const char * wantsHeader   = "Wants to ask: <b style=\"color: #00A0E3\">(%1)</b>";
+const char * chatHeader    = "Chat: <b style=\"color: #00A0E3\">(%1)</b>";
 
-const QString statusBarNonConfig = "Not configured, please set a settings by settings dialog";
-const QString statusBarConfigured = "Configured, waiting for clients...";
-const QString statusBarConnected = "Working, connected %1 clients";
+const char * statusBarNonConfig  = "Not configured, please set a settings by settings dialog";
+const char * statusBarConfigured = "Configured, waiting for clients...";
+const char * statusBarConnected  = "Working, connected %1 clients";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,21 +31,21 @@ MainWindow::MainWindow(QWidget *parent) :
     // Load server settings
     settings.loadSettings();
     // Set scroll boxes alignments
-    ui->channelBox->setAlignment(Qt::AlignTop);
-    ui->wantsBox->layout()->setAlignment(Qt::AlignTop);
-    ui->clientBox->layout()->setAlignment(Qt::AlignTop);
-    // Update headers
-    ui->clientLabel->setText(clientsHeader.arg(0));
-    ui->wantsLabel->setText(wantsHeader.arg(0));
-    ui->chatLabel->setText(chatHeader.arg(0));
+//    ui->channelBox->setAlignment(Qt::AlignTop);
+//    ui->wantsBox->layout()->setAlignment(Qt::AlignTop);
+//    ui->clientBox->layout()->setAlignment(Qt::AlignTop);
+//    // Update headers
+//    ui->clientLabel->setText(clientsHeader.arg(0));
+//    ui->wantsLabel->setText(wantsHeader.arg(0));
+//    ui->chatLabel->setText(chatHeader.arg(0));
     if (settings.isConfigured())
     {
-        ui->labelName->setText(settings.serverInfo().name);
-        ui->statusBar->showMessage(statusBarConfigured);
+//        ui->labelName->setText(settings.serverInfo().name);
+//        ui->statusBar->showMessage(statusBarConfigured);
     }
     else
     {
-        ui->statusBar->showMessage(statusBarNonConfig);
+//        ui->statusBar->showMessage(statusBarNonConfig);
         settings.show();
     }
 }
@@ -60,15 +60,15 @@ void MainWindow::appendClient(QString address, UserInformation info)
     Q_ASSERT(!clients.contains(address));
 
     ClientWidget *w = new ClientWidget(info, address, this);
-    ui->clientBox->layout()->addWidget(w);
+//    ui->clientBox->layout()->addWidget(w);
     clients.insert(address, w);
     w->show();
     // Ban handler
     connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
     // Update header
-    int countClients = ui->clientBox->layout()->count();
-    ui->clientLabel->setText(clientsHeader.arg(countClients));
-    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
+//    int countClients = ui->clientBox->layout()->count();
+//    ui->clientLabel->setText(clientsHeader.arg(countClients));
+//    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
 }
 
 void MainWindow::dropClient(QString address)
@@ -86,9 +86,9 @@ void MainWindow::dropClient(QString address)
         dropChannel(address);
     }
     // Update header
-    int countClients = ui->clientBox->layout()->count();
-    ui->clientLabel->setText(clientsHeader.arg(countClients));
-    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
+//    int countClients = ui->clientBox->layout()->count();
+//    ui->clientLabel->setText(clientsHeader.arg(countClients));
+//    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
 }
 
 void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
@@ -96,7 +96,7 @@ void MainWindow::appendChannel(QString address, UserInformation info, Receiver *
     ChannelWidget *c = new ChannelWidget(address, info, channel, this);
     channels.insert(address, c);
 
-    ui->channelBox->addWidget(c);
+//    ui->channelBox->addWidget(c);
     c->show();
 
     connect(c,      SIGNAL(closeChannelClicked(QString)),
@@ -105,8 +105,8 @@ void MainWindow::appendChannel(QString address, UserInformation info, Receiver *
             SIGNAL(closeChannelClicked(QString)),
             SLOT(dropChannel(QString)));
     // Update header
-    ui->chatLabel->setText(
-                chatHeader.arg(ui->channelBox->count()));
+//    ui->chatLabel->setText(
+//                chatHeader.arg(ui->channelBox->count()));
 }
 
 void MainWindow::dropChannel(QString address)
@@ -116,8 +116,8 @@ void MainWindow::dropChannel(QString address)
     delete channels[address];
     channels.remove(address);
     // Update header
-    ui->chatLabel->setText(
-                chatHeader.arg(ui->channelBox->count()));
+//    ui->chatLabel->setText(
+//                chatHeader.arg(ui->channelBox->count()));
 }
 
 void MainWindow::channelRequest(QString address, UserInformation info)
@@ -136,11 +136,11 @@ void MainWindow::channelRequest(QString address, UserInformation info)
     connect(reqWidget, SIGNAL(discarded(QString)),
             SLOT(dropRequest(QString)));
 
-    ui->wantsBox->layout()->addWidget(reqWidget);
-    reqWidget->show();
+//    ui->wantsBox->layout()->addWidget(reqWidget);
+//    reqWidget->show();
     // Update header
-    ui->wantsLabel->setText(
-                wantsHeader.arg(ui->wantsBox->layout()->count()));
+//    ui->wantsLabel->setText(
+//                wantsHeader.arg(ui->wantsBox->layout()->count()));
 }
 
 void MainWindow::dropRequest(QString address)
@@ -151,8 +151,8 @@ void MainWindow::dropRequest(QString address)
         delete requests[address];
         requests.remove(address);
         // Update header
-        ui->wantsLabel->setText(
-                    wantsHeader.arg(ui->wantsBox->layout()->count()));
+//        ui->wantsLabel->setText(
+//                    wantsHeader.arg(ui->wantsBox->layout()->count()));
     }
 }
 
@@ -197,8 +197,8 @@ void MainWindow::updateServerInfo(ServerInformation info)
             server,        SLOT(channelReloadSettings()));
 
     // Update headers
-    ui->labelName->setText(info.name);
-    ui->statusBar->showMessage(statusBarConfigured);
+//    ui->labelName->setText(info.name);
+//    ui->statusBar->showMessage(statusBarConfigured);
 }
 
 void MainWindow::on_actionAbout_triggered()

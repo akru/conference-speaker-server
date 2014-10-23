@@ -1,13 +1,13 @@
 <RCC>
-    <qresource prefix="/">
-        <file>res/fonts/BauhausC-Demibold.ttf</file>
-        <file>res/fonts/Gothic.ttf</file>
-        <file>res/fonts/GothicBold.ttf</file>
-        <file>res/images/background.png</file>
-        <file>res/images/cross.png</file>
-        <file>res/images/ok.png</file>
-        <file>res/images/avatar.png</file>
-        <file>res/images/hear.png</file>
-        <file>res/images/face.png</file>
+    <qresource prefix="/gui">
+        <file alias="avatar">res/images/avatar.png</file>
+        <file alias="hand-up">res/images/hadn-up.png</file>
+        <file alias="hands">res/images/hands.png</file>
+        <file alias="channel-box">res/images/rect/channel-box.png</file>
+        <file alias="client-list-box">res/images/rect/client-list-box.png</file>
+        <file alias="client-list-item-bg">res/images/client-list-item-bg.png</file>
+        <file alias="client-list-line">res/images/client-list-line.png</file>
+        <file alias="combo-box-arrow">res/images/combo-box-arrow.png</file>
+        <file alias="power-button">res/images/power-button.png</file>
     </qresource>
 </RCC>

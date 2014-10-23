@@ -79,10 +79,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset resource="resource.qrc">
-          <normaloff>:/res/images/cross.png</normaloff>:/res/images/cross.png</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>32</width>
@@ -121,10 +117,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset resource="resource.qrc">
-          <normaloff>:/res/images/ok.png</normaloff>:/res/images/ok.png</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>32</width>
@@ -140,9 +132,6 @@
        <widget class="QLabel" name="avatar">
         <property name="text">
          <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="resource.qrc">:/res/images/avatar.png</pixmap>
         </property>
        </widget>
       </item>
@@ -178,8 +167,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

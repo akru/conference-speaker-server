@@ -6,9 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
-    <height>383</height>
+    <width>754</width>
+    <height>422</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Verdana</family>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Conference Speaker Server</string>
@@ -18,110 +23,150 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#centralWidget {
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,  stop: 0 #FFFFFF, stop: 1 #CCCCCC);
-	font-family: Myriad Pro;
+/*
+	background-color: rgba(163,153,185,255);
+*/
+    
+	background-color: #E4E6DC;
+	font-family: Verdana;
 	font: 9pt;
-	color: &quot;#2E2E2E&quot;;
+	color: #2E2E2E;
 }
 
- QTabBar::tab:selected {
-     border-color: #9B9B9B;
-     border-bottom-color: #C2C7CB; /* same as pane color */
- }
-
 QWidget#centralWidget &gt; * {
-	font-family: Myriad Pro;
+	font-family: Verdana;
 	font: 9pt;
 	color: #2E2E2E;
 
 }
 
+QLabel#statusLabel {
+/*
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.972, stop:0 rgba(87, 78, 105, 255), stop:0.106145 rgba(150, 141, 167, 255), stop:0.983333 rgba(133, 124, 150, 255), stop:1 rgba(170, 160, 191, 255));
+*/
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.972, stop:0 rgba(0,0,0, 70), stop:0.106145 rgba(0,0,0, 20), stop:0.983333 rgba(0,0,0, 50), stop:1 rgba(0,0,0, 15));
+    padding: 3px;
+    margin: 0px 24px 0px 2px;
+/*
+    color: #E2E2E2;
+*/
+    color: #464A42;
+    font-weight: bold;
+}
+
+ QTabWidget::pane { /* The tab widget frame */
+    border-width: 9px;
+	border-image: url(:/gui/channel-box) 9;
+    padding: 5px 5px 8px 5px;
+ }
+
+
+ QTabWidget::tab-bar {
+ }
+
+ QTabBar::tab {
+    /*padding: 1px 5px;*/
+ }
+
+/*
+ QTabBar::tab:selected, QTabBar::tab:hover {
+ }
+
+ QTabBar::tab:selected {
+    padding: 1px 5px;
+ }
+
+ QTabBar::tab:!selected {
+     margin-top: 2px; 
+ }
+*/
+
 QWidget#clientsBox {
-    background-color: qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(186, 186, 186, 255), stop:1 rgba(212, 212, 212, 255));
-    border: 1px solid #2D2D2D;
-}</string>
+    border: 5px solid white;
+	border-image: url(:/gui/client-list-box) 5;
+}
+
+QLineEdit, QComboBox {
+    border-left: 1px solid rgba(171,161,151,255);
+    border-right: 1px solid rgba(171,161,151,255);
+    border-top: 1px solid rgba(30,30,30,255);
+    border-bottom: 1px solid rgba(250,249,245,255);
+    padding: 3px;
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.909227, stop:0 rgba(23, 23, 22, 255), stop:0.175141 rgba(235, 231, 220, 255), stop:1 rgba(220, 208, 195, 255));
+	color: rgba(115,113,113,255);
+}
+
+QComboBox::drop-down {
+     subcontrol-origin: padding;
+     subcontrol-position: top right;
+     width: 18px;
+
+     border-left-width: 1px;
+     border-left-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(134, 133, 134, 255), stop:1 rgba(250, 251, 250, 255));
+     border-left-style: solid;
+ }
+
+QComboBox::down-arrow {
+	image: url(:/gui/combo-box-arrow);
+    width: 8px;
+}
+
+QListWidget {
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(178,174,185, 255), stop:1 rgba(218,218,226, 255));
+    border-top: 4px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(118, 118, 120, 255), stop:1 rgba(184, 184, 192, 255));
+    border-left: 1px solid rgba(182,182,189,255);
+    border-right: 1px solid rgba(184,184,192,255);
+    border-bottom: 1px solid rgba(243,241,233,255);
+}
+
+QWidget#channelBox {
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(178,174,185, 255), stop:1 rgba(218,218,226, 255));
+    border-top: 4px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(118, 118, 120, 255), stop:1 rgba(184, 184, 192, 255));
+    border-left: 1px solid rgba(182,182,189,255);
+    border-right: 1px solid rgba(184,184,192,255);
+    border-bottom: 1px solid rgba(243,241,233,255);
+}
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>5</number>
+    </property>
     <property name="leftMargin">
-     <number>5</number>
-    </property>
-    <property name="topMargin">
-     <number>5</number>
-    </property>
-    <property name="rightMargin">
      <number>0</number>
     </property>
-    <property name="bottomMargin">
-     <number>16</number>
+    <property name="topMargin">
+     <number>0</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Control</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QLabel" name="chatLabel">
-          <property name="text">
-           <string>Chat: (N)</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="channelBox"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Voting</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>Sound</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_4">
-       <attribute name="title">
-        <string>Stats</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_5">
-       <attribute name="title">
-        <string>About</string>
-       </attribute>
-      </widget>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="QLabel" name="label_3">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(85, 255, 0);</string>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
      <widget class="QGroupBox" name="clientsBox">
       <property name="minimumSize">
        <size>
-        <width>200</width>
+        <width>100</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>250</width>
+        <width>200</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Verdana</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
@@ -129,71 +174,73 @@ QWidget#clientsBox {
       <property name="title">
        <string/>
       </property>
-      <layout class="QFormLayout" name="formLayout">
-       <property name="horizontalSpacing">
-        <number>4</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>5</number>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>9</number>
        </property>
        <property name="leftMargin">
-        <number>5</number>
+        <number>7</number>
        </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>7</number>
        </property>
        <property name="rightMargin">
-        <number>5</number>
+        <number>9</number>
        </property>
        <property name="bottomMargin">
-        <number>5</number>
+        <number>7</number>
        </property>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Server name:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Server address:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
+       <item>
         <widget class="QLineEdit" name="labelName">
          <property name="minimumSize">
           <size>
-           <width>126</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>126</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>
+         <property name="font">
+          <font>
+           <family>Verdana</family>
+          </font>
+         </property>
          <property name="text">
-          <string>Conference name</string>
+          <string/>
+         </property>
+         <property name="placeholderText">
+          <string>Server name</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item>
         <widget class="QComboBox" name="comboBox">
          <property name="minimumSize">
           <size>
-           <width>110</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>110</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Verdana</family>
+          </font>
+         </property>
+         <property name="editable">
+          <bool>false</bool>
+         </property>
+         <property name="frame">
+          <bool>false</bool>
          </property>
          <item>
           <property name="text">
@@ -202,73 +249,153 @@ QWidget#clientsBox {
          </item>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QScrollArea" name="clientsArea">
-         <property name="styleSheet">
-          <string notr="true">gridline-color: rgb(170, 0, 127);</string>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="clientBox">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>219</width>
-            <height>69</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-          </layout>
-         </widget>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="Line" name="line">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 0;
-background-image: url(:/res/images/face.png);</string>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item>
+        <widget class="QListWidget" name="clientList">
+         <property name="font">
+          <font>
+           <family>Verdana</family>
+          </font>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="font">
+         <font>
+          <family>Verdana</family>
+         </font>
+        </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::East</enum>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="elideMode">
+         <enum>Qt::ElideLeft</enum>
+        </property>
+        <property name="documentMode">
+         <bool>false</bool>
+        </property>
+        <property name="tabsClosable">
+         <bool>false</bool>
+        </property>
+        <property name="movable">
+         <bool>false</bool>
+        </property>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Control</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="resource.qrc">:/gui/power-button</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="channelBox"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Voting</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tab_3">
+         <attribute name="title">
+          <string>Sound</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Stats</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tab_5">
+         <attribute name="title">
+          <string>About</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLabel">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Sample text OLOLO</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
