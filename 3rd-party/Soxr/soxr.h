@@ -314,7 +314,12 @@ SOXR soxr_io_spec_t soxr_io_spec(
     soxr_datatype_t itype,
     soxr_datatype_t otype);
 
+/* --------------------------- Discrete Fourier transform ------------------- */
 
+SOXR void cdft(int, int, double *);
+SOXR void rdft(int, int, double *);
+SOXR void cdftf(int, int, float *);
+SOXR void rdftf(int, int, float *);
 
 /* --------------------------- Internal use only ---------------------------- */
 

@@ -1,6 +1,6 @@
 #include "hs_filter.h"
-#include "fft4g.h"
 
+#include <soxr.h>
 #include <cstdio>
 #include <QDebug>
 #include <QSettings>
@@ -9,8 +9,7 @@ HSFilter::HSFilter(EqualizerFilter *eq)
     : eq(eq)
 {
     Q_ASSERT(eq);
-    // Initialize fft work arrays.
-    ip[0] = 0; // Setting this triggers initialization.
+    // Initialize fft work array
     memset(dft_buf, 0, sizeof(float) * HS::dft_buffer_len);
 #ifdef QT_DEBUG
     qDebug() << "HS_INIT: PAPR_TH =" << PAPR_TH
@@ -87,7 +86,7 @@ short HSFilter::analyze_howling(short howling_freq[], const float input[])
            sizeof(float) * (HS::fft_input_length - Filter::sample_length));
 
     // Apply RDFT
-    rdft(HS::fft_input_length, 1, fin, ip, wfft);
+    rdftf(HS::fft_input_length, 1, fin);
 
     // Calc modulo
     for (short i = 0; i < HS::fft_input_length; i += 2)

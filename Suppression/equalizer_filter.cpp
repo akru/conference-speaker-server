@@ -1,5 +1,4 @@
 #include "equalizer_filter.h"
-#include "fft4g.h"
 
 #include <cmath>
 #include <QDebug>
@@ -107,8 +106,6 @@ EqualizerFilter::EqualizerFilter(float X, const float *W)
 {
     memset(overlap, 0, sizeof(float) * Equalizer::overlap_size);
     memset(buffer,  0, sizeof(float) * Filter::sample_length * 2);
-    memset(ip, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
-    memset(wfft, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
 
     // Zero padding compensation via stream resampler
     soxr_error_t error;
@@ -216,7 +213,7 @@ void EqualizerFilter::dsp_logic()
            (Equalizer::fft_size - Equalizer::window_size) * sizeof(float));
     //Processing is done here!
     //do fft
-    cdft(Equalizer::fft_size, 1, output_window, ip, wfft);
+    cdftf(Equalizer::fft_size, 1, output_window);
     //perform filtering
     for(short j = 0; j < Equalizer::fft_size; j+=2) {
         output_window[j]   *= H[j/2];
@@ -224,7 +221,7 @@ void EqualizerFilter::dsp_logic()
 //        qDebug() << "H["<<j/2<<"]="<<H[j/2];
     }
     //inverse fft
-    cdft(Equalizer::fft_size, -1, output_window, ip, wfft);
+    cdftf(Equalizer::fft_size, -1, output_window);
 /*
     // Dummy resampler
     for (short j = 1; j < Equalizer::window_size; ++j)

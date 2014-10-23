@@ -53,8 +53,6 @@ private:
     const float *W;
     float overlap[Equalizer::overlap_size];
     float buffer[Filter::sample_length * 2];
-    float wfft[Equalizer::fft_size * 2 >> 1];
-    int   ip[Equalizer::fft_size * 2 >> 1];
 
     // Improved resampler using SoX
     soxr_t          resampler;

@@ -7,7 +7,6 @@ CONFIG   += staticlib
 SOURCES  += \
     noise_suppression.c \
     ns_core.c \
-    fft4g.c \
 #    howling_suppression.c \
     ns_filter.cpp \
     hs_filter.cpp \
@@ -28,7 +27,6 @@ HEADERS  += \
     defines.h \
     windows_private.h \
     typedefs.h \
-    fft4g.h \
     signal_processing_library.h \
 #    howling_suppression.h \
     ns_filter.h \

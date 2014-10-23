@@ -2,7 +2,7 @@ QT       -= core gui
 
 TARGET   = Soxr
 TEMPLATE = lib
-CONFIG  += staticlib
+DEFINES += SOXR_DLL SOXR_LIB soxr_EXPORTS NDEBUG
 
 SOURCES += \
 #    avfft32.c \
@@ -51,8 +51,6 @@ HEADERS += \
     soxr.h \
 #    soxr-lsr.h \
     soxr-config.h
-
-DEFINES     += NDEBUG SOXR_LIB
 
 #unix {
 #    target.path = /usr/lib
