@@ -794,10 +794,10 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
     if (inst->blockInd < END_STARTUP_SHORT) {
       inst->initMagnEst[0] += magn[0];
       inst->initMagnEst[inst->magnLen - 1] += magn[inst->magnLen - 1];
-      tmpfloat2 = log((float)(inst->magnLen - 1));
+      tmpfloat2 = logf((float)(inst->magnLen - 1));
       sum_log_i = tmpfloat2;
       sum_log_i_square = tmpfloat2 * tmpfloat2;
-      tmpfloat1 = log(magn[inst->magnLen - 1]);
+      tmpfloat1 = logf(magn[inst->magnLen - 1]);
       sum_log_magn = tmpfloat1;
       sum_log_i_log_magn = tmpfloat2 * tmpfloat1;
     }
@@ -813,10 +813,10 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
       if (inst->blockInd < END_STARTUP_SHORT) {
         inst->initMagnEst[i] += magn[i];
         if (i >= kStartBand) {
-          tmpfloat2 = log((float)i);
+          tmpfloat2 = logf((float)i);
           sum_log_i += tmpfloat2;
           sum_log_i_square += tmpfloat2 * tmpfloat2;
-          tmpfloat1 = log(magn[i]);
+          tmpfloat1 = logf(magn[i]);
           sum_log_magn += tmpfloat1;
           sum_log_i_log_magn += tmpfloat2 * tmpfloat1;
         }
@@ -862,16 +862,16 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
         parametric_noise = inst->whiteNoiseLevel;
       } else {
         // Use pink noise estimate
-        parametric_num = exp(inst->pinkNoiseNumerator / (float)(inst->blockInd + 1));
+        parametric_num = expf(inst->pinkNoiseNumerator / (float)(inst->blockInd + 1));
         parametric_num *= (float)(inst->blockInd + 1);
         parametric_exp = inst->pinkNoiseExp / (float)(inst->blockInd + 1);
-        parametric_noise = parametric_num / pow((float)kStartBand, parametric_exp);
+        parametric_noise = parametric_num / powf((float)kStartBand, parametric_exp);
       }
       for (i = 0; i < inst->magnLen; i++) {
         // Estimate the background noise using the white and pink noise parameters
         if ((inst->pinkNoiseExp > 0.0f) && (i >= kStartBand)) {
           // Use pink noise estimate
-          parametric_noise = parametric_num / pow((float)i, parametric_exp);
+          parametric_noise = parametric_num / powf((float)i, parametric_exp);
         }
         theFilterTmp[i] = (inst->initMagnEst[i] - inst->overdrive * parametric_noise);
         theFilterTmp[i] /= (inst->initMagnEst[i] + (float)0.0001);

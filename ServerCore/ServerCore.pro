@@ -9,7 +9,6 @@ HEADERS += \
     connection.h \
     receiver.h \
     server.h \
-    licensing.h \
     voting.h
 
 SOURCES += \
@@ -17,8 +16,19 @@ SOURCES += \
     connection.cpp \
     receiver.cpp \
     server.cpp \
-    licensing.cpp \
     voting.cpp
+
+CONFIG(release, debug|release){
+message("Release with licensing")
+
+HEADERS += licensing.h
+SOURCES += licensing.cpp
+
+DEFINES     += NDEBUG
+
+INCLUDEPATH += $$PWD/../../cryptopp
+DEPENDPATH  += $$PWD/../../cryptopp
+}
 
 INCLUDEPATH += $$PWD/../Protocol $$PWD/../Speaker
 DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker
@@ -26,7 +36,3 @@ DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker
 INCLUDEPATH += $$PWD/../Suppression
 DEPENDPATH  += $$PWD/../Suppression
 
-DEFINES     += NDEBUG
-
-INCLUDEPATH += $$PWD/../../cryptopp
-DEPENDPATH  += $$PWD/../../cryptopp

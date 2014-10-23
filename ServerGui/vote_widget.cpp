@@ -43,7 +43,7 @@ void VoteWidget::updateResults(VoteResults results)
         delete i;
     }
     // Calc count of members
-    int sumAnswers;
+    int sumAnswers = 0;
     foreach (int a, results.values) {
         sumAnswers += a;
     }

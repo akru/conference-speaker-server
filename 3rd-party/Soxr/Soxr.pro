@@ -14,7 +14,7 @@ SOURCES += \
     fft4g64.c \
     fft4g.c \
     filter.c \
-    lsr.c \
+#    lsr.c \
 #    pffft32.c \
 #    pffft32s.c \
 #    pffft.c \
@@ -23,8 +23,7 @@ SOURCES += \
     rate64.c \
     simd.c \
     soxr.c \
-#    vr32.c \
-    soxr.c
+#    vr32.c
 
 HEADERS += \
     soxr.h \

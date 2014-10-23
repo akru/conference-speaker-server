@@ -148,7 +148,7 @@ void EqualizerFilter::setUserBand(short B1, short B2, short B3,
     float uBandH[Equalizer::h_size], ys[8];
     /* Static indexes for 16kHz freq */
     const quint32 *xs = bands;
-    static const float scale = 0.02;
+    static const float scale = 0.02f;
     // Set six bands coefs
     ys[0] = 0;
     ys[1] = B1 * scale; ys[2] = B2 * scale; ys[3] = B3* scale;

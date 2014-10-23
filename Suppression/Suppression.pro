@@ -4,8 +4,6 @@ TARGET    = Suppression
 TEMPLATE  = lib
 CONFIG   += staticlib
 
-QMAKE_CFLAGS += -O2 -std=c99
-
 SOURCES  += \
     noise_suppression.c \
     ns_core.c \

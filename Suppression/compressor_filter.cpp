@@ -7,8 +7,8 @@
 #define INT16_DIV (1<<15)
 
 CompressorFilter::CompressorFilter()
-    : mThreshold(0.25),
-      mNoiseFloor(0.01),
+    : mThreshold(0.25f),
+      mNoiseFloor(0.01f),
       mCircle(0),
       mFollow1(new float[sample_length]),
       mFollow2(new float[sample_length]),

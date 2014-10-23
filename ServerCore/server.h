@@ -6,8 +6,11 @@
 #include <user_information.h>
 #include <server_information.h>
 #include <voting_invite.h>
-#include "licensing.h"
 #include "voting.h"
+
+#ifndef QT_DEBUG
+#include "licensing.h"
+#endif
 
 class QTcpServer;
 class Connection;
