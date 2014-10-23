@@ -2,7 +2,7 @@ QT      -= core gui
 
 TARGET   = Soxr
 TEMPLATE = lib
-DEFINES += SOXR_DLL SOXR_LIB soxr_EXPORTS NDEBUG
+DEFINES += SOXR_VISIBILITY SOXR_DLL SOXR_LIB soxr_EXPORTS NDEBUG
 
 SOURCES += \
     data-io.c \

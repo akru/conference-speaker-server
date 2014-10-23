@@ -128,9 +128,9 @@ void MainWindow::channelRequest(QString address, UserInformation info)
     RequestWidget *reqWidget = new RequestWidget(info, address, this);
     requests[address] = reqWidget;
     connect(reqWidget, SIGNAL(accepted(QString)),
-            server, SLOT(openChannel(QString)));
+            server, SLOT(channelOpen(QString)));
     connect(reqWidget, SIGNAL(discarded(QString)),
-            server, SLOT(denyChannel(QString)));
+            server, SLOT(channelDeny(QString)));
     connect(reqWidget, SIGNAL(accepted(QString)),
             SLOT(dropRequest(QString)));
     connect(reqWidget, SIGNAL(discarded(QString)),

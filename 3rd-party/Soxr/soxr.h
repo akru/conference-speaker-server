@@ -33,7 +33,7 @@
   #include <stddef.h>
 #endif
 
-#if defined SOXR_DLL
+#if defined SOXR_DLL && _MSC_VER
   #if defined soxr_EXPORTS
     #define SOXR __declspec(dllexport)
   #else
