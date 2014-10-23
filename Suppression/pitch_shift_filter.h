@@ -2,6 +2,7 @@
 #define PITCH_SHIFT_FILTER_H
 
 #include "filter.h"
+#include <QTime>
 
 static const int PITCH_COUNT   = 2;
 static const int PITCH_SHIFT_TIME = 800; // ms; WARN: it divided by frame length (32 ms)
@@ -19,6 +20,8 @@ public:
     void reloadSettings();
 
 private:
+    QTime shift_time;
+
     static const short len_scaler = 2; // only powers of 2
     static const short analyze_length = sample_length * len_scaler;
     static const int   analyze_rate   = sample_rate * len_scaler;
@@ -35,7 +38,7 @@ private:
     float gSynMagn[analyze_length];
     long gRover, osamp;
     float pitchShift, pitchShiftCoef;
-    int currentPitch, iteration;
+    int currentPitch;
 
     float wfft[analyze_length * 2 >> 1];
     int   ip[analyze_length * 2 >> 1];
