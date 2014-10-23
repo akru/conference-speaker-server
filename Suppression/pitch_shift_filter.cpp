@@ -58,6 +58,7 @@ PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
       pitchShift(1),
       currentPitch(0)
+//      iteration(0)
 { 
     memset(gInFIFO, 0, analyze_length*sizeof(float));
     memset(gOutFIFO, 0, analyze_length*sizeof(float));
@@ -110,8 +111,10 @@ void PitchShiftFilter::processFilter(float sample[])
 {
 //    QTime t = QTime::currentTime();
     if (shift_time.elapsed() > PITCH_SHIFT_TIME)
+//    if((float)iteration++ > (float)PITCH_SHIFT_TIME / (((float)sample_length / (float)sample_rate)*100))
     {
         shift_time.restart();
+//        iteration = 0;
         currentPitch = (currentPitch + 1) % PITCH_COUNT;
 //        qDebug() << "PS Elapsed" << t.elapsed() << "ms";
         //avg 8 - 13 ms with PS time 800
@@ -137,25 +140,25 @@ void PitchShiftFilter::processFilter(float sample[])
     soxr_process(widener,
                  sample,    sample_length,      &idone,
                  input,     analyze_length,     &odone);
-    qDebug() << "PS widener engine" << soxr_engine(widener)
-             << "delay" << soxr_delay(widener)
-             << "idone:" << idone << "odone:" << odone;
+//    qDebug() << "PS widener engine" << soxr_engine(widener)
+//             << "delay" << soxr_delay(widener)
+//             << "idone:" << idone << "odone:" << odone;
 
     for(short i = 0; i < analyze_length; i++){
         if(input[i] != input[i]) {
             input[i] = 0.;
-            qDebug() << "Got a NaN after resampling!";
+//            qDebug() << "Got a NaN after resampling!";
         }
     }
 //    qDebug() << "resampler time" << rt.elapsed() << "ms";
 
     // Any NaNs?
-    bool nnan = false;
-    for(short i = 0; i < analyze_length; i++)
-        if(input[i] != input[i])
-            nnan = true;
-    if(nnan)
-        qDebug() << "-------------------------------> NaN <----------------------------------";
+//    bool nnan = false;
+//    for(short i = 0; i < analyze_length; i++)
+//        if(input[i] != input[i])
+//            nnan = true;
+//    if(nnan)
+//        qDebug() << "-------------------------------> NaN <----------------------------------";
 
     // Looking for negatives in the frame
 //    bool negative = false;
@@ -168,29 +171,29 @@ void PitchShiftFilter::processFilter(float sample[])
 //    } else if(!negative){ qDebug() << "No negative!"; }
 
     QTime t = QTime::currentTime();
-    if(currentPitch) // Pitch up
-    {
-        pitchShift = 1 + pitchShiftCoef;
-        smbPitchShift(analyze_length, analyze_length, input, output);
-//        smbPitchShift(sample_length, sample_length, sample, output);
-        qDebug() << "Pitch up";
-    }
-    else // Pitch down
-    {
-       pitchShift = 1 - pitchShiftCoef;
-       smbPitchShift(analyze_length, analyze_length, input, output);
-//       smbPitchShift(sample_length, sample_length, sample, output);
-                    qDebug() << "Pitch down";
-    }
+//    if(currentPitch) // Pitch up
+//    {
+//        pitchShift = 1 + pitchShiftCoef;
+//        smbPitchShift(analyze_length, analyze_length, input, output);
+////        smbPitchShift(sample_length, sample_length, sample, output);
+//        qDebug() << "Pitch up";
+//    }
+//    else // Pitch down
+//    {
+//       pitchShift = 1 - pitchShiftCoef;
+//       smbPitchShift(analyze_length, analyze_length, input, output);
+////       smbPitchShift(sample_length, sample_length, sample, output);
+//                    qDebug() << "Pitch down";
+//    }
     qDebug() << "PS Elapsed" << t.elapsed() << "ms";
 
-    for (int i = 0; i < analyze_length; i++)
-        if(output[i] >= 1.0 || output[i] < -1.0)
-            qDebug() << "PS after pitchShift: sample is bigger than 1.0!";
-
-
 //    for (int i = 0; i < analyze_length; i++)
-//        output[i] = input[i];
+//        if(output[i] >= 1.0 || output[i] < -1.0)
+//            qDebug() << "PS after pitchShift: sample is bigger than 1.0!";
+
+
+    for (int i = 0; i < analyze_length; i++)
+        output[i] = input[i];
 //    for (int i = 0; i < sample_length; ++i)
 //        sample[i] = output[i];
 
@@ -201,9 +204,9 @@ void PitchShiftFilter::processFilter(float sample[])
 //    qDebug() << "PS zipper engine" << soxr_engine(zipper)
 //             << "delay" << soxr_delay(zipper)
 //             << "idone:" << idone << "odone:" << odone;
-    for (int i = 0; i < sample_length; i++)
-        if(sample[i] >= 1.0 || sample[i] < -1.0)
-            qDebug() << "PS after zipper: sample is bigger than 1.0!";
+//    for (int i = 0; i < sample_length; i++)
+//        if(sample[i] >= 1.0 || sample[i] < -1.0)
+//            qDebug() << "PS after zipper: sample is bigger than 1.0!";
 }
 
 // -----------------------------------------------------------------------------------------------------------------

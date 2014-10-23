@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <soxr.h>
+#include <QTime>
 
 #define B_SPLINE_EQ
 
@@ -109,10 +110,10 @@ EqualizerFilter::EqualizerFilter(float X, const float *W)
 
     // Zero padding compensation via stream resampler
     soxr_error_t error;
-    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
-    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_VHQ, 0);
+//    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
+    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_HQ, 0);
     resampler = soxr_create(Filter::sample_rate * Equalizer::zero_scaler, Filter::sample_rate,
-                            1, &error, &io_spec, &q_spec, NULL);
+                            1, &error, NULL, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX has an error: " << error;
         return;
@@ -182,6 +183,7 @@ void EqualizerFilter::processFilter(float sample[])
     }
     else
     {
+        QTime t = QTime::currentTime();
         // Copy to input buf
         memcpy(buffer + Filter::sample_length, sample, Filter::sample_length * sizeof(float));
         // Process pass1
@@ -194,6 +196,7 @@ void EqualizerFilter::processFilter(float sample[])
         //preserve the needed input for the next window's overlap
         memcpy(sample + Equalizer::R, buffer, Equalizer::overlap_size * sizeof(float));
         memmove(buffer, buffer + Equalizer::R, (Filter::sample_length * 2 - Equalizer::R) * sizeof(float));
+        qDebug() << "EQ Elapsed" << t.elapsed() << "ms";
     }
 }
 
@@ -210,10 +213,12 @@ void EqualizerFilter::dsp_logic()
     }
     //zero pad the remaining fft window
     memset(output_window + Equalizer::window_size, 0,
-           (Equalizer::fft_size - Equalizer::window_size) * sizeof(float));
+          (Equalizer::fft_size - Equalizer::window_size) * sizeof(float));
+
     //Processing is done here!
     //do fft
     cdftf(Equalizer::fft_size, 1, output_window);
+
     //perform filtering
     for(short j = 0; j < Equalizer::fft_size; j+=2) {
         output_window[j]   *= H[j/2];
@@ -232,9 +237,17 @@ void EqualizerFilter::dsp_logic()
     size_t idone, odone;
     float resampled_window[Equalizer::window_size];
     soxr_process(resampler,
-                 output_window,     Equalizer::window_size * Equalizer::zero_scaler,     &idone,
-                 resampled_window,     Equalizer::window_size,                              &odone);
+                 output_window,     Equalizer::fft_size,     &idone,
+                 resampled_window,  Equalizer::window_size,  &odone);
+
+    for(short i = 0; i < Equalizer::window_size; i++){
+        if(resampled_window[i] != resampled_window[i]) {
+            resampled_window[i] = 0.;
+            qDebug() << "Got a NaN after resampling at EQ!";
+        }
+    }
     qDebug() << idone << odone;
+
     ////debug: tests overlapping add
     ////and negates ALL PREVIOUS processing
     ////yields a perfect reconstruction if COLA is held
