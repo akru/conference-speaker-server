@@ -4,6 +4,7 @@
 #include <cmath>
 #include <QDebug>
 #include <QSettings>
+#include <soxr.h>
 
 #define B_SPLINE_EQ
 
@@ -31,8 +32,8 @@ void interpolate(float *samples, quint16 length,
                  const quint32 *xs, const float *ys, quint16 n_points)
 {
 #ifdef B_SPLINE_EQ // B-Spline interpolation
-    double dist, span;
-    double value = 0.0;
+    float dist, span;
+    float value = 0.0;
     int minF = 0;
 
     for(quint16 i = 0; i < length; ++i)
@@ -108,6 +109,17 @@ EqualizerFilter::EqualizerFilter(float X, const float *W)
     memset(buffer,  0, sizeof(float) * Filter::sample_length * 2);
     memset(ip, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
     memset(wfft, 0, (Equalizer::fft_size * 2 >> 1) * sizeof(float));
+
+    // Zero padding compensation via stream resampler
+    soxr_error_t error;
+    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
+    soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_VHQ, 0);
+    resampler = soxr_create(Filter::sample_rate * Equalizer::zero_scaler, Filter::sample_rate,
+                            1, &error, &io_spec, &q_spec, NULL);
+    if (error) {
+        qWarning() << "SoX has an error: " << error;
+        return;
+    }
 
     reloadSettings();
 }
@@ -204,7 +216,7 @@ void EqualizerFilter::dsp_logic()
            (Equalizer::fft_size - Equalizer::window_size) * sizeof(float));
     //Processing is done here!
     //do fft
-    rdft(Equalizer::fft_size, 1, output_window, ip, wfft);
+    cdft(Equalizer::fft_size, 1, output_window, ip, wfft);
     //perform filtering
     for(short j = 0; j < Equalizer::fft_size; j+=2) {
         output_window[j]   *= H[j/2];
@@ -212,10 +224,19 @@ void EqualizerFilter::dsp_logic()
 //        qDebug() << "H["<<j/2<<"]="<<H[j/2];
     }
     //inverse fft
-    rdft(Equalizer::fft_size, -1, output_window, ip, wfft);
+    cdft(Equalizer::fft_size, -1, output_window, ip, wfft);
+/*
     // Dummy resampler
     for (short j = 1; j < Equalizer::window_size; ++j)
         output_window[j] = output_window[j * Equalizer::zero_scaler];
+*/
+    // Resampling for compensate zero padding
+    size_t idone, odone;
+    float resampled_window[Equalizer::window_size];
+    soxr_process(resampler,
+                 output_window,     Equalizer::window_size * Equalizer::zero_scaler,     &idone,
+                 resampled_window,     Equalizer::window_size,                              &odone);
+    qDebug() << idone << odone;
     ////debug: tests overlapping add
     ////and negates ALL PREVIOUS processing
     ////yields a perfect reconstruction if COLA is held
@@ -225,11 +246,14 @@ void EqualizerFilter::dsp_logic()
 
     //overlap add and preserve overlap component from this window (linear phase)
     for(short j = 0; j < Equalizer::overlap_size; ++j) {
-        buffer[j] = output_window[j] + overlap[j];
-        overlap[j] = output_window[Equalizer::R + j];
+        buffer[j] = resampled_window[j] + overlap[j];
+        overlap[j] = resampled_window[Equalizer::R + j];
 
 //        qDebug() << "W2[" << j << "]=" << output_window[j];
     }
+
+
+
     ////debug: tests if basic buffering works
     ////shouldn't modify the signal AT ALL (beyond roundoff)
     //for(size_t j = 0; j < u->window_size;++j) {

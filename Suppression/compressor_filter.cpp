@@ -81,8 +81,8 @@ bool CompressorFilter::NewTrackPass1()
    mLastLevel = mThreshold;
 
    mCircleSize = 100;
-   mCircle = new double[mCircleSize];
-   memset(mCircle, 0, mCircleSize * sizeof(double));
+   mCircle = new float[mCircleSize];
+   memset(mCircle, 0, mCircleSize * sizeof(float));
    mCirclePos = 0;
    mRMSSum = 0.0;
 
@@ -204,7 +204,7 @@ void CompressorFilter::Follow(float *buffer, float *env, float *previous)
     reasonable positive value from which to begin an attack.
    */
    int i;
-   double level,last;
+   float level,last;
 
    if(!mUsePeak) {
       // Update RMS sum directly from the circle buffer
@@ -281,7 +281,7 @@ void CompressorFilter::Follow(float *buffer, float *env, float *previous)
    }
 }
 
-float CompressorFilter::DoCompression(float value, double env)
+float CompressorFilter::DoCompression(float value, float env)
 {
    float out;
    if(mUsePeak) {

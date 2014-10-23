@@ -21,7 +21,8 @@ SOURCES  += \
     pitch_shift_filter.cpp \
     gate_filter.cpp \
     agc_filter.cpp \
-    filter.cpp
+    filter.cpp \
+    ampanalyze_filter.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -42,4 +43,8 @@ HEADERS  += \
     pitch_shift_filter.h \
     gate_filter.h \
     agc_filter.h \
-    filter.h
+    filter.h \
+    ampanalyze_filter.h
+
+INCLUDEPATH += $$PWD/../3rd-party/Soxr
+DEPENDPATH += $$PWD/../3rd-party/Soxr

@@ -13,9 +13,9 @@ public:
                    bool  use_peak=true,
                    float attack_time=0.2,
                    float decay_time=1.0,
-                   float ratio=2,
+                   float ratio=10,
                    float compression=0.5,
-                   float threshold_db=-12.0,
+                   float threshold_db=-6.0,
                    float noise_floor_db=-40);
 
 
@@ -32,32 +32,32 @@ private:
     bool      InitPass2();
 
     void      Follow(float *buffer, float *env, float *previous);
-    float     DoCompression(float x, double env);
+    float     DoCompression(float x, float env);
 
     bool      mNormalize;	//MJS
     bool      mUsePeak;
-    double    mThreshold;
-    double    mAttackTime;
-    double    mDecayTime;
-    double    mRatio;
-    double    mCompression;
-    double    mThresholdDB;
-    double    mNoiseFloorDB;
-    double    mNoiseFloor;
+    float    mThreshold;
+    float    mAttackTime;
+    float    mDecayTime;
+    float    mRatio;
+    float    mCompression;
+    float    mThresholdDB;
+    float    mNoiseFloorDB;
+    float    mNoiseFloor;
 
     void      FreshenCircle();
     float     AvgCircle(float x);
-    double    mRMSSum;
+    float    mRMSSum;
     int       mCircleSize;
     int       mCirclePos;
-    double   *mCircle;
+    float   *mCircle;
 
-    double    mAttackFactor;
-    double    mAttackInverseFactor;
-    double    mDecayFactor;
+    float    mAttackFactor;
+    float    mAttackInverseFactor;
+    float    mDecayFactor;
     int       mNoiseCounter;
-    double    mGain;
-    double    mLastLevel;
+    float    mGain;
+    float    mLastLevel;
 
     float    *mFollow1;
     float    *mFollow2;
@@ -66,7 +66,7 @@ private:
     float    *mSampleIn;
     float    *mSampleOut;
 
-    double    mMax;			//MJS
+    float    mMax;			//MJS
 
     bool      first_start;
 };

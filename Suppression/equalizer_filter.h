@@ -12,12 +12,14 @@ namespace Equalizer {
 static const int window_size  = Filter::sample_length;
 static const int R            = window_size / 2;
 static const int overlap_size = window_size - R;
-static const int zero_scaler  = 2;
+static const int zero_scaler  = 8;
 static const int fft_size     = Filter::sample_length * zero_scaler;
 static const int h_size       = fft_size / 2;
 // Freq to index converter for H
-static const float hz_to_index = 2.0 * h_size / Filter::sample_rate;
+static const float hz_to_index = 2.0f * h_size / Filter::sample_rate;
 }
+
+typedef struct soxr * soxr_t;
 
 class EqualizerFilter : public Filter
 {
@@ -53,6 +55,9 @@ private:
     float buffer[Filter::sample_length * 2];
     float wfft[Equalizer::fft_size * 2 >> 1];
     int   ip[Equalizer::fft_size * 2 >> 1];
+
+    // Improved resampler using SoX
+    soxr_t          resampler;
 
     void dsp_logic();
 };

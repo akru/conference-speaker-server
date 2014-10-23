@@ -19,7 +19,8 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
         throw(std::exception());
     // Connects with speaker
     connect(&speaker, SIGNAL(audioAmpUpdated(int)), SLOT(updateAmp(int)));
-    connect(this, SIGNAL(sampleReceived(QByteArray)), &speaker, SLOT(play(QByteArray)));
+    connect(this, SIGNAL(sampleReceived(QByteArray)),
+            &speaker, SLOT(incomingData(QByteArray)));
 }
 
 Receiver::~Receiver()
