@@ -1,41 +1,39 @@
 #include "speaker.h"
+#include "processing.h"
+#include "../Suppression/filter.h"
 
+#include <QFile>
 #include <QAudioOutput>
 #include <QAudioFormat>
-
-#include <ns_filter.h>
-#include <hs_filter.h>
-#include <pitch_shift_filter.h>
-#include <equalizer_filter.h>
-#include <agc_filter.h>
-#include <gate_filter.h>
-#include <compressor_filter.h>
+#include <exception>
 #include <soxr.h>
 
-//#include <QFile>
 #include <QDebug>
+
 
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
-    disabled(false),
-    format(new QAudioFormat),
-    audio(0)
+    audio(0),
+    audio_buffer(0)
 {   
+    QAudioFormat format;
     // Set up the format, eg.
-    format->setSampleSize(16);
-    format->setChannelCount(1);
-    format->setSampleRate(formatSampleRate);
-    format->setCodec("audio/pcm");
-    format->setSampleType(QAudioFormat::SignedInt);
-    format->setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleSize(16);
+    format.setChannelCount(1);
+    format.setSampleRate(formatSampleRate);
+    format.setCodec("audio/pcm");
+    format.setSampleType(QAudioFormat::SignedInt);
+    format.setByteOrder(QAudioFormat::LittleEndian);
 
     QAudioDeviceInfo info =
             QAudioDeviceInfo::defaultOutputDevice();
 
-    if (!info.isFormatSupported(*format)) {
+    if (!info.isFormatSupported(format)) {
+        qWarning() << "supported rates:" << info.supportedSampleRates();
+        qWarning() << "supported sizes:" << info.supportedSampleSizes();
+        qWarning() << "supported order:" << info.supportedByteOrders();
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
-        disabled = true;
-        return;
+        throw std::exception("Raw audio format not supported by backend, cannot play audio.");
     }
     // Create stream resampler
     soxr_error_t error;
@@ -45,27 +43,13 @@ Speaker::Speaker(QObject *parent) :
                             1, &error, &io_spec, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX has an error" << error;
-        disabled = true;
-        return;
+        throw std::exception("SoX has an error!");
     }
     // Open audio device
-    audio = new QAudioOutput(info, *format);
-    audio_buffer = audio->start();
-    // Append filters
-    amp = new AmpAnalyzeFilter;
-    filters.append(amp);
-    filters.append(new AGCFilter);
-    filters.append(new GateFilter);
-    filters.append(new NSFilter);
-    filters.append(new CompressorFilter);
-    EqualizerFilter *eq = new EqualizerFilter;
-    HSFilter *hs = new HSFilter(eq);
-    filters.append(hs);
-    filters.append(eq);
-    filters.append(new PitchShiftFilter);
+    audio = new QAudioOutput(info, format);
     // Moving to separate thread
-//    this->moveToThread(&myThread);
-//    myThread.start(QThread::TimeCriticalPriority);
+    this->moveToThread(&myThread);
+    myThread.start(QThread::TimeCriticalPriority);
     // Starting heartbeat timer
     connect(&heartbeat, SIGNAL(timeout()), SLOT(speakHeartbeat()));
     heartbeat.setInterval(Filter::sample_length * 999.0 / Filter::sample_rate);
@@ -74,37 +58,50 @@ Speaker::Speaker(QObject *parent) :
 
 Speaker::~Speaker()
 {
-//    myThread.terminate();
-//    myThread.wait();
-
     audio->stop();
-
-    delete format;
     delete audio;
-    foreach (Filter *f, filters) {
-        delete f;
+
+    foreach (Processing *p, proc.values()) {
+        delete p;
     }
+
+    myThread.terminate();
+    myThread.wait();
 }
 
+void Speaker::speakerNew(QString id)
+{
+    proc.insert(id, new Processing);
+}
+
+void Speaker::speakerDelete(QString id)
+{
+    delete proc.take(id);
+}
 
 void Speaker::setVolume(qreal volume)
 {
-    qDebug() << "Set volume:" << volume;
-    Q_ASSERT(audio);
+    qDebug() << "Set global volume:" << volume;
     Q_ASSERT(volume >= 0 && volume <= 1);
 
-    if(volume == 0)
-        audio->setVolume(volume);
-    else{
-        audio->setVolume(volume*1.2);
-    }
+    audio->setVolume(volume);
 }
 
-void Speaker::incomingData(QByteArray packet)
+void Speaker::setVolume(QString speaker, qreal volume)
 {
+    qDebug() << "Set speaker " << speaker << "volume:" << volume;
+    Q_ASSERT(volume >= 0 && volume <= 1);
+}
+
+void Speaker::incomingData(QString speaker, QByteArray packet)
+{
+    if(!proc.contains(speaker))
+    {
+        qWarning() << "Unregistered speaker" << speaker;
+        return;
+    }
     // Put sample to accum
-    accBuf.putData((qint16 *) packet.data(),
-                   packet.length() / sizeof(qint16));
+    proc[speaker]->insert(packet);
 
 //    QFile f("/tmp/sample.raw");
 //    f.open(QIODevice::Append);
@@ -113,20 +110,22 @@ void Speaker::incomingData(QByteArray packet)
 
 void Speaker::speakHeartbeat()
 {
-    QByteArray sample_raw(Filter::sample_length * sizeof(qint16),
-                          Qt::Uninitialized);
-    // When accumulator has too low sounds - skips
-    if (!accBuf.avail(Filter::sample_length * sizeof(qint16) * 2)) return;
-    // Drop too old samples from acc
-    accBuf.purity(Filter::sample_length * sizeof(qint16) * 4);
-    // Prepare sample
-    accBuf.getData((qint16 *) sample_raw.data(), Filter::sample_length);
-    // Apply filters
-    Filter::applyFilters(filters, sample_raw);
-    // Emit amplitude signal
-    emit audioAmpUpdated(amp->getAmp());
+    QByteArray sample, sample_out(Filter::sample_length * 2, 0);
+    bool processed = false;
+    foreach (Processing *p, proc.values()) {
+        sample = p->take();
+        // Empty sample when no data to process
+        if (!sample.length())
+            continue;
+        // Processed flag
+        processed = true;
+        // Emit amplitude signal
+        emit audioAmpUpdated(proc.key(p), p->getAmp());
+        // Mix samples
+        sample_out = Processing::mix(sample, sample_out);
+    }
     // Resampling & play
-    play(sample_raw);
+    if (processed) play(sample_out);
 }
 
 void Speaker::play(const QByteArray &sample)
@@ -145,5 +144,7 @@ void Speaker::play(const QByteArray &sample)
 
 void Speaker::reloadFilterSettings()
 {
-    Filter::reloadSettings(filters);
+    foreach (Processing *p, proc.values()) {
+        p->reloadSettings();
+    }
 }

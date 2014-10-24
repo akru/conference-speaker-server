@@ -91,10 +91,14 @@ void MainWindow::dropClient(QString address)
     ui->statusBar->showMessage(statusBarConnected.arg(countClients));
 }
 
-void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
+void MainWindow::appendChannel(QString address)
 {
-    ChannelWidget *c = new ChannelWidget(address, info, channel, this);
+    ChannelWidget *c = new ChannelWidget(address, clients[address]->info, this);
     channels.insert(address, c);
+    connect(c,      SIGNAL(volumeChanged(QString,qreal)),
+            server, SLOT(channelVolume(QString,qreal)));
+    connect(server, SIGNAL(channelAmpUpdated(QString,ushort)),
+            c,      SLOT(setAmplitude(QString,ushort)));
 
     ui->channelBox->addWidget(c);
     c->show();
@@ -169,8 +173,8 @@ void MainWindow::updateServerInfo(ServerInformation info)
             SLOT(dropClient(QString)));
 
     connect(server,
-            SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
-            SLOT(appendChannel(QString,UserInformation,Receiver*)));
+            SIGNAL(channelConnected(QString)),
+            SLOT(appendChannel(QString)));
     connect(server,
             SIGNAL(channelCloseRequest(QString)),
             SLOT(dropRequest(QString)));

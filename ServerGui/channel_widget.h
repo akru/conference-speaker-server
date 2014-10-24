@@ -14,18 +14,22 @@ class ChannelWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChannelWidget(QString clientAddress, UserInformation info,
-                           Receiver *channel, QWidget *parent = 0);
+    explicit ChannelWidget(QString clientAddress,
+                           UserInformation info,
+                           QWidget *parent = 0);
     ~ChannelWidget();
 
 signals:
-    void volumeChanged(qreal volume);
+    void volumeChanged(QString address, qreal volume);
     void closeChannelClicked(QString address);
+
+public slots:
+    void setAmplitude(QString address, ushort amp);
 
 private slots:
     void changeVolume(int volume)
     {
-        emit volumeChanged(volume / 100.0);
+        emit volumeChanged(address, volume / 100.0);
     }
 
     void on_closeButton_clicked();

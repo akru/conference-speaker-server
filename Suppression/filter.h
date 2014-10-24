@@ -42,24 +42,8 @@ public:
     static const int sample_rate   = 22050; // Hz
     static const int sample_length = 512;  // Bins
 
-    // Multiple filters manipulation
-    /*
-     * Apply multiple filters to raw sample.
-     * @param filters Is a list of applyed filters.
-     * @param raw_sample Is a sample to processing
-     */
-    static void applyFilters(QList<Filter*> &filters, QByteArray &raw_sample);
-    /*
-     * Reload settings for multiple filters.
-     */
-    static void reloadSettings(QList<Filter*> &filters);
-
 protected:
     bool enabled;
-
-    // Sample conversions
-    static void fromPCM(qint16 pcm[], float sample[]);
-    static void toPCM(float sample[], qint16 pcm[]);
 };
 
 #endif // FILTER_H
