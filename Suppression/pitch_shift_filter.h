@@ -39,6 +39,7 @@ private:
     long gRover, osamp;
     float pitchShift, pitchShiftCoef;
     int currentPitch;
+//    int iteration;
 
     float wfft[analyze_length * 2 >> 1];
     int   ip[analyze_length * 2 >> 1];
