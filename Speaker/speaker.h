@@ -12,7 +12,6 @@ class QAudioOutput;
 class Processing;
 class QIODevice;
 
-
 class Speaker : public QObject
 {
     Q_OBJECT
@@ -25,6 +24,8 @@ public:
 
 signals:
     void audioAmpUpdated(QString speaker, ushort amplitude);
+    void sampleReady(QString speaker, QByteArray sample);
+    void sampleReady(QByteArray sample);
 
 public slots:
     void setVolume(qreal volume);
@@ -36,7 +37,7 @@ public slots:
 
 private slots:
     void speakHeartbeat();
-    void play(const QByteArray &sample);
+    void play(QByteArray sample);
 
 private:
     QAudioOutput               *audio;

@@ -6,12 +6,14 @@ CONFIG   += staticlib
 
 SOURCES  += \
     speaker.cpp \
-    processing.cpp
+    processing.cpp \
+    recorder.cpp
 
 HEADERS += \
     accbuffer.hpp \
     speaker.h \
-    processing.h
+    processing.h \
+    recorder.h
 
 INCLUDEPATH += $$PWD/../Suppression $$PWD/../3rd-party/Soxr
 DEPENDPATH  += $$PWD/../Suppression $$PWD/../3rd-party/Soxr

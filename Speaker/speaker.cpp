@@ -11,7 +11,6 @@
 
 #include <QDebug>
 
-
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
     audio(0),
@@ -52,7 +51,10 @@ Speaker::Speaker(QObject *parent) :
     // Open audio device
     audio = new QAudioOutput(info, format);
     audio_buffer = audio->start();
-    audio_buffer->write(QByteArray(Filter::sample_length * 2, 0));
+    // Connect audio sample processing signals
+    connect(this,
+            SIGNAL(sampleReady(QByteArray)),
+            SLOT(play(QByteArray)));
     // Moving to separate thread
     this->moveToThread(&myThread);
     myThread.start(QThread::TimeCriticalPriority);
@@ -108,10 +110,6 @@ void Speaker::incomingData(QString speaker, QByteArray packet)
     }
     // Put sample to accum
     proc[speaker]->insert(packet);
-
-//    QFile f("/tmp/sample.raw");
-//    f.open(QIODevice::Append);
-//    f.write(packet);
 }
 
 void Speaker::speakHeartbeat()
@@ -124,16 +122,19 @@ void Speaker::speakHeartbeat()
         // Empty sample when no data to process
         if (!sample.length())
             continue;
+        QString speaker = proc.key(p);
         // Emit amplitude signal
-        emit audioAmpUpdated(proc.key(p), p->getAmp());
+        emit audioAmpUpdated(speaker, p->getAmp());
+        // Emit unmixed sample
+        emit sampleReady(speaker, sample);
         // Mix samples
         sample_out = Processing::mix(sample, sample_out);
     }
-    // Resampling & play
-    play(sample_out);
+    // Emit mixed sample
+    emit sampleReady(sample_out);
 }
 
-void Speaker::play(const QByteArray &sample)
+void Speaker::play(QByteArray sample)
 {
     QByteArray sample_out(Filter::sample_length * 4, Qt::Uninitialized);
     size_t idone, odone;

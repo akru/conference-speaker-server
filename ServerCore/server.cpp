@@ -16,6 +16,7 @@
 #include <user_information.h>
 
 #include <speaker.h>
+#include <recorder.h>
 
 #include <QDebug>
 
@@ -24,7 +25,8 @@ Server::Server(const ServerInformation &info, QObject *parent)
       server(new QTcpServer(this)),
       broadcaster(new Broadcaster(this)),
       voting(0),
-      speaker(new Speaker(this))
+      speaker(new Speaker(this)),
+      recorder(new Recorder(this))
 {
     broadcaster->setServerInformation(info);
 
@@ -37,6 +39,7 @@ Server::Server(const ServerInformation &info, QObject *parent)
             SIGNAL(channelCloseRequest(QString)),
             SLOT(channelClose(QString)));
 
+    // Connect speaker signals
     connect(this,    SIGNAL(channelConnected(QString)),
             speaker, SLOT(speakerNew(QString)));
     connect(this,    SIGNAL(channelDisconnected(QString)),
@@ -49,6 +52,11 @@ Server::Server(const ServerInformation &info, QObject *parent)
             speaker, SLOT(reloadFilterSettings()));
     connect(speaker, SIGNAL(audioAmpUpdated(QString,ushort)),
             this,    SLOT(channelAmp(QString,ushort)));
+
+    connect(speaker, SIGNAL(sampleReady(QString,QByteArray)),
+            recorder,SLOT(record(QString,QByteArray)));
+    connect(speaker, SIGNAL(sampleReady(QByteArray)),
+            recorder,SLOT(record(QByteArray)));
 
     QHostAddress hostAddress = QHostAddress(info.address);
     // Listening port
@@ -344,4 +352,14 @@ void Server::channelVolume(qreal volume)
 void Server::channelAmp(QString address, ushort amp)
 {
     emit channelAmpUpdated(address, amp);
+}
+
+void Server::recordStart()
+{
+    emit recordStarted();
+}
+
+void Server::recordStop()
+{
+    emit recordStoped();
 }

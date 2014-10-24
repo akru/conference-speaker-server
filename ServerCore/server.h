@@ -16,6 +16,7 @@ class QTcpServer;
 class Connection;
 class Broadcaster;
 class Receiver;
+class Recorder;
 class Speaker;
 
 class Server : public QObject
@@ -42,6 +43,9 @@ signals:
     void voteRequest(QString address, QJsonObject request);
     void voteResultsUpdated(VoteResults results);
 
+    void recordStarted();
+    void recordStoped();
+
 public slots:
     void userDrop(QString address);
 
@@ -55,6 +59,9 @@ public slots:
 
     void voteNew(VotingInvite invite);
     void voteStop();
+
+    void recordStart();
+    void recordStop();
 
 private slots:
     void connectionNew();
@@ -76,6 +83,8 @@ private:
     Voting                        *voting;
     // Speaker instance
     Speaker                       *speaker;
+    // Speaker recorder
+    Recorder                      *recorder;
     // User information by address map
     QMap<QString, UserInformation> users;
     // Channel information by address map
