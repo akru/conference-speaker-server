@@ -23,20 +23,16 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#centralWidget {
-/*
-	background-color: rgba(163,153,185,255);
-*/
-    
-	background-color: #E4E6DC;
+	background-color: #0A3C6D;
 	font-family: Verdana;
 	font: 9pt;
-	color: #2E2E2E;
+	color: #03223F;
 }
 
 QWidget#centralWidget &gt; * {
 	font-family: Verdana;
 	font: 9pt;
-	color: #2E2E2E;
+	color: #03223F;
 
 }
 
@@ -44,13 +40,10 @@ QLabel#statusLabel {
 /*
 	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.972, stop:0 rgba(87, 78, 105, 255), stop:0.106145 rgba(150, 141, 167, 255), stop:0.983333 rgba(133, 124, 150, 255), stop:1 rgba(170, 160, 191, 255));
 */
-    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.972, stop:0 rgba(0,0,0, 70), stop:0.106145 rgba(0,0,0, 20), stop:0.983333 rgba(0,0,0, 50), stop:1 rgba(0,0,0, 15));
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.972, stop:0 rgba(255,255,255, 10), stop:0.106145 rgba(255,255,255, 40), stop:0.983333 rgba(255,255,255, 20), stop:1 rgba(255,255,255, 60));
     padding: 3px;
-    margin: 0px 24px 0px 2px;
-/*
+    margin: 0px 2px 0px 2px;
     color: #E2E2E2;
-*/
-    color: #464A42;
     font-weight: bold;
 }
 
@@ -65,22 +58,54 @@ QLabel#statusLabel {
  }
 
  QTabBar::tab {
-    /*padding: 1px 5px;*/
+     padding: 2px 3px -15px 0px;
  }
 
-/*
+
  QTabBar::tab:selected, QTabBar::tab:hover {
  }
 
  QTabBar::tab:selected {
-    padding: 1px 5px;
  }
 
  QTabBar::tab:!selected {
-     margin-top: 2px; 
  }
-*/
 
+ QScrollBar:vertical {
+      border: 1px solid #03223F;
+      background: #0A3C6D;
+      width: 15px;
+      margin: 22px 0 22px 0;
+  }
+  QScrollBar::handle:vertical {
+      background: #F1F0EC;
+      min-height: 20px;
+  }
+  QScrollBar::add-line:vertical {
+      border: 1px solid #03223F;
+      background: #0A3C6D;
+      height: 20px;
+      subcontrol-position: bottom;
+      subcontrol-origin: margin;
+  }
+
+  QScrollBar::sub-line:vertical {
+      border: 1px solid #03223F;
+      background: #0A3C6D;
+      height: 20px;
+      subcontrol-position: top;
+      subcontrol-origin: margin;
+  }
+  QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+      border: 1px solid #03223F;
+      width: 3px;
+      height: 3px;
+      background: #F3EFEC;
+  }
+
+  QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+      background: none;
+  }
 QWidget#clientsBox {
     border: 5px solid white;
 	border-image: url(:/gui/client-list-box) 5;
@@ -112,8 +137,8 @@ QComboBox::down-arrow {
 }
 
 QListWidget {
-	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(178,174,185, 255), stop:1 rgba(218,218,226, 255));
-    border-top: 4px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(118, 118, 120, 255), stop:1 rgba(184, 184, 192, 255));
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(196,193,186, 255), stop:1 rgba(241,239,236, 255));
+    border-top: 4px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 130), stop:1 rgba(0, 0, 0, 50));
     border-left: 1px solid rgba(182,182,189,255);
     border-right: 1px solid rgba(184,184,192,255);
     border-bottom: 1px solid rgba(243,241,233,255);
@@ -175,9 +200,6 @@ QWidget#channelBox {
        <string/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>9</number>
-       </property>
        <property name="leftMargin">
         <number>7</number>
        </property>
@@ -256,6 +278,145 @@ QWidget#channelBox {
            <family>Verdana</family>
           </font>
          </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOn</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
+         <property name="autoScroll">
+          <bool>false</bool>
+         </property>
+         <property name="dragEnabled">
+          <bool>false</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="isWrapping" stdset="0">
+          <bool>false</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>5</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>6</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>7</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>8</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>9</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
@@ -288,8 +449,17 @@ QWidget#channelBox {
         <property name="currentIndex">
          <number>0</number>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>46</width>
+          <height>46</height>
+         </size>
+        </property>
         <property name="elideMode">
-         <enum>Qt::ElideLeft</enum>
+         <enum>Qt::ElideNone</enum>
+        </property>
+        <property name="usesScrollButtons">
+         <bool>true</bool>
         </property>
         <property name="documentMode">
          <bool>false</bool>
@@ -300,9 +470,16 @@ QWidget#channelBox {
         <property name="movable">
          <bool>false</bool>
         </property>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="speakers">
+         <attribute name="icon">
+          <iconset resource="resource.qrc">
+           <normaloff>:/gui/speakers-button</normaloff>:/gui/speakers-button</iconset>
+         </attribute>
          <attribute name="title">
-          <string>Control</string>
+          <string notr="true"/>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Speakers</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
@@ -321,52 +498,55 @@ QWidget#channelBox {
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap resource="resource.qrc">:/gui/power-button</pixmap>
-            </property>
-            <property name="scaledContents">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <layout class="QVBoxLayout" name="channelBox"/>
           </item>
          </layout>
         </widget>
         <widget class="QWidget" name="tab_2">
+         <attribute name="icon">
+          <iconset resource="resource.qrc">
+           <normaloff>:/gui/voting-button</normaloff>:/gui/voting-button</iconset>
+         </attribute>
          <attribute name="title">
+          <string/>
+         </attribute>
+         <attribute name="toolTip">
           <string>Voting</string>
          </attribute>
         </widget>
         <widget class="QWidget" name="tab_3">
+         <attribute name="icon">
+          <iconset resource="resource.qrc">
+           <normaloff>:/gui/sound-button</normaloff>:/gui/sound-button</iconset>
+         </attribute>
          <attribute name="title">
+          <string/>
+         </attribute>
+         <attribute name="toolTip">
           <string>Sound</string>
          </attribute>
         </widget>
         <widget class="QWidget" name="tab_4">
+         <attribute name="icon">
+          <iconset resource="resource.qrc">
+           <normaloff>:/gui/stats-button</normaloff>:/gui/stats-button</iconset>
+         </attribute>
          <attribute name="title">
+          <string/>
+         </attribute>
+         <attribute name="toolTip">
           <string>Stats</string>
          </attribute>
         </widget>
         <widget class="QWidget" name="tab_5">
+         <attribute name="icon">
+          <iconset resource="resource.qrc">
+           <normaloff>:/gui/about-button</normaloff>:/gui/about-button</iconset>
+         </attribute>
          <attribute name="title">
+          <string/>
+         </attribute>
+         <attribute name="toolTip">
           <string>About</string>
          </attribute>
         </widget>
