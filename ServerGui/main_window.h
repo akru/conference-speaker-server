@@ -41,7 +41,7 @@ public slots:
 private slots:
     void appendClient(QString address, UserInformation info);
     void dropClient(QString address);
-    void appendChannel(QString address, UserInformation info, Receiver *channel);
+    void appendChannel(QString address);
     void dropChannel(QString address);
     void channelRequest(QString address, UserInformation info);
     void dropRequest(QString address);

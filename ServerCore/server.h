@@ -16,6 +16,7 @@ class QTcpServer;
 class Connection;
 class Broadcaster;
 class Receiver;
+class Speaker;
 
 class Server : public QObject
 {
@@ -29,10 +30,13 @@ signals:
     void userDisconnected(QString address);
     void userRegistrationRequest(QString address, UserInformation info);
 
-    void channelConnected(QString address, UserInformation user, Receiver *channel);
+    void channelConnected(QString address);
     void channelDisconnected(QString address);
     void channelRequest(QString address, UserInformation info);
     void channelCloseRequest(QString address);
+    void channelVolumeChanged(QString address, qreal volume);
+    void channelVolumeChanged(qreal volume);
+    void channelAmpUpdated(QString address, ushort amp);
     void channelSettingsUpdated();
 
     void voteRequest(QString address, QJsonObject request);
@@ -44,6 +48,9 @@ public slots:
     void channelDeny(QString address);
     void channelOpen(QString address);
     void channelClose(QString address);
+    void channelVolume(QString address, qreal volume);
+    void channelVolume(qreal volume);
+    void channelAmp(QString address, ushort amp);
     void channelReloadSettings();
 
     void voteNew(VotingInvite invite);
@@ -67,6 +74,8 @@ private:
     Broadcaster                   *broadcaster;
     // Voting instance
     Voting                        *voting;
+    // Speaker instance
+    Speaker                       *speaker;
     // User information by address map
     QMap<QString, UserInformation> users;
     // Channel information by address map

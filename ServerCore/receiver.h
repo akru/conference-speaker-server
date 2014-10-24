@@ -3,7 +3,6 @@
 
 #include <QUdpSocket>
 #include <channel_information.h>
-#include <speaker.h>
 
 class Receiver : public QObject
 {
@@ -23,29 +22,13 @@ public:
     }
 
 signals:
-    void audioAmpUpdated(int);
-    void sampleReceived(QByteArray);
-
-public slots:
-    void setVolume(qreal volume)
-    {
-        speaker.setVolume(volume);
-    }
-    void reloadFilterSettings()
-    {
-        speaker.reloadFilterSettings();
-    }
+    void sampleReceived(QString, QByteArray);
 
 private slots:
     void sockReadyRead();
-    void updateAmp(int amplitude)
-    {
-        emit audioAmpUpdated(amplitude);
-    }
 
 private:
     QUdpSocket         sock;
-    Speaker            speaker;
     ChannelInformation channel;
 };
 

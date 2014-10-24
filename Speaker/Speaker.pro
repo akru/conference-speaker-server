@@ -5,11 +5,13 @@ TEMPLATE  = lib
 CONFIG   += staticlib
 
 SOURCES  += \
-    speaker.cpp
+    speaker.cpp \
+    processing.cpp
 
 HEADERS += \
     accbuffer.hpp \
-    speaker.h
+    speaker.h \
+    processing.h
 
 INCLUDEPATH += $$PWD/../Suppression $$PWD/../3rd-party/Soxr
 DEPENDPATH  += $$PWD/../Suppression $$PWD/../3rd-party/Soxr

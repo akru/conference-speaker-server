@@ -3,11 +3,9 @@
 
 ChannelWidget::ChannelWidget(QString clientAddress,
                              UserInformation info,
-                             Receiver *channel,
                              QWidget *parent)
     : QWidget(parent),
       ui(new Ui::ChannelWidget),
-      receiver(channel),
       address(clientAddress)
 {
     ui->setupUi(this);
@@ -15,8 +13,6 @@ ChannelWidget::ChannelWidget(QString clientAddress,
     ui->companyLabel->setText(info.company);
 
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(changeVolume(int)));
-    connect(this, SIGNAL(volumeChanged(qreal)), channel, SLOT(setVolume(qreal)));
-    connect(channel, SIGNAL(audioAmpUpdated(int)), ui->volumeBar, SLOT(setValue(int)));
 
     ui->volumeSlider->setValue(50);
 }
@@ -29,4 +25,10 @@ ChannelWidget::~ChannelWidget()
 void ChannelWidget::on_closeButton_clicked()
 {
     emit closeChannelClicked(address);
+}
+
+void ChannelWidget::setAmplitude(QString address, ushort amp)
+{
+    if (address == this->address)
+        ui->volumeBar->setValue(amp);
 }

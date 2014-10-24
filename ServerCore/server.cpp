@@ -15,13 +15,16 @@
 #include <registration_request.h>
 #include <user_information.h>
 
+#include <speaker.h>
+
 #include <QDebug>
 
 Server::Server(const ServerInformation &info, QObject *parent)
     : QObject(parent),
       server(new QTcpServer(this)),
       broadcaster(new Broadcaster(this)),
-      voting(0)
+      voting(0),
+      speaker(new Speaker(this))
 {
     broadcaster->setServerInformation(info);
 
@@ -33,6 +36,19 @@ Server::Server(const ServerInformation &info, QObject *parent)
     connect(this,
             SIGNAL(channelCloseRequest(QString)),
             SLOT(channelClose(QString)));
+
+    connect(this,    SIGNAL(channelConnected(QString)),
+            speaker, SLOT(speakerNew(QString)));
+    connect(this,    SIGNAL(channelDisconnected(QString)),
+            speaker, SLOT(speakerDelete(QString)));
+    connect(this,    SIGNAL(channelVolumeChanged(QString,qreal)),
+            speaker, SLOT(setVolume(QString,qreal)));
+    connect(this,    SIGNAL(channelVolumeChanged(qreal)),
+            speaker, SLOT(setVolume(qreal)));
+    connect(this,    SIGNAL(channelSettingsUpdated()),
+            speaker, SLOT(reloadFilterSettings()));
+    connect(speaker, SIGNAL(audioAmpUpdated(QString,ushort)),
+            this,    SLOT(channelAmp(QString,ushort)));
 
     QHostAddress hostAddress = QHostAddress(info.address);
     // Listening port
@@ -229,16 +245,16 @@ void Server::channelOpen(QString address)
             // Allocate voice receiver
             try {
                 Receiver *r = new Receiver(server->serverAddress());
-                // Connect all
-                connect(this, SIGNAL(channelSettingsUpdated()),
-                        r,    SLOT(reloadFilterSettings()));
                 // Append to channel map
                 channels.insert(address, r);
+                // Connect with speaker
+                connect(r,       SIGNAL(sampleReceived(QString,QByteArray)),
+                        speaker, SLOT(incomingData(QString,QByteArray)));
                 // Make success response
                 ChannelResponse res(r->getChannelInfo());
                 result = res.toJson();
                 qDebug() << "Success channel open:" << r->getChannelInfo().toJson();
-                emit channelConnected(address, users[address], r);
+                emit channelConnected(address);
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::Channel, Response::Error, "Server fault");
@@ -313,4 +329,19 @@ void Server::voteDeny(QString address, QString error)
 void Server::voteReadyResults(VoteResults results)
 {
     emit voteResultsUpdated(results);
+}
+
+void Server::channelVolume(QString address, qreal volume)
+{
+    emit channelVolumeChanged(address, volume);
+}
+
+void Server::channelVolume(qreal volume)
+{
+    emit channelVolumeChanged(volume);
+}
+
+void Server::channelAmp(QString address, ushort amp)
+{
+    emit channelAmpUpdated(address, amp);
 }

@@ -18,6 +18,8 @@ public:
                           QWidget *parent = 0);
     ~ClientWidget();
 
+    UserInformation info;
+
 signals:
     void banned(QString);
 

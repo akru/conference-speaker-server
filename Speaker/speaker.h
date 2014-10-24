@@ -1,18 +1,17 @@
 #ifndef SPEAKER_H
 #define SPEAKER_H
 
-#include <QList>
-#include <QObject>
-//#include <QThread>
+#include <QMap>
 #include <QTimer>
-#include <filter.h>
-#include <ampanalyze_filter.h>
-#include "accbuffer.hpp"
+#include <QObject>
+#include <QThread>
+
+typedef struct soxr * soxr_t;
 
 class QAudioOutput;
-class QAudioFormat;
+class Processing;
 class QIODevice;
-typedef struct soxr * soxr_t;
+
 
 class Speaker : public QObject
 {
@@ -21,39 +20,34 @@ public:
     explicit Speaker(QObject *parent = 0);
     ~Speaker();
 
-    inline bool isDisabled()
-    {
-        return disabled;
-    }
+    // QAudioFormat sample rate for output samples
+    static const uint formatSampleRate = 44100;
 
 signals:
-    void audioAmpUpdated(int amplitude);
+    void audioAmpUpdated(QString speaker, ushort amplitude);
 
 public slots:
     void setVolume(qreal volume);
-    void incomingData(QByteArray packet);
+    void setVolume(QString speaker, qreal volume);
+    void incomingData(QString speaker, QByteArray packet);
     void reloadFilterSettings();
+    void speakerNew(QString id);
+    void speakerDelete(QString id);
 
 private slots:
     void speakHeartbeat();
     void play(const QByteArray &sample);
 
 private:
-    static const int formatSampleRate = 44100;
-
-    bool            disabled;
-    QAudioFormat    *format;
-    QAudioOutput    *audio;
-    QIODevice       *audio_buffer;
-
-    AmpAnalyzeFilter *amp;
-    QList<Filter *>   filters;
-    AccBuffer<qint16> accBuf;
-
-//    QThread         myThread;
-    QTimer          heartbeat;
+    QAudioOutput               *audio;
+    QIODevice                  *audio_buffer;
     // Improved resampler using SoX
-    soxr_t          resampler;
+    soxr_t                      resampler;
+    // Speaker filters
+    QMap<QString, Processing *> proc;
+    // Separate time-critical speaker thread
+    QThread                     myThread;
+    QTimer                      heartbeat;
 };
 
 #endif // SPEAKER_H

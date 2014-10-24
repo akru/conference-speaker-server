@@ -5,6 +5,7 @@ ClientWidget::ClientWidget(UserInformation &user,
                            QString &address,
                            QWidget *parent)
     : QWidget(parent),
+      info(user),
       ui(new Ui::ClientWidget),
       address(address)
 {
