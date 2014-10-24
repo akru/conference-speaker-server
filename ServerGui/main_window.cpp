@@ -64,7 +64,7 @@ void MainWindow::appendClient(QString address, UserInformation info)
     clients.insert(address, w);
     w->show();
     // Ban handler
-    connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
+    connect(w, SIGNAL(banned(QString)), server, SLOT(userDrop(QString)));
     // Update header
     int countClients = ui->clientBox->layout()->count();
     ui->clientLabel->setText(clientsHeader.arg(countClients));
@@ -104,7 +104,7 @@ void MainWindow::appendChannel(QString address)
     c->show();
 
     connect(c,      SIGNAL(closeChannelClicked(QString)),
-            server, SLOT(closeChannel(QString)));
+            server, SLOT(channelClose(QString)));
     connect(c,
             SIGNAL(closeChannelClicked(QString)),
             SLOT(dropChannel(QString)));

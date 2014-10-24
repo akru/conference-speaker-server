@@ -10,7 +10,29 @@
 
 #include <cmath>
 
+static const int max_qint16 = 32768;
 
+void fromPCM(qint16 pcm[], float sample[])
+{
+// Normalization
+for (short i = 0; i < Filter::sample_length; ++i)
+    sample[i] = ((float)pcm[i]) / max_qint16;
+}
+
+void toPCM(float sample[], qint16 pcm[])
+{
+// Back to the RAW
+bool distortion = false;
+for (short i = 0; i < Filter::sample_length; ++i) {
+    if(sample[i] > 1.0)
+        distortion = true;
+    if(distortion)
+        qDebug() << "Distortion detected!";
+    pcm[i] = fabs(sample[i]) >= 1.0
+              ? sample[i] / sample[i] * (max_qint16 - 10)
+              : sample[i] * max_qint16;
+}
+}
 
 
 int main()
@@ -71,7 +93,15 @@ int main()
 //                *rawp++ = (qint16) (*fltp++ * 32767);
 //            }
 
-            Filter::applyFilters(filters, sam);
+
+            float sample[Filter::sample_length];
+            fromPCM((qint16 *)sam.data(), sample);
+            foreach (Filter *f, filters) {
+                f->process(sample);
+            }
+            toPCM(sample, (qint16 *)sam.data());
+
+//            Filter::applyFilters(filters, sam);
             phones.write(sam);
             qDebug() << t.elapsed() << "passed" << tm++ * 32 << "ms";
         }

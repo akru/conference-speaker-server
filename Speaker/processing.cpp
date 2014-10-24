@@ -107,7 +107,7 @@ QByteArray Processing::mix(const QByteArray &s1,
            *outp = (qint16 *) sample_out.data();
     int max_amp = 0;
     // First step (simple sum & calc max amp)
-    while (outp < (qint16 *) sample_out.data())
+    while ((char *)outp < sample_out.data() + sample_out.size())
     {
         if (max_amp < abs((int)*inp1 + (int)*inp2))
             max_amp = abs((int)*inp1 + (int)*inp2);
@@ -120,7 +120,7 @@ QByteArray Processing::mix(const QByteArray &s1,
         inp2 = (qint16 *) s2.data();
         outp = (qint16 *) sample_out.data();
         const float scaler = 1.0f * max_qint16 / max_amp;
-        while (outp < (qint16 *) sample_out.data())
+        while ((char *) outp < sample_out.data() + sample_out.size())
             *outp++ = *inp1++ * scaler + *inp2++ * scaler;
     }
     return sample_out;

@@ -2,6 +2,7 @@
 #include "processing.h"
 #include "../Suppression/filter.h"
 
+#include <QTime>
 #include <QFile>
 #include <QAudioOutput>
 #include <QAudioFormat>
@@ -33,7 +34,7 @@ Speaker::Speaker(QObject *parent) :
         qWarning() << "supported sizes:" << info.supportedSampleSizes();
         qWarning() << "supported order:" << info.supportedByteOrders();
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
-        throw std::exception("Raw audio format not supported by backend, cannot play audio.");
+        throw std::exception();
     }
     // Create stream resampler
     soxr_error_t error;
@@ -43,10 +44,15 @@ Speaker::Speaker(QObject *parent) :
                             1, &error, &io_spec, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX has an error" << error;
-        throw std::exception("SoX has an error!");
+        throw std::exception();
     }
+    qDebug() << "Speaker resampler:" << soxr_engine(resampler)
+             << "delay" << soxr_delay(resampler);
+
     // Open audio device
     audio = new QAudioOutput(info, format);
+    audio_buffer = audio->start();
+    audio_buffer->write(QByteArray(Filter::sample_length * 2, 0));
     // Moving to separate thread
     this->moveToThread(&myThread);
     myThread.start(QThread::TimeCriticalPriority);
@@ -111,21 +117,20 @@ void Speaker::incomingData(QString speaker, QByteArray packet)
 void Speaker::speakHeartbeat()
 {
     QByteArray sample, sample_out(Filter::sample_length * 2, 0);
-    bool processed = false;
     foreach (Processing *p, proc.values()) {
+        QTime t = QTime::currentTime();
         sample = p->take();
+        qDebug() << "Processing elapsed" << t.elapsed() << "ms";
         // Empty sample when no data to process
         if (!sample.length())
             continue;
-        // Processed flag
-        processed = true;
         // Emit amplitude signal
         emit audioAmpUpdated(proc.key(p), p->getAmp());
         // Mix samples
         sample_out = Processing::mix(sample, sample_out);
     }
     // Resampling & play
-    if (processed) play(sample_out);
+    play(sample_out);
 }
 
 void Speaker::play(const QByteArray &sample)
@@ -136,8 +141,6 @@ void Speaker::play(const QByteArray &sample)
     soxr_process(resampler,
                  sample.data(),     Filter::sample_length,   &idone,
                  sample_out.data(), Filter::sample_length*2, &odone);
-    qDebug() << "Speaker resampler:" << soxr_engine(resampler)
-             << "delay" << soxr_delay(resampler);
     // Play buffer
     audio_buffer->write(sample_out);
 }
