@@ -6,13 +6,15 @@
         <file alias="client-list-item-bg">res/images/client-list-item-bg.png</file>
         <file alias="client-list-line">res/images/client-list-line.png</file>
         <file alias="combo-box-arrow">res/images/combo-box-arrow.png</file>
-        <file alias="channel-box">res/images/box/channel.png</file>
         <file alias="client-list-box">res/images/box/client-list.png</file>
         <file alias="about-button">res/images/button/about.png</file>
-        <file alias="power-button">res/images/button/power.png</file>
         <file alias="sound-button">res/images/button/sound.png</file>
         <file alias="speakers-button">res/images/button/speakers.png</file>
         <file alias="stats-button">res/images/button/stats.png</file>
         <file alias="voting-button">res/images/button/voting.png</file>
+        <file alias="channel-box">res/images/box/channel.png</file>
+        <file alias="window-icon">res/images/icon.png</file>
+        <file alias="power-button">res/images/button/power.png</file>
+        <file alias="power-button-pressed">res/images/button/power-pressed.png</file>
     </qresource>
 </RCC>
