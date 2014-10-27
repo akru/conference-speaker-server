@@ -22,7 +22,7 @@ public:
 private:
     QTime shift_time;
 
-    static const short len_scaler = 2; // only powers of 2
+    static const short len_scaler = 1; // only powers of 2
     static const short analyze_length = sample_length * len_scaler;
     static const int   analyze_rate   = sample_rate * len_scaler;
 

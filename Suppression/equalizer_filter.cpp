@@ -108,7 +108,7 @@ EqualizerFilter::EqualizerFilter(float X, const float *W)
     memset(overlap, 0, sizeof(float) * Equalizer::overlap_size);
     memset(buffer,  0, sizeof(float) * Filter::sample_length * 2);
 
-    // Zero padding compensation via stream resampler
+    // Zero padding compensation with resampler
     soxr_error_t error;
 //    soxr_io_spec_t io_spec = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
     soxr_quality_spec_t q_spec = soxr_quality_spec(SOXR_HQ, 0);
@@ -143,7 +143,7 @@ void EqualizerFilter::reloadSettings()
 void EqualizerFilter::setUserBand(short B1, short B2, short B3,
                                   short B4, short B5, short B6, short B7)
 {
-    float uBandH[Equalizer::h_size], ys[8];
+    float uBandH[Equalizer::h_size * Equalizer::zero_scaler], ys[8];
     /* Static indexes for 16kHz freq */
     const quint32 *xs = bands;
     static const float scale = 0.02f;
@@ -153,11 +153,11 @@ void EqualizerFilter::setUserBand(short B1, short B2, short B3,
     ys[4] = B4 * scale; ys[5] = B5 * scale; ys[6] = B6 * scale;
     ys[7] = B7 * scale;
     // Interpolate values
-    interpolate(uBandH, Equalizer::h_size, xs, ys, 8);
+    interpolate(uBandH, Equalizer::h_size * Equalizer::zero_scaler, xs, ys, 8);
     // Debug output
 //    qDebug() << "B: " << B1 << B2 << B3 << B4 << B5 << B6 << B7;
-    for (short i = 0; i < Equalizer::h_size; ++i)
-//        qDebug() << "H [" << i << "] =" << sixBandH[i];
+    for (short i = 0; i < Equalizer::h_size * Equalizer::zero_scaler; ++i)
+        qDebug() << "H [" << i << "] =" << uBandH[i];
 //        qDebug() << uBandH[i];
     // Set new H
     setFullBand(uBandH);
@@ -167,9 +167,9 @@ void EqualizerFilter::setFullBand(const float fbH[])
 {
     // Copy new H
     if (fbH)
-        memcpy(H, fbH, Equalizer::h_size * sizeof(float));
+        memcpy(H, fbH, Equalizer::h_size * Equalizer::zero_scaler* sizeof(float));
     else
-        for (short i = 0; i < Equalizer::h_size; ++i)
+        for (short i = 0; i < Equalizer::h_size * Equalizer::zero_scaler; ++i)
             H[i] = 1;
 }
 
@@ -202,14 +202,12 @@ void EqualizerFilter::processFilter(float sample[])
 
 void EqualizerFilter::dsp_logic()
 {
+    //use a linear-phase sliding STFT and overlap-add method (for each channel)
 
     float output_window[Equalizer::fft_size];
-    //use a linear-phase sliding STFT and overlap-add method (for each channel)
     //window the data
     for(short j = 0; j < Equalizer::window_size; ++j) {
-//        qDebug() << "B[" << j << "]=" << buffer[j];
         output_window[j] = X * W[j] * buffer[j];
-//        qDebug() << "W[" << j << "]=" << output_window[j];
     }
     //zero pad the remaining fft window
     memset(output_window + Equalizer::window_size, 0,
@@ -227,18 +225,15 @@ void EqualizerFilter::dsp_logic()
     }
     //inverse fft
     cdftf(Equalizer::fft_size, -1, output_window);
-    // TODO: NORMING
-/*
-    // Dummy resampler
-    for (short j = 1; j < Equalizer::window_size; ++j)
-        output_window[j] = output_window[j * Equalizer::zero_scaler];
-*/
+    // #TODO: NORMING
+
     // Resampling for compensate zero padding
     size_t idone, odone;
     float resampled_window[Equalizer::window_size];
     soxr_process(resampler,
                  output_window,     Equalizer::fft_size,     &idone,
                  resampled_window,  Equalizer::window_size,  &odone);
+    qDebug() << "idone, odone:" << idone << "," << odone;
 
     for(short i = 0; i < Equalizer::window_size; i++){
         if(resampled_window[i] != resampled_window[i]) {
@@ -246,28 +241,11 @@ void EqualizerFilter::dsp_logic()
             qDebug() << "Got a NaN after resampling at EQ!";
         }
     }
-    qDebug() << idone << odone;
-
-    ////debug: tests overlapping add
-    ////and negates ALL PREVIOUS processing
-    ////yields a perfect reconstruction if COLA is held
-    //for(size_t j = 0; j < u->window_size; ++j) {
-    //    u->work_buffer[j] = u->W[j] * u->input[c][j];
-    //}
 
     //overlap add and preserve overlap component from this window (linear phase)
     for(short j = 0; j < Equalizer::overlap_size; ++j) {
         buffer[j] = resampled_window[j] + overlap[j];
         overlap[j] = resampled_window[Equalizer::R + j];
-
-//        qDebug() << "W2[" << j << "]=" << output_window[j];
     }
 
-
-
-    ////debug: tests if basic buffering works
-    ////shouldn't modify the signal AT ALL (beyond roundoff)
-    //for(size_t j = 0; j < u->window_size;++j) {
-    //    u->work_buffer[j] = u->input[c][j];
-    //}
 }

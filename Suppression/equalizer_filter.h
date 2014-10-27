@@ -10,9 +10,9 @@
 
 namespace Equalizer {
 static const int window_size  = Filter::sample_length;
-static const int R            = window_size / 2;
+static const int R            = window_size / 2; // only win/2 for now
 static const int overlap_size = window_size - R;
-static const int zero_scaler  = 1;
+static const int zero_scaler  = 1; //only powers of 2, not working for now
 static const int fft_size     = Filter::sample_length * zero_scaler;
 static const int h_size       = fft_size / 2;
 // Freq to index converter for H
@@ -37,7 +37,7 @@ public:
     void setUserBand(short B1, short B2, short B3,
                      short B4, short B5, short B6, short B7);
     /*
-     * Bans step is 43Hz
+     * Bans step is 43 / zero_scaler  Hz
      */
     void setFullBand(const float fbH[]);
     float * getFullBand() { return H; }
@@ -49,7 +49,7 @@ public:
 private:
     bool  first_iteration;
     float X;
-    float H[Equalizer::h_size];
+    float H[Equalizer::h_size * Equalizer::zero_scaler];
     const float *W;
     float overlap[Equalizer::overlap_size];
     float buffer[Filter::sample_length * 2];

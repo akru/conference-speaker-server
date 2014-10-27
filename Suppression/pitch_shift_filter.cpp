@@ -68,8 +68,6 @@ PitchShiftFilter::PitchShiftFilter()
     memset(gOutputAccum, 0, 2*analyze_length*sizeof(float));
     memset(gAnaFreq, 0, analyze_length*sizeof(float));
     memset(gAnaMagn, 0, analyze_length*sizeof(float));
-    memset(ip, 0, (analyze_length * 2 >> 1)*sizeof(float));
-    memset(wfft, 0, (analyze_length * 2 >> 1)*sizeof(float));
 
     // Resampling for high-res STFT while pitch shifting
     soxr_error_t error;
@@ -111,7 +109,7 @@ void PitchShiftFilter::processFilter(float sample[])
 {
 //    QTime t = QTime::currentTime();
     if (shift_time.elapsed() > PITCH_SHIFT_TIME)
-//    if((float)iteration++ > (float)PITCH_SHIFT_TIME / (((float)sample_length / (float)sample_rate)*100))
+//    if((float)iteration++ > (float)PITCH_SHIFT_TIME / (((float)sample_length / (float)sample_rate)*100.))
     {
         shift_time.restart();
 //        iteration = 0;
@@ -126,15 +124,10 @@ void PitchShiftFilter::processFilter(float sample[])
 //    for (int i = 0; i < sample_length; ++i)
 //    {
 //        if(sample[i] < -1.0 && sample[i] >= 1.0)
-//            qDebug() << "PS RANGE DEFLORATED!!!";
+//            qDebug() << "PS range limit breaked!";
 //    }
 
-      // Stupid resampler:
-//    memset(input, 0, analyze_length * sizeof(float));
-//    for (int i = 0; i < sample_length; ++i)
-//        input[i * len_scaler] = sample[i];
-
-      // Scaling up for analyze
+    // Scaling up for analyze
     size_t idone, odone;
 //    QTime rt = QTime::currentTime();
     soxr_process(widener,
@@ -144,56 +137,36 @@ void PitchShiftFilter::processFilter(float sample[])
 //             << "delay" << soxr_delay(widener)
 //             << "idone:" << idone << "odone:" << odone;
 
+    // Protecting against the NaN
     for(short i = 0; i < analyze_length; i++){
-        if(input[i] != input[i]) {
+        if(isnan(input[i])) {
             input[i] = 0.;
 //            qDebug() << "Got a NaN after resampling!";
         }
     }
 //    qDebug() << "resampler time" << rt.elapsed() << "ms";
 
-    // Any NaNs?
-//    bool nnan = false;
-//    for(short i = 0; i < analyze_length; i++)
-//        if(input[i] != input[i])
-//            nnan = true;
-//    if(nnan)
-//        qDebug() << "-------------------------------> NaN <----------------------------------";
-
-    // Looking for negatives in the frame
-//    bool negative = false;
-//    // What is in the frame?
-//    for(short i = 0; i < analyze_length; i++)
-//        if(input[i] < 0.)
-//            negative = true;
-//    if(negative) {
-//        qDebug() << "Negative!";
-//    } else if(!negative){ qDebug() << "No negative!"; }
-
-    QTime t = QTime::currentTime();
-//    if(currentPitch) // Pitch up
-//    {
-//        pitchShift = 1 + pitchShiftCoef;
-//        smbPitchShift(analyze_length, analyze_length, input, output);
-////        smbPitchShift(sample_length, sample_length, sample, output);
-//        qDebug() << "Pitch up";
-//    }
-//    else // Pitch down
-//    {
-//       pitchShift = 1 - pitchShiftCoef;
-//       smbPitchShift(analyze_length, analyze_length, input, output);
-////       smbPitchShift(sample_length, sample_length, sample, output);
-//                    qDebug() << "Pitch down";
-//    }
-    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
+//    QTime t = QTime::currentTime();
+    if(currentPitch) // Pitch up
+    {
+        pitchShift = 1 + pitchShiftCoef;
+        smbPitchShift(analyze_length, analyze_length, input, output);
+        //     qDebug() << "Pitch up";
+    }
+    else // Pitch down
+    {
+        pitchShift = 1 - pitchShiftCoef;
+        smbPitchShift(analyze_length, analyze_length, input, output);
+        //     qDebug() << "Pitch down";
+    }
+//    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
 
 //    for (int i = 0; i < analyze_length; i++)
 //        if(output[i] >= 1.0 || output[i] < -1.0)
 //            qDebug() << "PS after pitchShift: sample is bigger than 1.0!";
 
-
-    for (int i = 0; i < analyze_length; i++)
-        output[i] = input[i];
+//    for (int i = 0; i < analyze_length; i++)
+//        output[i] = input[i];
 //    for (int i = 0; i < sample_length; ++i)
 //        sample[i] = output[i];
 
@@ -223,17 +196,12 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 {
     float magn, phase, tmp, window, real, imag;
     float freqPerBin, expct;
-//    double magn, phase, tmp, window, real, imag;
-//    double freqPerBin, expct;
 	long i,k, qpd, index, inFifoLatency, stepSize, fftFrameSize2;
 
 	/* set up some handy variables */
 	fftFrameSize2 = fftFrameSize/2;
 	stepSize = fftFrameSize/osamp;
-//    freqPerBin = sample_rate/(double)fftFrameSize;
-//    freqPerBin = sample_rate/(float)fftFrameSize;
     freqPerBin = analyze_rate/(float)fftFrameSize;
-//    expct = 2.*M_PI*(double)stepSize/(double)fftFrameSize;
     expct = 2.*M_PI*(float)stepSize/(float)fftFrameSize;
 	inFifoLatency = fftFrameSize-stepSize;
 	if (gRover == false) gRover = inFifoLatency;
@@ -253,11 +221,9 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			/* do windowing and re,im interleave */
             for (k = 0; k < fftFrameSize;k++) {
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
-//                window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
                 gFFTworksp[2*k] = gInFIFO[k] * window;
                 gFFTworksp[2*k+1] = 0.;
             }
-            // avg. time for all windowing somwhere between 5 ms to frame
 
             /*
             // prepare gFFTworksp for rdft proc
@@ -289,21 +255,18 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				gLastPhase[k] = phase;
 
 				/* subtract expected phase difference */
-//                tmp -= (double)k*expct;
                 tmp -= (float)k*expct;
 
 				/* map delta phase into +/- Pi interval */
 				qpd = tmp/M_PI;
 				if (qpd >= 0) qpd += qpd&1;
-				else qpd -= qpd&1;
-//                tmp -= M_PI*(double)qpd;
+                else qpd -= qpd&1;
                 tmp -= M_PI*(float)qpd;
 
 				/* get deviation from bin frequency from the +/- Pi interval */
 				tmp = osamp*tmp/(2.*M_PI);
 
-				/* compute the k-th partials' true frequency */
-//                tmp = (double)k*freqPerBin + tmp*freqPerBin;
+                /* compute the k-th partials' true frequency */
                 tmp = (float)k*freqPerBin + tmp*freqPerBin;
 
 				/* store magnitude and true frequency in analysis arrays */
@@ -368,7 +331,6 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 			/* do windowing and add to output accumulator */ 
 			for(k=0; k < fftFrameSize; k++) {
                 window = -.5*cos(2.*M_PI*(float)k/(float)fftFrameSize)+.5;
-//                window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
                 gOutputAccum[k] += 2.*window*gFFTworksp[2*k]/(fftFrameSize2*osamp);
 //                gOutputAccum[k] += 2.*window*gFFTworksp[k]/(fftFrameSize2*osamp);
 			}
