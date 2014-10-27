@@ -23,6 +23,15 @@ public:
      */
     QByteArray take();
     /*
+     * Local volume scaling.
+     * @param v Is a relative speaker volume: [0,1]
+     */
+    inline void setVolume(float v)
+    {
+        Q_ASSERT(v <= 1 && v >= 0);
+        gScaler = v;
+    }
+    /*
      * Average last sample amplitude getter.
      */
     inline uint getAmp() const
@@ -40,6 +49,7 @@ public:
     static QByteArray mix(const QByteArray &s1, const QByteArray &s2);
 
 protected:
+    float             gScaler;
     AccBuffer<qint16> acc;
     QList<Filter *>   filters;
     uint              avgAmp;
@@ -52,7 +62,7 @@ protected:
     void applyFilters(QByteArray &raw_sample);
 
     // Sample conversions
-    static void fromPCM(qint16 pcm[], float sample[]);
+    void fromPCM(qint16 pcm[], float sample[]);
     static void toPCM(float sample[], qint16 pcm[]);
 };
 

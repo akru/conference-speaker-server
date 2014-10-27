@@ -13,6 +13,7 @@
 
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
+    disabled(false),
     audio(0),
     audio_buffer(0)
 {   
@@ -33,7 +34,8 @@ Speaker::Speaker(QObject *parent) :
         qWarning() << "supported sizes:" << info.supportedSampleSizes();
         qWarning() << "supported order:" << info.supportedByteOrders();
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
-        throw std::exception();
+        disabled = true;
+        return;
     }
     // Create stream resampler
     soxr_error_t error;
@@ -43,7 +45,8 @@ Speaker::Speaker(QObject *parent) :
                             1, &error, &io_spec, &q_spec, NULL);
     if (error) {
         qWarning() << "SoX has an error" << error;
-        throw std::exception();
+        disabled = true;
+        return;
     }
     qDebug() << "Speaker resampler:" << soxr_engine(resampler)
              << "delay" << soxr_delay(resampler);
@@ -66,13 +69,16 @@ Speaker::Speaker(QObject *parent) :
 
 Speaker::~Speaker()
 {
+    // Stop audio
     audio->stop();
     delete audio;
-
+    // Delete processing cycle
     foreach (Processing *p, proc.values()) {
         delete p;
     }
-
+    // Delete resampler
+    soxr_delete(resampler);
+    // Terminate thread
     myThread.terminate();
     myThread.wait();
 }
@@ -91,7 +97,8 @@ void Speaker::setVolume(qreal volume)
 {
     qDebug() << "Set global volume:" << volume;
     Q_ASSERT(volume >= 0 && volume <= 1);
-
+    // Disabled behaviour
+    if (disabled) return;
     audio->setVolume(volume);
 }
 
@@ -99,6 +106,15 @@ void Speaker::setVolume(QString speaker, qreal volume)
 {
     qDebug() << "Set speaker " << speaker << "volume:" << volume;
     Q_ASSERT(volume >= 0 && volume <= 1);
+    if(!proc.contains(speaker))
+    {
+        qWarning() << "Unregistered speaker" << speaker;
+        return;
+    }
+    // Disabled behaviour
+    if (disabled) return;
+    // Set local speaker volume
+    proc[speaker]->setVolume(volume);
 }
 
 void Speaker::incomingData(QString speaker, QByteArray packet)
@@ -108,12 +124,17 @@ void Speaker::incomingData(QString speaker, QByteArray packet)
         qWarning() << "Unregistered speaker" << speaker;
         return;
     }
+    // Disabled behaviour
+    if (disabled) return;
     // Put sample to accum
     proc[speaker]->insert(packet);
 }
 
 void Speaker::speakHeartbeat()
 {
+    // Disabled behaviour
+    if (disabled) return;
+
     QByteArray sample, sample_out(Filter::sample_length * 2, 0);
     foreach (Processing *p, proc.values()) {
         QTime t = QTime::currentTime();

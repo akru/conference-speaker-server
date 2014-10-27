@@ -19,12 +19,19 @@ class Receiver;
 class Recorder;
 class Speaker;
 
+typedef QMap<QString, UserInformation> UserMap;
+typedef QMap<QString, Receiver *>      ChannelMap;
+typedef QMap<QString, Connection *>    ConnectionMap;
+
+
 class Server : public QObject
 {
     Q_OBJECT
 public:
     explicit Server(const ServerInformation &info, QObject *parent = 0);
     ~Server();
+
+    bool speakerIsDisabled() const;
 
 signals:
     void userConnected(QString address, UserInformation info);
@@ -76,21 +83,21 @@ private slots:
 
 private:
     // TCP server instance
-    QTcpServer                    *server;
+    QTcpServer   *server;
     // Broadcaster instance
-    Broadcaster                   *broadcaster;
+    Broadcaster  *broadcaster;
     // Voting instance
-    Voting                        *voting;
+    Voting       *voting;
     // Speaker instance
-    Speaker                       *speaker;
+    Speaker      *speaker;
     // Speaker recorder
-    Recorder                      *recorder;
+    Recorder     *recorder;
     // User information by address map
-    QMap<QString, UserInformation> users;
+    UserMap       users;
     // Channel information by address map
-    QMap<QString, Receiver *>      channels;
+    ChannelMap    channels;
     // Connection by address map
-    QMap<QString, Connection *>    clients;
+    ConnectionMap clients;
 #ifndef QT_DEBUG
     // Licensing policy
     Licensing                      license;

@@ -53,6 +53,10 @@ private slots:
     void updateServerInfo(ServerInformation info);
 
 
+    void on_actionStart_triggered();
+
+    void on_actionStop_triggered();
+
 private:
     Ui::MainWindow *ui;
     Server         *server;

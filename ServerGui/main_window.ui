@@ -257,7 +257,15 @@ font: 14pt;
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuRecord">
+     <property name="title">
+      <string>Record</string>
+     </property>
+     <addaction name="actionStart"/>
+     <addaction name="actionStop"/>
+    </widget>
     <addaction name="actionQuit"/>
+    <addaction name="menuRecord"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -313,6 +321,16 @@ font: 14pt;
   <action name="actionVoting">
    <property name="text">
     <string>Voting</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="text">
+    <string>Stop</string>
    </property>
   </action>
  </widget>

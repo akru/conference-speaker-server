@@ -225,3 +225,13 @@ void MainWindow::on_actionVoting_triggered()
 {
     voting.show();
 }
+
+void MainWindow::on_actionStart_triggered()
+{
+    server->recordStart();
+}
+
+void MainWindow::on_actionStop_triggered()
+{
+    server->recordStop();
+}

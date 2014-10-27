@@ -22,6 +22,9 @@ public:
     // QAudioFormat sample rate for output samples
     static const uint formatSampleRate = 44100;
 
+    inline bool isDisabled() const
+    { return disabled; }
+
 signals:
     void audioAmpUpdated(QString speaker, ushort amplitude);
     void sampleReady(QString speaker, QByteArray sample);
@@ -40,6 +43,7 @@ private slots:
     void play(QByteArray sample);
 
 private:
+    bool                        disabled;
     QAudioOutput               *audio;
     QIODevice                  *audio_buffer;
     // Improved resampler using SoX

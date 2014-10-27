@@ -2,6 +2,7 @@
 #include "broadcaster.h"
 #include "connection.h"
 #include "receiver.h"
+#include "recorder.h"
 #include "voting.h"
 
 #include <QTcpServer>
@@ -16,7 +17,6 @@
 #include <user_information.h>
 
 #include <speaker.h>
-#include <recorder.h>
 
 #include <QDebug>
 
@@ -26,7 +26,7 @@ Server::Server(const ServerInformation &info, QObject *parent)
       broadcaster(new Broadcaster(this)),
       voting(0),
       speaker(new Speaker(this)),
-      recorder(new Recorder(this))
+      recorder(new Recorder(users, this))
 {
     broadcaster->setServerInformation(info);
 
@@ -58,6 +58,12 @@ Server::Server(const ServerInformation &info, QObject *parent)
     connect(speaker, SIGNAL(sampleReady(QByteArray)),
             recorder,SLOT(record(QByteArray)));
 
+    // Recorder mgt
+    connect(this,     SIGNAL(recordStarted()),
+            recorder, SLOT(start()));
+    connect(this,     SIGNAL(recordStoped()),
+            recorder, SLOT(stop()));
+
     QHostAddress hostAddress = QHostAddress(info.address);
     // Listening port
     qDebug() << "Listening" << info.address << SERVER_CONNECTION_PORT <<
@@ -67,6 +73,11 @@ Server::Server(const ServerInformation &info, QObject *parent)
 Server::~Server()
 {
     server->close();
+}
+
+bool Server::speakerIsDisabled() const
+{
+    return speaker->isDisabled();
 }
 
 void Server::connectionNew()

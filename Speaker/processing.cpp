@@ -12,6 +12,7 @@
 static const int max_qint16 = 32768;
 
 Processing::Processing()
+    : gScaler(1.0f)
 {
     // Append filters
     filters.append(new AmpAnalyzeFilter); // WARNING: Must be first !!!
@@ -76,9 +77,9 @@ void Processing::applyFilters(QByteArray &raw_sample)
 
 void Processing::fromPCM(qint16 pcm[], float sample[])
 {
-    // Normalization
+    // Normalization & scaling
     for (short i = 0; i < Filter::sample_length; ++i)
-        sample[i] = ((float)pcm[i]) / max_qint16;
+        sample[i] = gScaler * pcm[i] / max_qint16;
 }
 
 void Processing::toPCM(float sample[], qint16 pcm[])

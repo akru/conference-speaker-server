@@ -9,14 +9,16 @@ HEADERS += \
     connection.h \
     receiver.h \
     server.h \
-    voting.h
+    voting.h \
+    recorder.h
 
 SOURCES += \
     broadcaster.cpp \
     connection.cpp \
     receiver.cpp \
     server.cpp \
-    voting.cpp
+    voting.cpp \
+    recorder.cpp
 
 CONFIG(release, debug|release){
 message("Release with licensing")
