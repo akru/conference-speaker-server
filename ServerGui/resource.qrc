@@ -16,5 +16,10 @@
         <file alias="window-icon">res/images/icon.png</file>
         <file alias="power-button">res/images/button/power.png</file>
         <file alias="power-button-pressed">res/images/button/power-pressed.png</file>
+        <file alias="combo-box-up-arrow">res/images/combo-box-up-arrow.png</file>
+        <file alias="slider-bg">res/images/slider-bg.png</file>
+        <file alias="simple-button">res/images/button/simple.png</file>
+        <file alias="simple-button-pressed">res/images/button/simple-down.png</file>
+        <file alias="select-box-selected">res/images/select-box-selected.png</file>
     </qresource>
 </RCC>

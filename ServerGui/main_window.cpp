@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Load server settings
     settings.loadSettings();
     // Set scroll boxes alignments
+    ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
 //    ui->channelBox->setAlignment(Qt::AlignTop);
 //    ui->wantsBox->layout()->setAlignment(Qt::AlignTop);
 //    ui->clientBox->layout()->setAlignment(Qt::AlignTop);
@@ -46,8 +47,10 @@ MainWindow::MainWindow(QWidget *parent) :
     else
     {
 //        ui->statusBar->showMessage(statusBarNonConfig);
-        settings.show();
+//        settings.show();
     }
+    UserInformation u("Example", "Example Inc", "Engineer");
+    appendChannel("1.1.1.1", u, 0);
 }
 
 MainWindow::~MainWindow()
@@ -95,8 +98,7 @@ void MainWindow::appendChannel(QString address, UserInformation info, Receiver *
 {
     ChannelWidget *c = new ChannelWidget(address, info, channel, this);
     channels.insert(address, c);
-
-//    ui->channelBox->addWidget(c);
+    ui->speakersArea->layout()->addWidget(c);
     c->show();
 
     connect(c,      SIGNAL(closeChannelClicked(QString)),

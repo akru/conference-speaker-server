@@ -6,9 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>854</width>
-    <height>471</height>
+    <width>944</width>
+    <height>632</height>
    </rect>
+  </property>
+  <property name="palette">
+   <palette>
+    <active/>
+    <inactive/>
+    <disabled/>
+   </palette>
   </property>
   <property name="font">
    <font>
@@ -30,13 +37,13 @@
 	background-color: #0A3C6D;
 	font-family: Verdana;
 	font: 9pt;
-	color: #03223F;
+	color: rgba(80,80,80,255);
 }
 
 QWidget#centralWidget &gt; * {
 	font-family: Verdana;
 	font: 9pt;
-	color: #03223F;
+	color: rgba(80,80,80,255);
 
 }
 
@@ -48,17 +55,13 @@ QLabel#statusLabel {
     font-weight: bold;
 }
 
- QTabWidget::pane { /* The tab widget frame */
+QTabWidget::pane { /* The tab widget frame */
     border-width: 9px;
 	border-image: url(:/gui/channel-box) 9;
     padding: 5px 5px 8px 5px;
- }
+}
 
-
- QTabWidget::tab-bar {
- }
-
- QTabBar::tab {
+QTabBar::tab {
      margin-bottom: 2px;
      padding: 4px 3px -15px 1px;
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -67,37 +70,47 @@ QLabel#statusLabel {
      border: 1px solid #C4C4C3;
      border-bottom-color: #C2C7CB; /* same as the pane color */
      border-radius: 4px;
- }
+}
 
-
- QTabBar::tab:selected, QTabBar::tab:hover {
+QTabBar::tab:selected, QTabBar::tab:hover {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                  stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
- }
+}
 
- QTabBar::tab:selected {
+QTabBar::tab:selected {
      border-color: #9B9B9B;
      border-bottom-color: #C2C7CB; /* same as pane color */
- }
+}
 
- QTabBar::tab:!selected {
-margin-right: 2px; /* make non-selected tabs look smaller */
- }
+QTabBar::tab:!selected {
+    margin-right: 2px; /* make non-selected tabs look smaller */
+}
 
 QWidget#clientsBox {
     border: 5px solid white;
 	border-image: url(:/gui/client-list-box) 5;
+    padding: 0;
 }
 
-QLineEdit, QComboBox {
-    border-left: 1px solid rgba(171,161,151,255);
-    border-right: 1px solid rgba(171,161,151,255);
-    border-top: 1px solid rgba(30,30,30,255);
+QLineEdit, QComboBox, QDoubleSpinBox {
+    border-left: 1px solid rgba(191,181,171,255);
+    border-right: 1px solid rgba(191,181,171,255);
+    border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
     border-bottom: 1px solid rgba(250,249,245,255);
     padding: 3px;
-	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.909227, stop:0 rgba(23, 23, 22, 255), stop:0.175141 rgba(235, 231, 220, 255), stop:1 rgba(220, 208, 195, 255));
-	color: rgba(115,113,113,255);
+	background-color:  qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(244,239,233, 255), stop:1 rgba(253,255,248, 255));
+	color: rgba(80,80,80,255);
+}
+
+QLineEdit:disabled, QComboBox:disabled, QDoubleSpinBox:disabled {
+    border-left: 1px solid rgba(180,180,180,255);
+    border-right: 1px solid rgba(180,180,180,255);
+    border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 50), stop:1 rgba(0, 0, 0, 10));
+    border-bottom: 1px solid rgba(250,249,245,255);
+    padding: 3px;
+	background-color:  qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(224,219,213, 255), stop:1 rgba(223,225,228, 255));
+	color: rgba(80,80,80,255);
 }
 
 QComboBox::drop-down {
@@ -110,16 +123,32 @@ QComboBox::drop-down {
      border-left-style: solid;
  }
 
-QComboBox::down-arrow {
+QComboBox::down-arrow, QDoubleSpinBox::down-arrow {
 	image: url(:/gui/combo-box-arrow);
     width: 8px;
+}
+
+QDoubleSpinBox::up-arrow {
+	image: url(:/gui/combo-box-up-arrow) inverse;
+    width: 8px;
+}
+
+QDoubleSpinBox::down-button {
+    border: 0;
+    border-left: 1px solid #CCC;
+}
+
+QDoubleSpinBox::up-button {
+    border: 0;
+    border-bottom: 1px solid #CCC;
+    border-left: 1px solid #CCC;
 }
 
 QScrollArea {
     border: 0;
 }
 
-QListWidget, QWidget#speakersArea {
+QListWidget, QWidget#speakersArea, QWidget#soundTab {
 	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(224,219,213, 255), stop:1 rgba(253,255,248, 255));
     border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
     border-left: 1px solid rgba(188,186,184,255);
@@ -135,15 +164,84 @@ QWidget#channelBox {
     border-bottom: 1px solid rgba(243,241,233,255);
 }
 
-QPushButton#powerButton {
-	background-image: url(:/gui/power-button);
+QGroupBox {
+    border: 0;
+    padding: 14px 0;
 }
 
-QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
-    border: 0;
-	background-image: url(:/gui/power-button-pressed);
+QCheckBox::indicator, QGroupBox::indicator {
+    background-color: rgba(245,245,245,255);
+    border: 1px solid #0A3C6D;
 }
-</string>
+
+QCheckBox::indicator:checked, QGroupBox::indicator:checked {
+	background-image: url(:/gui/select-box-selected);
+}
+
+ QSlider::groove:vertical {
+     position: absolute; /* absolutely position 4px from the left and right of the widget. setting margins on the widget should work too... */
+     left: 2px; right: 2px;
+	background-image: url(:/gui/slider-bg);
+ }
+
+ QSlider::groove:vertical:disabled {
+	background: rgba(180,180,180,255);
+ }
+
+ QSlider::handle:vertical {
+     height: 25px;
+     background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.423729 rgba(237, 237, 237, 255), stop:0.740113 rgba(237, 237, 237, 255), stop:1 rgba(211, 211, 211, 255));
+     margin: 0 5px; /* expand outside the groove */
+     border-top: 1px solid rgba(236,236,236,255);
+     border-radius: 2px;
+ }
+
+QPushButton {
+     padding: 5px 15px;
+     border: 1px solid rgba(180,180,180,255);
+     border-radius: 5px;
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #E3E3E3, stop: 0.4 #EEE,
+                                 stop: 0.5 #DADADA, stop: 1.0 #D5D5D5);
+}
+
+QPushButton:hover {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+}
+
+QPushButton:pressed {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #e3e3e3, stop: 0.4 #e2e2e2,
+                                 stop: 0.5 #d3d3d3, stop: 1.0 #e3e3e3);
+}
+
+QPushButton#powerButton, QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
+    border: 0;
+    background: none;
+}
+
+QRadioButton::indicator {
+    background-color: rgba(245,245,245,255);
+    border: 1px solid #0A3C6D;
+    border-radius: 2px;
+}
+
+QRadioButton::indicator:disabled {
+    background-color: rgba(200,200,200,200);
+    border: 1px solid #CCC;
+    border-radius: 2px;
+}
+
+QRadioButton::indicator:checked {
+    padding: 2px;
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.452, fx:0.5, fy:0.5, stop:0 rgba(23, 97, 132, 255), stop:0.460227 rgba(23, 97, 132, 255), stop:0.465909 rgba(245, 245, 245, 255), stop:1 rgba(245, 245, 245, 255));
+}
+
+QRadioButton::indicator:checked:disabled {
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.452, fx:0.5, fy:0.5, stop:0 rgba(100, 100, 100, 255), stop:0.460227 rgba(100, 100, 100, 255), stop:0.465909 rgba(200, 200, 200, 255), stop:1 rgba(200, 200, 200, 255));
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -166,7 +264,7 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
      <widget class="QGroupBox" name="clientsBox">
       <property name="minimumSize">
        <size>
-        <width>100</width>
+        <width>200</width>
         <height>0</height>
        </size>
       </property>
@@ -192,6 +290,9 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
        <string/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>12</number>
+       </property>
        <property name="leftMargin">
         <number>7</number>
        </property>
@@ -227,7 +328,7 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
           <string/>
          </property>
          <property name="placeholderText">
-          <string>Server name</string>
+          <string>Conference name</string>
          </property>
         </widget>
        </item>
@@ -259,6 +360,16 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
          <item>
           <property name="text">
            <string>255.255.255.255</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1.1.1.1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2.2.2.24</string>
           </property>
          </item>
         </widget>
@@ -439,12 +550,12 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="iconSize">
          <size>
-          <width>46</width>
-          <height>46</height>
+          <width>48</width>
+          <height>48</height>
          </size>
         </property>
         <property name="elideMode">
@@ -475,7 +586,7 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
-           <number>20</number>
+           <number>12</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -491,6 +602,18 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
           </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QPushButton" name="powerButton">
               <property name="enabled">
@@ -502,10 +625,15 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
                 <height>42</height>
                </size>
               </property>
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/gui/power-button</normaloff>
+                <normalon>:/gui/power-button-pressed</normalon>:/gui/power-button</iconset>
+              </property>
               <property name="iconSize">
                <size>
-                <width>32</width>
-                <height>32</height>
+                <width>48</width>
+                <height>48</height>
                </size>
               </property>
               <property name="checkable">
@@ -529,33 +657,13 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="resource.qrc">
-                <normaloff>:/gui/hands</normaloff>:/gui/hands</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>50</width>
                 <height>20</height>
                </size>
               </property>
@@ -574,13 +682,16 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
             <property name="widgetResizable">
              <bool>true</bool>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
             <widget class="QWidget" name="speakersArea">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>560</width>
-               <height>341</height>
+               <width>648</width>
+               <height>494</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4"/>
@@ -600,6 +711,131 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
          <attribute name="toolTip">
           <string>Voting</string>
          </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>New vote</string>
+            </property>
+            <layout class="QFormLayout" name="formLayout_5">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Question:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="2">
+              <widget class="QRadioButton" name="simpleRB">
+               <property name="text">
+                <string>Yes / No</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="2">
+              <widget class="QRadioButton" name="customRB">
+               <property name="text">
+                <string>Custom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0" colspan="2">
+              <layout class="QFormLayout" name="customLayout">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
+               <property name="leftMargin">
+                <number>50</number>
+               </property>
+               <property name="rightMargin">
+                <number>50</number>
+               </property>
+              </layout>
+             </item>
+             <item row="7" column="0">
+              <widget class="QPushButton" name="pushButton">
+               <property name="text">
+                <string>Start</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QPushButton" name="plusButton">
+               <property name="maximumSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>+</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QTextEdit" name="textEdit"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="title">
+             <string>Results</string>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="1" column="0">
+              <widget class="QLabel" name="resultQuestion">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="pushButton_3">
+               <property name="maximumSize">
+                <size>
+                 <width>50</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>^_^</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="2">
+              <layout class="QFormLayout" name="formLayout_4">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="soundTab">
          <attribute name="icon">
@@ -613,6 +849,9 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
           <string>Sound</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout">
+          <property name="topMargin">
+           <number>16</number>
+          </property>
           <item row="2" column="2">
            <widget class="QGroupBox" name="psBox">
             <property name="title">
@@ -622,17 +861,23 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
              <bool>true</bool>
             </property>
             <layout class="QFormLayout" name="formLayout">
+             <property name="horizontalSpacing">
+              <number>3</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>3</number>
+             </property>
              <item row="0" column="0">
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>coef</string>
+                <string>Coef</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_6">
                <property name="text">
-                <string>osamp</string>
+                <string>Overlap samp</string>
                </property>
               </widget>
              </item>
@@ -645,6 +890,268 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
             </layout>
            </widget>
           </item>
+          <item row="0" column="0" rowspan="3">
+           <widget class="QGroupBox" name="eqBox">
+            <property name="title">
+             <string>Equalizer</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <property name="horizontalSpacing">
+              <number>16</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QSlider" name="verticalSlider_2">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>  3k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>  1k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>  5k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="4">
+              <widget class="QSlider" name="verticalSlider_6">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="5">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>  10k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="5">
+              <widget class="QSlider" name="verticalSlider_7">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="4">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>  8k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QSlider" name="verticalSlider_5">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSlider" name="verticalSlider_3">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QSlider" name="verticalSlider_4">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string> 200</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QGroupBox" name="compressorBox">
+            <property name="title">
+             <string>Compressor</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <layout class="QFormLayout" name="formLayout_3">
+             <property name="horizontalSpacing">
+              <number>3</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>3</number>
+             </property>
+             <item row="0" column="0" colspan="2">
+              <widget class="QCheckBox" name="normalizeCheckBox">
+               <property name="text">
+                <string>Normalize</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_19">
+               <property name="text">
+                <string>Attack time</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="cAttackSpinBox"/>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="cDecaySpinBox"/>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_20">
+               <property name="text">
+                <string>Decay time</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QDoubleSpinBox" name="cRatioSpinBox"/>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_22">
+               <property name="text">
+                <string>Ratio</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_21">
+               <property name="text">
+                <string>Compression</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QDoubleSpinBox" name="cCompressionSpinBox"/>
+             </item>
+             <item row="8" column="1">
+              <widget class="QDoubleSpinBox" name="cThresholdSpinBox">
+               <property name="suffix">
+                <string> db</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0">
+              <widget class="QLabel" name="label_23">
+               <property name="text">
+                <string>Threshold</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="label_24">
+               <property name="text">
+                <string>Noise floor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QDoubleSpinBox" name="cNoiseSpinBox">
+               <property name="suffix">
+                <string> db</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QCheckBox" name="peakCheckBox">
+               <property name="text">
+                <string>Peak</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
           <item row="0" column="1">
            <widget class="QGroupBox" name="hsBox">
             <property name="title">
@@ -653,7 +1160,16 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
             <property name="checkable">
              <bool>true</bool>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
             <layout class="QGridLayout" name="gridLayout_2">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>3</number>
+             </property>
              <item row="2" column="0">
               <widget class="QLabel" name="label_2">
                <property name="text">
@@ -813,292 +1329,6 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
             <zorder>phprEnabled</zorder>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QGroupBox" name="compressorBox">
-            <property name="title">
-             <string>Compressor</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QFormLayout" name="formLayout_3">
-             <item row="0" column="0" colspan="2">
-              <widget class="QCheckBox" name="normalizeCheckBox">
-               <property name="text">
-                <string>Normalize</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_19">
-               <property name="text">
-                <string>Attack time</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="cAttackSpinBox"/>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="cDecaySpinBox"/>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>Decay time</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QDoubleSpinBox" name="cRatioSpinBox"/>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="label_22">
-               <property name="text">
-                <string>Ratio</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="label_21">
-               <property name="text">
-                <string>Compression</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QDoubleSpinBox" name="cCompressionSpinBox"/>
-             </item>
-             <item row="8" column="1">
-              <widget class="QDoubleSpinBox" name="cThresholdSpinBox">
-               <property name="suffix">
-                <string> db</string>
-               </property>
-               <property name="minimum">
-                <double>-100.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="0">
-              <widget class="QLabel" name="label_23">
-               <property name="text">
-                <string>Threshold</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="0">
-              <widget class="QLabel" name="label_24">
-               <property name="text">
-                <string>Noise floor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="1">
-              <widget class="QDoubleSpinBox" name="cNoiseSpinBox">
-               <property name="suffix">
-                <string> db</string>
-               </property>
-               <property name="minimum">
-                <double>-100.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <widget class="QCheckBox" name="peakCheckBox">
-               <property name="text">
-                <string>Peak</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="0" rowspan="3">
-           <widget class="QGroupBox" name="eqBox">
-            <property name="title">
-             <string>Equalizer</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="0">
-              <widget class="QSlider" name="verticalSlider_2">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>3k </string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_10">
-               <property name="text">
-                <string>1k </string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>5k </string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="4">
-              <widget class="QSlider" name="verticalSlider_6">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="5">
-              <widget class="QLabel" name="label_14">
-               <property name="text">
-                <string>10k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="5">
-              <widget class="QSlider" name="verticalSlider_7">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="4">
-              <widget class="QLabel" name="label_13">
-               <property name="text">
-                <string>8k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QSlider" name="verticalSlider_5">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSlider" name="verticalSlider_3">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QSlider" name="verticalSlider_4">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>200</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QGroupBox" name="nsBox">
-            <property name="title">
-             <string>Noise suppression</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <item>
-              <widget class="QRadioButton" name="highRadioButton">
-               <property name="text">
-                <string>High</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="mediumRadioButton">
-               <property name="text">
-                <string>Medium</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="lowRadioButton">
-               <property name="text">
-                <string>Low</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="1" column="1" rowspan="2">
            <widget class="QGroupBox" name="gateBox">
             <property name="title">
@@ -1190,6 +1420,81 @@ QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
               <widget class="QLabel" name="label_18">
                <property name="text">
                 <string>Release time</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QGroupBox" name="nsBox">
+            <property name="title">
+             <string>Noise suppression</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <property name="spacing">
+              <number>3</number>
+             </property>
+             <item>
+              <widget class="QRadioButton" name="highRadioButton">
+               <property name="text">
+                <string>High</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="mediumRadioButton">
+               <property name="text">
+                <string>Medium</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="lowRadioButton">
+               <property name="text">
+                <string>Low</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="3">
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="title">
+             <string>Record the conference</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>Storage directory:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit">
+               <property name="echoMode">
+                <enum>QLineEdit::Normal</enum>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton">
+               <property name="text">
+                <string>...</string>
                </property>
               </widget>
              </item>
