@@ -7,33 +7,28 @@ TEMPLATE = app
 
 SOURCES  += main.cpp \
     main_window.cpp \
-    about_dialog.cpp \
+#    about_dialog.cpp \
     channel_widget.cpp \
-    settings_dialog.cpp \
-    request_widget.cpp \
-    vote_widget.cpp \
-    client_widget.cpp \
-    debug_dialog.cpp
+#    settings_dialog.cpp \
+#    request_widget.cpp \
+#    vote_widget.cpp \
+#    client_widget.cpp \
+#    debug_dialog.cpp
 
 HEADERS  += \
     main_window.h \
-    about_dialog.h \
+#    about_dialog.h \
     channel_widget.h \
-    settings_dialog.h \
-    request_widget.h \
-    vote_widget.h \
-    client_widget.h \
-    debug_dialog.h
+#    settings_dialog.h \
+#    request_widget.h \
+#    vote_widget.h \
+#    client_widget.h \
+#    debug_dialog.h
 
 FORMS    += \
     main_window.ui \
-    about_dialog.ui \
-    channel_widget.ui \
-    settings_dialog.ui \
-    request_widget.ui \
-    vote_widget.ui \
-    client_widget.ui \
-    debug_dialog.ui
+#    about_dialog.ui \
+    channel_widget.ui
 
 RESOURCES += \
     resource.qrc

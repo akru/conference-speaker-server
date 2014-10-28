@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>944</width>
-    <height>632</height>
+    <width>973</width>
+    <height>638</height>
    </rect>
   </property>
   <property name="palette">
@@ -16,11 +16,6 @@
     <inactive/>
     <disabled/>
    </palette>
-  </property>
-  <property name="font">
-   <font>
-    <family>Verdana</family>
-   </font>
   </property>
   <property name="windowTitle">
    <string>Conference Speaker Server</string>
@@ -34,17 +29,11 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#centralWidget {
-	background-color: #0A3C6D;
-	font-family: Verdana;
-	font: 9pt;
-	color: rgba(80,80,80,255);
+    background-color: #0A3C6D;
 }
 
-QWidget#centralWidget &gt; * {
-	font-family: Verdana;
-	font: 9pt;
-	color: rgba(80,80,80,255);
-
+QLabel, QCheckBox, QGroupBox {
+    font-size: 10pt;
 }
 
 QLabel#statusLabel {
@@ -52,7 +41,7 @@ QLabel#statusLabel {
     padding: 3px;
     margin: 0px 2px 0px 2px;
     color: #E2E2E2;
-    font-weight: bold;
+    font-size: 10pt;
 }
 
 QTabWidget::pane { /* The tab widget frame */
@@ -87,8 +76,8 @@ QTabBar::tab:!selected {
     margin-right: 2px; /* make non-selected tabs look smaller */
 }
 
-QWidget#clientsBox {
-    border: 5px solid white;
+QGroupBox#clientsBox {
+    border: 5px solid black;
 	border-image: url(:/gui/client-list-box) 5;
     padding: 0;
 }
@@ -101,6 +90,7 @@ QLineEdit, QComboBox, QDoubleSpinBox {
     padding: 3px;
 	background-color:  qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(244,239,233, 255), stop:1 rgba(253,255,248, 255));
 	color: rgba(80,80,80,255);
+    font-size: 10pt;
 }
 
 QLineEdit:disabled, QComboBox:disabled, QDoubleSpinBox:disabled {
@@ -178,25 +168,37 @@ QCheckBox::indicator:checked, QGroupBox::indicator:checked {
 	background-image: url(:/gui/select-box-selected);
 }
 
+QCheckBox::indicator:disabled,
+QGroupBox::indicator:disabled,
+QCheckBox::indicator:checked:disabled,
+QGroupBox::indicator:checked:disabled {
+    background: rgba(200,200,200,200);
+}
+
+QSlider {
+    background: rgba(14,64,112,255);
+    border-radius: 3px;
+}
+
  QSlider::groove:vertical {
      position: absolute; /* absolutely position 4px from the left and right of the widget. setting margins on the widget should work too... */
-     left: 2px; right: 2px;
-	background-image: url(:/gui/slider-bg);
+     left: 2px; right: 2px; top: 10px; bottom: 10px;
+	 background-image: url(:/gui/slider-bg);
  }
 
  QSlider::groove:vertical:disabled {
-	background: rgba(180,180,180,255);
+    background-color: rgba(200,200,200,200);
  }
 
  QSlider::handle:vertical {
      height: 25px;
-     background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.423729 rgba(237, 237, 237, 255), stop:0.740113 rgba(237, 237, 237, 255), stop:1 rgba(211, 211, 211, 255));
+     background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.423729 rgba(237, 237, 237, 255), stop:0.740113 rgba(237, 237, 237, 255), stop:1 rgba(140, 140, 140, 255));
      margin: 0 5px; /* expand outside the groove */
      border-top: 1px solid rgba(236,236,236,255);
      border-radius: 2px;
  }
 
-QPushButton {
+QPushButton, QToolButton {
      padding: 5px 15px;
      border: 1px solid rgba(180,180,180,255);
      border-radius: 5px;
@@ -205,21 +207,31 @@ QPushButton {
                                  stop: 0.5 #DADADA, stop: 1.0 #D5D5D5);
 }
 
-QPushButton:hover {
+QToolButton {
+    padding: 5px 5px;
+}
+
+QPushButton:hover, QToolButton:hover {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                  stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
 }
 
-QPushButton:pressed {
+QPushButton:pressed, QToolButton:pressed {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0 #e3e3e3, stop: 0.4 #e2e2e2,
                                  stop: 0.5 #d3d3d3, stop: 1.0 #e3e3e3);
 }
 
-QPushButton#powerButton, QPushButton#powerButton:checked, QPushButton#powerButton:pressed {
+QPushButton#powerButton,
+QPushButton#powerButton:checked,
+QPushButton#powerButton:pressed,
+QPushButton#recordButton,
+QPushButton#recordButton:checked,
+QPushButton#recordButton:pressed {
     border: 0;
     background: none;
+    padding: 0;
 }
 
 QRadioButton::indicator {
@@ -241,7 +253,36 @@ QRadioButton::indicator:checked {
 
 QRadioButton::indicator:checked:disabled {
     background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.452, fx:0.5, fy:0.5, stop:0 rgba(100, 100, 100, 255), stop:0.460227 rgba(100, 100, 100, 255), stop:0.465909 rgba(200, 200, 200, 255), stop:1 rgba(200, 200, 200, 255));
-}</string>
+}
+
+QListView {
+    show-decoration-selected: 1; /* make the selection span the entire width of the view */
+    font-size: 10pt;
+    color: rgba(70,70,70,255);
+}
+
+QListView {
+}
+
+QListView::item {
+    padding: 5px;
+	border-bottom: 1px solid qlineargradient(spread:reflect, x1:1, y1:0, x2:0, y2:0, stop:0 rgba(162, 162, 162, 0), stop:0.5 rgba(219, 173, 114, 255), stop:1 rgba(162, 162, 162, 0));
+}
+
+ QListView::item:selected {
+    border: 0;
+    color: rgba(30,30,30,255);
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+ }
+
+ QListView::item:hover {
+    color: rgba(30,30,30,255);
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+ }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -274,15 +315,6 @@ QRadioButton::indicator:checked:disabled {
         <height>16777215</height>
        </size>
       </property>
-      <property name="font">
-       <font>
-        <family>Verdana</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -297,13 +329,13 @@ QRadioButton::indicator:checked:disabled {
         <number>7</number>
        </property>
        <property name="topMargin">
-        <number>7</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>9</number>
        </property>
        <property name="bottomMargin">
-        <number>7</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QLineEdit" name="labelName">
@@ -319,11 +351,6 @@ QRadioButton::indicator:checked:disabled {
            <height>16777215</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <family>Verdana</family>
-          </font>
-         </property>
          <property name="text">
           <string/>
          </property>
@@ -333,7 +360,7 @@ QRadioButton::indicator:checked:disabled {
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="addressBox">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -345,11 +372,6 @@ QRadioButton::indicator:checked:disabled {
            <width>16777215</width>
            <height>16777215</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Verdana</family>
-          </font>
          </property>
          <property name="editable">
           <bool>false</bool>
@@ -375,152 +397,100 @@ QRadioButton::indicator:checked:disabled {
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="clientList">
-         <property name="font">
-          <font>
-           <family>Verdana</family>
-          </font>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <property name="leftMargin">
+          <number>0</number>
          </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustIgnored</enum>
-         </property>
-         <property name="autoScroll">
-          <bool>false</bool>
-         </property>
-         <property name="dragEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="verticalScrollMode">
-          <enum>QAbstractItemView::ScrollPerItem</enum>
-         </property>
-         <property name="isWrapping" stdset="0">
-          <bool>false</bool>
+         <property name="topMargin">
+          <number>0</number>
          </property>
          <item>
-          <property name="text">
-           <string>1</string>
-          </property>
+          <widget class="QLabel" name="label_27">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>18</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resource.qrc">:/gui/client-list-line</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
-          <property name="text">
-           <string>1</string>
-          </property>
+          <widget class="QListWidget" name="clientList">
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="autoScroll">
+            <bool>false</bool>
+           </property>
+           <property name="dragEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::NoSelection</enum>
+           </property>
+           <property name="verticalScrollMode">
+            <enum>QAbstractItemView::ScrollPerItem</enum>
+           </property>
+           <property name="isWrapping" stdset="0">
+            <bool>false</bool>
+           </property>
+           <item>
+            <property name="text">
+             <string>Xeny Rakova</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Alisher Khassanov</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Alexander Krupenkin</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Alexander Borgul</string>
+            </property>
+           </item>
+          </widget>
          </item>
          <item>
-          <property name="text">
-           <string>1</string>
-          </property>
+          <widget class="QLabel" name="label_26">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>18</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resource.qrc">:/gui/client-list-line</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>2</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>3</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>4</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>5</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>6</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>7</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>8</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>9</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </item>
-        </widget>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -538,11 +508,6 @@ QRadioButton::indicator:checked:disabled {
       </property>
       <item>
        <widget class="QTabWidget" name="tabWidget">
-        <property name="font">
-         <font>
-          <family>Verdana</family>
-         </font>
-        </property>
         <property name="tabPosition">
          <enum>QTabWidget::East</enum>
         </property>
@@ -550,7 +515,7 @@ QRadioButton::indicator:checked:disabled {
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>2</number>
         </property>
         <property name="iconSize">
          <size>
@@ -603,16 +568,16 @@ QRadioButton::indicator:checked:disabled {
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <property name="leftMargin">
-             <number>0</number>
+             <number>5</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>5</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>5</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>5</number>
             </property>
             <item>
              <widget class="QPushButton" name="powerButton">
@@ -657,6 +622,27 @@ QRadioButton::indicator:checked:disabled {
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="recordButton">
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/gui/record-button</normaloff>
+                <normalon>:/gui/pause-button</normalon>:/gui/record-button</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>48</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -690,17 +676,33 @@ QRadioButton::indicator:checked:disabled {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>648</width>
-               <height>494</height>
+               <width>677</width>
+               <height>499</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_4"/>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>3</number>
+              </property>
+              <property name="topMargin">
+               <number>3</number>
+              </property>
+              <property name="rightMargin">
+               <number>3</number>
+              </property>
+              <property name="bottomMargin">
+               <number>3</number>
+              </property>
+             </layout>
             </widget>
            </widget>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_2">
+        <widget class="QWidget" name="votingTab">
          <attribute name="icon">
           <iconset resource="resource.qrc">
            <normaloff>:/gui/voting-button</normaloff>:/gui/voting-button</iconset>
@@ -905,40 +907,10 @@ QRadioButton::indicator:checked:disabled {
              <property name="horizontalSpacing">
               <number>16</number>
              </property>
-             <item row="0" column="0">
-              <widget class="QSlider" name="verticalSlider_2">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QLabel" name="label_11">
+             <item row="1" column="5">
+              <widget class="QLabel" name="label_14">
                <property name="text">
-                <string>  3k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_10">
-               <property name="text">
-                <string>  1k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>  5k</string>
+                <string>10k</string>
                </property>
               </widget>
              </item>
@@ -958,15 +930,29 @@ QRadioButton::indicator:checked:disabled {
                </property>
               </widget>
              </item>
-             <item row="1" column="5">
-              <widget class="QLabel" name="label_14">
+             <item row="1" column="3">
+              <widget class="QLabel" name="label_12">
                <property name="text">
-                <string>  10k</string>
+                <string> 5k</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="5">
-              <widget class="QSlider" name="verticalSlider_7">
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string> 1k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string> 3k</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QSlider" name="verticalSlider_2">
                <property name="value">
                 <number>50</number>
                </property>
@@ -984,39 +970,7 @@ QRadioButton::indicator:checked:disabled {
              <item row="1" column="4">
               <widget class="QLabel" name="label_13">
                <property name="text">
-                <string>  8k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QSlider" name="verticalSlider_5">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSlider" name="verticalSlider_3">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
+                <string> 8k</string>
                </property>
               </widget>
              </item>
@@ -1036,10 +990,58 @@ QRadioButton::indicator:checked:disabled {
                </property>
               </widget>
              </item>
+             <item row="0" column="3">
+              <widget class="QSlider" name="verticalSlider_5">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string> 200</string>
+                <string>200</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSlider" name="verticalSlider_3">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="5">
+              <widget class="QSlider" name="verticalSlider_7">
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksAbove</enum>
+               </property>
+               <property name="tickInterval">
+                <number>5</number>
                </property>
               </widget>
              </item>
@@ -1482,7 +1484,7 @@ QRadioButton::indicator:checked:disabled {
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit">
+              <widget class="QLineEdit" name="storageEdit">
                <property name="echoMode">
                 <enum>QLineEdit::Normal</enum>
                </property>
@@ -1492,7 +1494,7 @@ QRadioButton::indicator:checked:disabled {
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="toolButton">
+              <widget class="QToolButton" name="storageSelectButton">
                <property name="text">
                 <string>...</string>
                </property>
@@ -1503,7 +1505,7 @@ QRadioButton::indicator:checked:disabled {
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_4">
+        <widget class="QWidget" name="statsTab">
          <attribute name="icon">
           <iconset resource="resource.qrc">
            <normaloff>:/gui/stats-button</normaloff>:/gui/stats-button</iconset>
@@ -1515,7 +1517,7 @@ QRadioButton::indicator:checked:disabled {
           <string>Stats</string>
          </attribute>
         </widget>
-        <widget class="QWidget" name="tab_5">
+        <widget class="QWidget" name="aboutTab">
          <attribute name="icon">
           <iconset resource="resource.qrc">
            <normaloff>:/gui/about-button</normaloff>:/gui/about-button</iconset>
@@ -1531,12 +1533,6 @@ QRadioButton::indicator:checked:disabled {
       </item>
       <item>
        <widget class="QLabel" name="statusLabel">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>

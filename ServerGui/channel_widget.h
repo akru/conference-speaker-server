@@ -27,8 +27,8 @@ private slots:
     {
         emit volumeChanged(volume / 100.0);
     }
-
     void on_closeButton_clicked();
+    void on_volumeSlider_sliderMoved(int position);
 
 private:
     Ui::ChannelWidget *ui;

@@ -30,3 +30,9 @@ void ChannelWidget::on_closeButton_clicked()
 {
     emit closeChannelClicked(address);
 }
+
+void ChannelWidget::on_volumeSlider_sliderMoved(int position)
+{
+
+    ui->volumeBar->setValue(position);
+}

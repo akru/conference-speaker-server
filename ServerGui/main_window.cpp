@@ -4,6 +4,7 @@
 #include <QHostAddress>
 #include <QFontDatabase>
 #include <QFile>
+#include <QFont>
 
 const char * clientsHeader = "Clients: <b style=\"color: #00A0E3\">(%1)</b>";
 const char * wantsHeader   = "Wants to ask: <b style=\"color: #00A0E3\">(%1)</b>";
@@ -19,17 +20,15 @@ MainWindow::MainWindow(QWidget *parent) :
     server(0)
 {
     // Loading fonts
-//    QFontDatabase::addApplicationFont(":/res/fonts/BauhausC-Demibold.ttf");
-    //QFontDatabase::addApplicationFont(":/res/fonts/Gothic.ttf");
-//    QFontDatabase::addApplicationFont(":/res/fonts/GothicBold.ttf");
+    loadFonts();
     // Setup UI
     ui->setupUi(this);
     // Restart server with new info
-    connect(&settings,
-            SIGNAL(newServerInfo(ServerInformation)),
-            SLOT(updateServerInfo(ServerInformation)));
+//    connect(&settings,
+//            SIGNAL(newServerInfo(ServerInformation)),
+//            SLOT(updateServerInfo(ServerInformation)));
     // Load server settings
-    settings.loadSettings();
+//    settings.loadSettings();
     // Set scroll boxes alignments
     ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
 //    ui->channelBox->setAlignment(Qt::AlignTop);
@@ -39,17 +38,25 @@ MainWindow::MainWindow(QWidget *parent) :
 //    ui->clientLabel->setText(clientsHeader.arg(0));
 //    ui->wantsLabel->setText(wantsHeader.arg(0));
 //    ui->chatLabel->setText(chatHeader.arg(0));
-    if (settings.isConfigured())
-    {
+//    if (settings.isConfigured())
+//    {
 //        ui->labelName->setText(settings.serverInfo().name);
 //        ui->statusBar->showMessage(statusBarConfigured);
-    }
-    else
-    {
+//    }
+//    else
+//    {
 //        ui->statusBar->showMessage(statusBarNonConfig);
 //        settings.show();
-    }
+//    }
     UserInformation u("Example", "Example Inc", "Engineer");
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
+    appendChannel("1.1.1.1", u, 0);
     appendChannel("1.1.1.1", u, 0);
 }
 
@@ -58,16 +65,28 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::loadFonts()
+{
+    qDebug() << "Gothic:"
+             << QFontDatabase::addApplicationFont(":/fonts/Gothic.ttf");
+    qDebug() << "GothicBold:"
+             << QFontDatabase::addApplicationFont(":/fonts/GothicBold.ttf");
+    QFont f;
+    f.setFamily("Century Gothic");
+    QGuiApplication::setFont(f);
+    qDebug() << "Default font:" << QGuiApplication::font().family();
+}
+
 void MainWindow::appendClient(QString address, UserInformation info)
 {
-    Q_ASSERT(!clients.contains(address));
+//    Q_ASSERT(!clients.contains(address));
 
-    ClientWidget *w = new ClientWidget(info, address, this);
+//    ClientWidget *w = new ClientWidget(info, address, this);
 //    ui->clientBox->layout()->addWidget(w);
-    clients.insert(address, w);
-    w->show();
+//    clients.insert(address, w);
+//    w->show();
     // Ban handler
-    connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
+//    connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
     // Update header
 //    int countClients = ui->clientBox->layout()->count();
 //    ui->clientLabel->setText(clientsHeader.arg(countClients));
@@ -76,18 +95,18 @@ void MainWindow::appendClient(QString address, UserInformation info)
 
 void MainWindow::dropClient(QString address)
 {
-    Q_ASSERT(clients.contains(address));
-    delete clients[address];
-    clients.remove(address);
+//    Q_ASSERT(clients.contains(address));
+//    delete clients[address];
+//    clients.remove(address);
 
-    if (requests.contains(address))
-    {
-        dropRequest(address);
-    }
-    if (channels.contains(address))
-    {
-        dropChannel(address);
-    }
+//    if (requests.contains(address))
+//    {
+//        dropRequest(address);
+//    }
+//    if (channels.contains(address))
+//    {
+//        dropChannel(address);
+//    }
     // Update header
 //    int countClients = ui->clientBox->layout()->count();
 //    ui->clientLabel->setText(clientsHeader.arg(countClients));
@@ -124,19 +143,19 @@ void MainWindow::dropChannel(QString address)
 
 void MainWindow::channelRequest(QString address, UserInformation info)
 {
-    if(requests.contains(address))
-        return;
+//    if(requests.contains(address))
+//        return;
 
-    RequestWidget *reqWidget = new RequestWidget(info, address, this);
-    requests[address] = reqWidget;
-    connect(reqWidget, SIGNAL(accepted(QString)),
-            server, SLOT(openChannel(QString)));
-    connect(reqWidget, SIGNAL(discarded(QString)),
-            server, SLOT(denyChannel(QString)));
-    connect(reqWidget, SIGNAL(accepted(QString)),
-            SLOT(dropRequest(QString)));
-    connect(reqWidget, SIGNAL(discarded(QString)),
-            SLOT(dropRequest(QString)));
+//    RequestWidget *reqWidget = new RequestWidget(info, address, this);
+//    requests[address] = reqWidget;
+//    connect(reqWidget, SIGNAL(accepted(QString)),
+//            server, SLOT(openChannel(QString)));
+//    connect(reqWidget, SIGNAL(discarded(QString)),
+//            server, SLOT(denyChannel(QString)));
+//    connect(reqWidget, SIGNAL(accepted(QString)),
+//            SLOT(dropRequest(QString)));
+//    connect(reqWidget, SIGNAL(discarded(QString)),
+//            SLOT(dropRequest(QString)));
 
 //    ui->wantsBox->layout()->addWidget(reqWidget);
 //    reqWidget->show();
@@ -147,15 +166,15 @@ void MainWindow::channelRequest(QString address, UserInformation info)
 
 void MainWindow::dropRequest(QString address)
 {
-    if (requests.contains(address))
-    {
-        requests[address]->close();
-        delete requests[address];
-        requests.remove(address);
+//    if (requests.contains(address))
+//    {
+//        requests[address]->close();
+//        delete requests[address];
+//        requests.remove(address);
         // Update header
 //        ui->wantsLabel->setText(
 //                    wantsHeader.arg(ui->wantsBox->layout()->count()));
-    }
+//    }
 }
 
 void MainWindow::updateServerInfo(ServerInformation info)
@@ -180,12 +199,12 @@ void MainWindow::updateServerInfo(ServerInformation info)
             SIGNAL(channelDisconnected(QString)),
             SLOT(dropChannel(QString)));
 
-    connect(server,  SIGNAL(voteResultsUpdated(VoteResults)),
-            &voting, SLOT(updateResults(VoteResults)));
-    connect(&voting, SIGNAL(voteNew(VotingInvite)),
-            server,  SLOT(voteNew(VotingInvite)));
-    connect(&voting, SIGNAL(voteStop()),
-            server,  SLOT(voteStop()));
+//    connect(server,  SIGNAL(voteResultsUpdated(VoteResults)),
+//            &voting, SLOT(updateResults(VoteResults)));
+//    connect(&voting, SIGNAL(voteNew(VotingInvite)),
+//            server,  SLOT(voteNew(VotingInvite)));
+//    connect(&voting, SIGNAL(voteStop()),
+//            server,  SLOT(voteStop()));
 
     connect(server,
             SIGNAL(channelRequest(QString,UserInformation)),
@@ -195,8 +214,8 @@ void MainWindow::updateServerInfo(ServerInformation info)
     connect(this,   SIGNAL(channelRequestDiscarded(QString)),
             server, SLOT(channelDeny(QString)));
 
-    connect(&filter_setup, SIGNAL(filterSettingsUpdated()),
-            server,        SLOT(channelReloadSettings()));
+//    connect(&filter_setup, SIGNAL(filterSettingsUpdated()),
+//            server,        SLOT(channelReloadSettings()));
 
     // Update headers
 //    ui->labelName->setText(info.name);
@@ -205,21 +224,21 @@ void MainWindow::updateServerInfo(ServerInformation info)
 
 void MainWindow::on_actionAbout_triggered()
 {
-    about.show();
+//    about.show();
 }
 
 void MainWindow::on_actionSettings_triggered()
 {
-    settings.updateAddressSelect();
-    settings.show();
+//    settings.updateAddressSelect();
+//    settings.show();
 }
 
 void MainWindow::on_actionSound_processing_triggered()
 {
-    filter_setup.show();
+//    filter_setup.show();
 }
 
 void MainWindow::on_actionVoting_triggered()
 {
-    voting.show();
+//    voting.show();
 }

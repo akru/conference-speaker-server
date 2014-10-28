@@ -3,7 +3,6 @@
         <file alias="avatar">res/images/avatar.png</file>
         <file alias="hand-up">res/images/hadn-up.png</file>
         <file alias="hands">res/images/hands.png</file>
-        <file alias="client-list-item-bg">res/images/client-list-item-bg.png</file>
         <file alias="client-list-line">res/images/client-list-line.png</file>
         <file alias="combo-box-arrow">res/images/combo-box-arrow.png</file>
         <file alias="client-list-box">res/images/box/client-list.png</file>
@@ -18,8 +17,15 @@
         <file alias="power-button-pressed">res/images/button/power-pressed.png</file>
         <file alias="combo-box-up-arrow">res/images/combo-box-up-arrow.png</file>
         <file alias="slider-bg">res/images/slider-bg.png</file>
-        <file alias="simple-button">res/images/button/simple.png</file>
-        <file alias="simple-button-pressed">res/images/button/simple-down.png</file>
         <file alias="select-box-selected">res/images/select-box-selected.png</file>
+        <file alias="pause-button">res/images/button/pause.png</file>
+        <file alias="record-button">res/images/button/record.png</file>
+        <file alias="volume-slider-bg">res/images/volume-slider-bg.png</file>
+        <file alias="volume-slider-sub-bg">res/images/volume-slider-sub-bg.png</file>
+        <file alias="progress-bar-bg">res/images/progress-bar-bg.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="Gothic.ttf">res/fonts/Gothic.ttf</file>
+        <file alias="GothicBold.ttf">res/fonts/GothicBold.ttf</file>
     </qresource>
 </RCC>

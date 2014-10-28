@@ -5,16 +5,16 @@
 #include <QMainWindow>
 #include <user_information.h>
 
-#ifdef QT_DEBUG
-#include "debug_dialog.h"
-#endif
-#include "settings_dialog.h"
+//#ifdef QT_DEBUG
+//#include "debug_dialog.h"
+//#endif
+//#include "settings_dialog.h"
 #include "channel_widget.h"
-#include "request_widget.h"
-#include "client_widget.h"
-#include "about_dialog.h"
-#include "debug_dialog.h"
-#include "vote_widget.h"
+//#include "request_widget.h"
+//#include "client_widget.h"
+//#include "about_dialog.h"
+//#include "debug_dialog.h"
+//#include "vote_widget.h"
 #include "receiver.h"
 #include "server.h"
 
@@ -57,14 +57,16 @@ private:
     Ui::MainWindow *ui;
     Server         *server;
 
-    SettingsDialog settings;
-    DebugDialog    filter_setup;
-    AboutDialog    about;
-    VoteWidget     voting;
+//    SettingsDialog settings;
+//    DebugDialog    filter_setup;
+//    AboutDialog    about;
+//    VoteWidget     voting;
 
-    QMap<QString, ClientWidget*>  clients;
-    QMap<QString, RequestWidget*> requests;
+//    QMap<QString, ClientWidget*>  clients;
+//    QMap<QString, RequestWidget*> requests;
     QMap<QString, ChannelWidget*> channels;
+
+    void loadFonts();
 };
 
 #endif // MAIN_WINDOW_H
