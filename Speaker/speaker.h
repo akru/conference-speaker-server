@@ -10,6 +10,7 @@ typedef struct soxr * soxr_t;
 
 class QAudioOutput;
 class Processing;
+class QIODevice;
 
 class Speaker : public QObject
 {
@@ -44,6 +45,7 @@ private slots:
 private:
     bool                        disabled;
     QAudioOutput               *audio;
+    QIODevice                  *audio_buffer;
     // Improved resampler using SoX
     soxr_t                      resampler;
     // Speaker filters

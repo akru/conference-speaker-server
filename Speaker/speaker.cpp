@@ -14,7 +14,7 @@
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
     disabled(false),
-    audio(0)
+    audio(0), audio_buffer(0)
 {   
     QAudioFormat format;
     // Set up the format, eg.
@@ -52,6 +52,7 @@ Speaker::Speaker(QObject *parent) :
 
     // Open audio device
     audio = new QAudioOutput(info, format);
+    audio_buffer = audio->start();
     // Connect audio sample processing signals
     connect(this,
             SIGNAL(sampleReady(QByteArray)),
@@ -163,7 +164,7 @@ void Speaker::play(QByteArray sample)
                  sample.data(),     Filter::sample_length,   &idone,
                  sample_out.data(), Filter::sample_length*2, &odone);
     // Play buffer
-    audio->start()->write(sample_out);
+    audio_buffer->write(sample_out);
 }
 
 void Speaker::reloadFilterSettings()
