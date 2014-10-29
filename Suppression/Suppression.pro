@@ -4,12 +4,9 @@ TARGET    = Suppression
 TEMPLATE  = lib
 CONFIG   += staticlib
 
-QMAKE_CFLAGS += -O2 -std=c99
-
 SOURCES  += \
     noise_suppression.c \
     ns_core.c \
-    fft4g.c \
 #    howling_suppression.c \
     ns_filter.cpp \
     hs_filter.cpp \
@@ -21,7 +18,9 @@ SOURCES  += \
     pitch_shift_filter.cpp \
     gate_filter.cpp \
     agc_filter.cpp \
-    filter.cpp
+    filter.cpp \
+    ampanalyze_filter.cpp \
+    processing.cpp
 
 HEADERS  += \
     noise_suppression.h \
@@ -29,7 +28,6 @@ HEADERS  += \
     defines.h \
     windows_private.h \
     typedefs.h \
-    fft4g.h \
     signal_processing_library.h \
 #    howling_suppression.h \
     ns_filter.h \
@@ -42,4 +40,10 @@ HEADERS  += \
     pitch_shift_filter.h \
     gate_filter.h \
     agc_filter.h \
-    filter.h
+    filter.h \
+    ampanalyze_filter.h \
+    accbuffer.hpp \
+    processing.h
+
+INCLUDEPATH += $$PWD/../3rd-party/Soxr
+DEPENDPATH += $$PWD/../3rd-party/Soxr

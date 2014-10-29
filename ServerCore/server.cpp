@@ -2,6 +2,8 @@
 #include "broadcaster.h"
 #include "connection.h"
 #include "receiver.h"
+#include "recorder.h"
+#include "speaker.h"
 #include "voting.h"
 
 #include <QTcpServer>
@@ -21,7 +23,9 @@ Server::Server(const ServerInformation &info, QObject *parent)
     : QObject(parent),
       server(new QTcpServer(this)),
       broadcaster(new Broadcaster(this)),
-      voting(0)
+      voting(0),
+      speaker(new Speaker),
+      recorder(new Recorder(users))
 {
     broadcaster->setServerInformation(info);
 
@@ -34,6 +38,31 @@ Server::Server(const ServerInformation &info, QObject *parent)
             SIGNAL(channelCloseRequest(QString)),
             SLOT(channelClose(QString)));
 
+    // Connect speaker signals
+    connect(this,    SIGNAL(channelConnected(QString)),
+            speaker, SLOT(speakerNew(QString)));
+    connect(this,    SIGNAL(channelDisconnected(QString)),
+            speaker, SLOT(speakerDelete(QString)));
+    connect(this,    SIGNAL(channelVolumeChanged(QString,qreal)),
+            speaker, SLOT(setVolume(QString,qreal)));
+    connect(this,    SIGNAL(channelVolumeChanged(qreal)),
+            speaker, SLOT(setVolume(qreal)));
+    connect(this,    SIGNAL(channelSettingsUpdated()),
+            speaker, SLOT(reloadFilterSettings()));
+    connect(speaker, SIGNAL(audioAmpUpdated(QString,ushort)),
+            this,    SLOT(channelAmp(QString,ushort)));
+
+    connect(speaker, SIGNAL(sampleReady(QString,QByteArray)),
+            recorder,SLOT(record(QString,QByteArray)));
+    connect(speaker, SIGNAL(sampleReady(QByteArray)),
+            recorder,SLOT(record(QByteArray)));
+
+    // Recorder mgt
+    connect(this,     SIGNAL(recordStarted()),
+            recorder, SLOT(start()));
+    connect(this,     SIGNAL(recordStoped()),
+            recorder, SLOT(stop()));
+
     QHostAddress hostAddress = QHostAddress(info.address);
     // Listening port
     qDebug() << "Listening" << info.address << SERVER_CONNECTION_PORT <<
@@ -43,6 +72,8 @@ Server::Server(const ServerInformation &info, QObject *parent)
 Server::~Server()
 {
     server->close();
+    delete speaker;
+    delete recorder;
 }
 
 void Server::connectionNew()
@@ -133,7 +164,7 @@ void Server::connectionReadyRead(Connection *client)
             break;
         case Request::Channel:
             qDebug() << "New channel request from" << client->getAddress();
-            emit channelRequest(client->getAddress(), users[client->getAddress()]);
+            emit channelRequest(client->getAddress());
             break;
         case Request::ChannelClose:
             qDebug() << "New channel close request from" << client->getAddress();
@@ -159,7 +190,7 @@ void Server::userRegister(QString address, UserInformation info)
     {
         users.insert(address, info);
         res = Response(Request::Registration, Response::Success);
-        emit userConnected(address, info);
+        emit userConnected(address);
         qDebug() << "Success registered user:" << info.name;
     }
     else
@@ -229,16 +260,16 @@ void Server::channelOpen(QString address)
             // Allocate voice receiver
             try {
                 Receiver *r = new Receiver(server->serverAddress());
-                // Connect all
-                connect(this, SIGNAL(channelSettingsUpdated()),
-                        r,    SLOT(reloadFilterSettings()));
                 // Append to channel map
                 channels.insert(address, r);
+                // Connect with speaker
+                connect(r,       SIGNAL(sampleReceived(QString,QByteArray)),
+                        speaker, SLOT(incomingData(QString,QByteArray)));
                 // Make success response
                 ChannelResponse res(r->getChannelInfo());
                 result = res.toJson();
                 qDebug() << "Success channel open:" << r->getChannelInfo().toJson();
-                emit channelConnected(address, users[address], r);
+                emit channelConnected(address);
             } catch(...) {
                 qDebug() << "Can not open the channel";
                 Response res(Request::Channel, Response::Error, "Server fault");
@@ -313,4 +344,29 @@ void Server::voteDeny(QString address, QString error)
 void Server::voteReadyResults(VoteResults results)
 {
     emit voteResultsUpdated(results);
+}
+
+void Server::channelVolume(QString address, qreal volume)
+{
+    emit channelVolumeChanged(address, volume);
+}
+
+void Server::channelVolume(qreal volume)
+{
+    emit channelVolumeChanged(volume);
+}
+
+void Server::channelAmp(QString address, ushort amp)
+{
+    emit channelAmpUpdated(address, amp);
+}
+
+void Server::recordStart()
+{
+    emit recordStarted();
+}
+
+void Server::recordStop()
+{
+    emit recordStoped();
 }

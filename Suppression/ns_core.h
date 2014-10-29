@@ -75,9 +75,6 @@ typedef struct NSinst_t_ {
   float           overdrive;
   float           denoiseBound;
   int             gainmap;
-  // fft work arrays.
-  int             ip[IP_LENGTH];
-  float           wfft[W_LENGTH];
 
   // parameters for new method: some not needed, will reduce/cleanup later
   WebRtc_Word32   blockInd;                           //frame index counter

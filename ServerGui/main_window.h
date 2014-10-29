@@ -5,20 +5,14 @@
 #include <QMainWindow>
 #include <user_information.h>
 
-//#ifdef QT_DEBUG
-//#include "debug_dialog.h"
-//#endif
-//#include "settings_dialog.h"
-#include "channel_widget.h"
-//#include "request_widget.h"
-//#include "client_widget.h"
-//#include "about_dialog.h"
-//#include "debug_dialog.h"
-//#include "vote_widget.h"
-#include "receiver.h"
-#include "server.h"
+#include "settings.h"
 
 class Server;
+class SpeakerWidget;
+class QListWidgetItem;
+
+typedef QMap<QString, QListWidgetItem*> ItemMap;
+typedef QMap<QString, SpeakerWidget*>   SpeakerWidgetMap;
 
 namespace Ui {
 class MainWindow;
@@ -27,46 +21,44 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 signals:
-    void channelRequestAccepted(QString address);
-    void channelRequestDiscarded(QString address);
-
-public slots:
+    void requestAccepted(QString address);
+    void requestDiscarded(QString address);
 
 private slots:
-    void appendClient(QString address, UserInformation info);
-    void dropClient(QString address);
-    void appendChannel(QString address, UserInformation info, Receiver *channel);
-    void dropChannel(QString address);
-    void channelRequest(QString address, UserInformation info);
-    void dropRequest(QString address);
-    void on_actionAbout_triggered();
-    void on_actionSettings_triggered();
-    void on_actionSound_processing_triggered();
-    void on_actionVoting_triggered();
+    void userAppend(QString address);
+    void userRemove(QString address);
 
-    void updateServerInfo(ServerInformation info);
+    void channelRequest(QString address);
+    void channelConnect(QString address);
+    void speakerRemove(QString address);
 
+    void serverStart();
+    void serverStop();
+
+    inline void serverRestart()
+    { serverStop(); serverStart(); }
+
+    void on_addressBox_currentIndexChanged(int index);
+    void on_powerButton_toggled(bool checked);
+    void on_recordButton_toggled(bool checked);
 
 private:
-    Ui::MainWindow *ui;
-    Server         *server;
+    Ui::MainWindow  *ui;
+    Settings        *settings;
+    Server          *server;
 
-//    SettingsDialog settings;
-//    DebugDialog    filter_setup;
-//    AboutDialog    about;
-//    VoteWidget     voting;
-
-//    QMap<QString, ClientWidget*>  clients;
-//    QMap<QString, RequestWidget*> requests;
-    QMap<QString, ChannelWidget*> channels;
+    ItemMap          userItem;
+    SpeakerWidgetMap speakers;
 
     void loadFonts();
+    void setupUi();
+    void setStatus(const char *status);
+    void updateServerInfo();
 };
 
 #endif // MAIN_WINDOW_H

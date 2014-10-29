@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QString>
+#include <QList>
 
 // Audio filter interface
 class Filter
@@ -37,6 +38,7 @@ public:
      */
     void enable(bool e=true);
 
+    // Sample params
     static const int sample_rate   = 22050; // Hz
     static const int sample_length = 512;  // Bins
 

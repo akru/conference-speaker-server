@@ -10,14 +10,35 @@
 
 #include <cmath>
 
+static const int max_qint16 = 32768;
 
+void fromPCM(qint16 pcm[], float sample[])
+{
+    // Normalization
+    for (short i = 0; i < Filter::sample_length; ++i)
+        sample[i] = ((float)pcm[i]) / max_qint16;
+}
+
+void toPCM(float sample[], qint16 pcm[])
+{
+    // Back to the RAW
+    bool distortion = false;
+    for (short i = 0; i < Filter::sample_length; ++i) {
+        if(sample[i] > 1.0)
+            distortion = true;
+        if(distortion)
+            qDebug() << "Distortion detected!";
+        pcm[i] = fabs(sample[i]) >= 1.0
+                  ? sample[i] / sample[i] * (max_qint16 - 10)
+                  : sample[i] * max_qint16;
+    }
+}
 
 
 int main()
 {
-
-    NSFilter nsf;
-//    PitchShiftFilter psf(1.04, 4);
+//    NSFilter nsf;
+////    PitchShiftFilter psf(1.04, 4);
 
     float eqs[Filter::sample_length];
     for (short i = 0; i<Filter::sample_length / 2 + 1; ++i) {
@@ -28,8 +49,15 @@ int main()
     }
 
     EqualizerFilter eq;
-    HSFilter hsf(&eq);
-    hsf.setTH(15, 15, 13, 0.8);
+    HSFilter hs(&eq);
+    hs.setTH(15, 15, 13, 0.8f);
+
+//    PitchShiftFilter ps;
+//    ps.reloadSettings();
+
+    QList<Filter*> filters;
+    filters.append(&hs);
+    filters.append(&eq);
 
     QFile audio("in.wav");
     audio.open(QIODevice::ReadOnly);
@@ -38,33 +66,20 @@ int main()
     phones.open(QIODevice::WriteOnly);
 
     QTime t;
-    QByteArray sam, res;
-    res.resize(512);  short tm = 0;
+    short tm = 0;
     while (!audio.atEnd())
     {
-        sam = audio.read(512);
-        if (sam.length() == 512)
+        QByteArray sam = audio.read(Filter::sample_length * sizeof(qint16));
+        if (sam.length() == Filter::sample_length * sizeof(qint16))
         {
             t = QTime::currentTime();
 
-            // Normalization
-            qint16 *rawp = (qint16 *) sam.data();
             float sample[Filter::sample_length];
-            float *fltp = sample;
-            while ((char *) rawp < sam.data() + sam.length()) {
-//                qDebug() << "I:" << *rawp;
-                *fltp++ = (float) *rawp++ / 30000;
-                //qDebug() << "O:" << *fltp;
+            fromPCM((qint16 *)sam.data(), sample);
+            foreach (Filter *f, filters) {
+                f->process(sample);
             }
-            hsf.process(sample);
-            eq.process(sample);
-
-            rawp = (qint16 *) sam.data();
-            fltp = sample;
-            while ((char *) rawp < sam.data() + sam.length()) {
-//                qDebug() << "O:" << *fltp;
-                *rawp++ = (qint16) (*fltp++ * 30000);
-            }
+            toPCM(sample, (qint16 *)sam.data());
 
             phones.write(sam);
             qDebug() << t.elapsed() << "passed" << tm++ * 32 << "ms";

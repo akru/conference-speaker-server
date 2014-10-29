@@ -1,63 +1,31 @@
 #include "main_window.h"
 #include "ui_main_window.h"
-#include <QMessageBox>
-#include <QHostAddress>
+#include "speaker_widget.h"
+
+#include <server.h>
+
 #include <QFontDatabase>
-#include <QFile>
-#include <QFont>
+#include <QNetworkInterface>
+#include <QHostAddress>
+#include <QMessageBox>
+#include <QSettings>
 
-const char * clientsHeader = "Clients: <b style=\"color: #00A0E3\">(%1)</b>";
-const char * wantsHeader   = "Wants to ask: <b style=\"color: #00A0E3\">(%1)</b>";
-const char * chatHeader    = "Chat: <b style=\"color: #00A0E3\">(%1)</b>";
-
-const char * statusBarNonConfig  = "Not configured, please set a settings by settings dialog";
-const char * statusBarConfigured = "Configured, waiting for clients...";
-const char * statusBarConnected  = "Working, connected %1 clients";
+const char * statusStoped    = "Server stoped";
+const char * statusStarted   = "Server started, waiting for clients...";
+const char * statusConnected = "Working, clients connected";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    settings(new Settings),
     server(0)
 {
     // Loading fonts
     loadFonts();
     // Setup UI
     ui->setupUi(this);
-    // Restart server with new info
-//    connect(&settings,
-//            SIGNAL(newServerInfo(ServerInformation)),
-//            SLOT(updateServerInfo(ServerInformation)));
-    // Load server settings
-//    settings.loadSettings();
-    // Set scroll boxes alignments
-    ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
-//    ui->channelBox->setAlignment(Qt::AlignTop);
-//    ui->wantsBox->layout()->setAlignment(Qt::AlignTop);
-//    ui->clientBox->layout()->setAlignment(Qt::AlignTop);
-//    // Update headers
-//    ui->clientLabel->setText(clientsHeader.arg(0));
-//    ui->wantsLabel->setText(wantsHeader.arg(0));
-//    ui->chatLabel->setText(chatHeader.arg(0));
-//    if (settings.isConfigured())
-//    {
-//        ui->labelName->setText(settings.serverInfo().name);
-//        ui->statusBar->showMessage(statusBarConfigured);
-//    }
-//    else
-//    {
-//        ui->statusBar->showMessage(statusBarNonConfig);
-//        settings.show();
-//    }
-    UserInformation u("Example", "Example Inc", "Engineer");
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
-    appendChannel("1.1.1.1", u, 0);
+    // Setup UI elements
+    setupUi();
 }
 
 MainWindow::~MainWindow()
@@ -71,133 +39,141 @@ void MainWindow::loadFonts()
              << QFontDatabase::addApplicationFont(":/fonts/Gothic.ttf");
     qDebug() << "GothicBold:"
              << QFontDatabase::addApplicationFont(":/fonts/GothicBold.ttf");
-    QFont f;
-    f.setFamily("Century Gothic");
+
+    QFont f; f.setFamily("Century Gothic");
     QGuiApplication::setFont(f);
+
     qDebug() << "Default font:" << QGuiApplication::font().family();
 }
 
-void MainWindow::appendClient(QString address, UserInformation info)
+void MainWindow::setupUi()
 {
-//    Q_ASSERT(!clients.contains(address));
-
-//    ClientWidget *w = new ClientWidget(info, address, this);
-//    ui->clientBox->layout()->addWidget(w);
-//    clients.insert(address, w);
-//    w->show();
-    // Ban handler
-//    connect(w, SIGNAL(banned(QString)), server, SLOT(dropUser(QString)));
-    // Update header
-//    int countClients = ui->clientBox->layout()->count();
-//    ui->clientLabel->setText(clientsHeader.arg(countClients));
-//    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
+    // Conference name label
+    ui->labelName->setText(settings->info.name);
+    // IP address box
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol
+                && !address.isLoopback())
+        ui->addressBox->addItem(address.toString());
+    }
+    int addrId = ui->addressBox->findText(settings->info.address);
+    ui->addressBox->setCurrentIndex(addrId);
+    // Scroll boxes alignments
+    ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
+    // Status label
+    setStatus(statusStoped);
 }
 
-void MainWindow::dropClient(QString address)
+void MainWindow::setStatus(const char *status)
 {
-//    Q_ASSERT(clients.contains(address));
-//    delete clients[address];
-//    clients.remove(address);
-
-//    if (requests.contains(address))
-//    {
-//        dropRequest(address);
-//    }
-//    if (channels.contains(address))
-//    {
-//        dropChannel(address);
-//    }
-    // Update header
-//    int countClients = ui->clientBox->layout()->count();
-//    ui->clientLabel->setText(clientsHeader.arg(countClients));
-//    ui->statusBar->showMessage(statusBarConnected.arg(countClients));
+    ui->statusLabel->setText(tr(status));
 }
 
-void MainWindow::appendChannel(QString address, UserInformation info, Receiver *channel)
+void MainWindow::updateServerInfo()
 {
-    ChannelWidget *c = new ChannelWidget(address, info, channel, this);
-    channels.insert(address, c);
-    ui->speakersArea->layout()->addWidget(c);
-    c->show();
+    settings->info.name = ui->labelName->text();
+    settings->info.address = ui->addressBox->currentText();
+    settings->save();
 
-    connect(c,      SIGNAL(closeChannelClicked(QString)),
-            server, SLOT(closeChannel(QString)));
-    connect(c,
-            SIGNAL(closeChannelClicked(QString)),
-            SLOT(dropChannel(QString)));
-    // Update header
-//    ui->chatLabel->setText(
-//                chatHeader.arg(ui->channelBox->count()));
+    if (server)
+    {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this,
+                                      tr("Restart server"),
+                                      tr("Settings changed, do you want to restart server?"),
+                                      QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes)
+            serverRestart();
+    }
 }
 
-void MainWindow::dropChannel(QString address)
+void MainWindow::userAppend(QString address)
 {
-    Q_ASSERT(channels.contains(address));
-    channels[address]->close();
-    delete channels[address];
-    channels.remove(address);
-    // Update header
-//    ui->chatLabel->setText(
-//                chatHeader.arg(ui->channelBox->count()));
+    Q_ASSERT(!userItem.contains(address));
+    // Client label in client list
+    QString label = server->getUsers()[address].name;
+    QListWidgetItem *item = new QListWidgetItem(label);
+    ui->userList->addItem(item);
+    userItem.insert(address, item);
+    // Update status
+    setStatus(statusConnected);
 }
 
-void MainWindow::channelRequest(QString address, UserInformation info)
+void MainWindow::userRemove(QString address)
 {
-//    if(requests.contains(address))
-//        return;
-
-//    RequestWidget *reqWidget = new RequestWidget(info, address, this);
-//    requests[address] = reqWidget;
-//    connect(reqWidget, SIGNAL(accepted(QString)),
-//            server, SLOT(openChannel(QString)));
-//    connect(reqWidget, SIGNAL(discarded(QString)),
-//            server, SLOT(denyChannel(QString)));
-//    connect(reqWidget, SIGNAL(accepted(QString)),
-//            SLOT(dropRequest(QString)));
-//    connect(reqWidget, SIGNAL(discarded(QString)),
-//            SLOT(dropRequest(QString)));
-
-//    ui->wantsBox->layout()->addWidget(reqWidget);
-//    reqWidget->show();
-    // Update header
-//    ui->wantsLabel->setText(
-//                wantsHeader.arg(ui->wantsBox->layout()->count()));
+    Q_ASSERT(userItem.contains(address));
+    // Drop client from list
+    delete userItem.take(address);
 }
 
-void MainWindow::dropRequest(QString address)
+void MainWindow::channelConnect(QString address)
 {
-//    if (requests.contains(address))
-//    {
-//        requests[address]->close();
-//        delete requests[address];
-//        requests.remove(address);
-        // Update header
-//        ui->wantsLabel->setText(
-//                    wantsHeader.arg(ui->wantsBox->layout()->count()));
-//    }
+    Q_ASSERT(speakers.contains(address));
+    SpeakerWidget *w = speakers[address];
+
+    connect(w,      SIGNAL(volumeChanged(QString,qreal)),
+            server, SLOT(channelVolume(QString,qreal)));
+    connect(server, SIGNAL(channelAmpUpdated(QString,ushort)),
+            w,      SLOT(setAmplitude(QString,ushort)));
+
+    connect(w,      SIGNAL(closeClicked(QString)),
+            server, SLOT(channelClose(QString)));
+    connect(w,
+            SIGNAL(closeClicked(QString)),
+            SLOT(speakerRemove(QString)));
+
+    // TODO: Boost widget to top
+
+    w->setState(SpeakerWidget::Stream);
 }
 
-void MainWindow::updateServerInfo(ServerInformation info)
+void MainWindow::speakerRemove(QString address)
 {
-    delete server;
-    server = new Server(info);
+    Q_ASSERT(speakers.contains(address));
+    delete speakers.take(address);
+}
 
+void MainWindow::channelRequest(QString address)
+{
+    Q_ASSERT(!speakers.contains(address));
+
+    SpeakerWidget *w = new SpeakerWidget(address,
+                                         server->getUsers()[address],
+                                         this);
+    speakers.insert(address, w);
+
+    connect(w,      SIGNAL(requestAccepted(QString)),
+            server, SLOT(channelOpen(QString)));
+    connect(w,      SIGNAL(requestDiscarded(QString)),
+            server, SLOT(channelDeny(QString)));
+    connect(w,
+            SIGNAL(requestDiscarded(QString)),
+            SLOT(speakerRemove(QString)));
+
+    ui->speakersArea->layout()->addWidget(w);
+    w->show();
+}
+
+void MainWindow::serverStart()
+{
+    server = new Server(settings->info);
+    // User MGT
     connect(server,
-            SIGNAL(userConnected(QString,UserInformation)),
-            SLOT(appendClient(QString,UserInformation)));
+            SIGNAL(userConnected(QString)),
+            SLOT(userAppend(QString)));
     connect(server,
             SIGNAL(userDisconnected(QString)),
-            SLOT(dropClient(QString)));
-
+            SLOT(userRemove(QString)));
+    // Channel MGT
     connect(server,
-            SIGNAL(channelConnected(QString,UserInformation,Receiver*)),
-            SLOT(appendChannel(QString,UserInformation,Receiver*)));
+            SIGNAL(channelConnected(QString)),
+            SLOT(channelConnect(QString)));
     connect(server,
             SIGNAL(channelCloseRequest(QString)),
-            SLOT(dropRequest(QString)));
+            SLOT(speakerRemove(QString)));
     connect(server,
             SIGNAL(channelDisconnected(QString)),
-            SLOT(dropChannel(QString)));
+            SLOT(speakerRemove(QString)));
 
 //    connect(server,  SIGNAL(voteResultsUpdated(VoteResults)),
 //            &voting, SLOT(updateResults(VoteResults)));
@@ -205,40 +181,49 @@ void MainWindow::updateServerInfo(ServerInformation info)
 //            server,  SLOT(voteNew(VotingInvite)));
 //    connect(&voting, SIGNAL(voteStop()),
 //            server,  SLOT(voteStop()));
-
+    // Request MGT
     connect(server,
-            SIGNAL(channelRequest(QString,UserInformation)),
-            SLOT(channelRequest(QString,UserInformation)));
-    connect(this,   SIGNAL(channelRequestAccepted(QString)),
+            SIGNAL(channelRequest(QString)),
+            SLOT(channelRequest(QString)));
+    connect(this,   SIGNAL(requestAccepted(QString)),
             server, SLOT(channelOpen(QString)));
-    connect(this,   SIGNAL(channelRequestDiscarded(QString)),
+    connect(this,   SIGNAL(requestDiscarded(QString)),
             server, SLOT(channelDeny(QString)));
 
-//    connect(&filter_setup, SIGNAL(filterSettingsUpdated()),
-//            server,        SLOT(channelReloadSettings()));
-
-    // Update headers
-//    ui->labelName->setText(info.name);
-//    ui->statusBar->showMessage(statusBarConfigured);
+    // Update status
+    setStatus(statusStarted);
 }
 
-void MainWindow::on_actionAbout_triggered()
+void MainWindow::serverStop()
 {
-//    about.show();
+    delete server; server = 0;
+    setStatus(statusStoped);
 }
 
-void MainWindow::on_actionSettings_triggered()
+void MainWindow::on_addressBox_currentIndexChanged(int index)
 {
-//    settings.updateAddressSelect();
-//    settings.show();
+    Q_UNUSED(index)
+    updateServerInfo();
 }
 
-void MainWindow::on_actionSound_processing_triggered()
+void MainWindow::on_powerButton_toggled(bool checked)
 {
-//    filter_setup.show();
+    if (checked)
+        serverStart();
+    else
+        serverStop();
 }
 
-void MainWindow::on_actionVoting_triggered()
+void MainWindow::on_recordButton_toggled(bool checked)
 {
-//    voting.show();
+    if (server)
+    {
+        if (checked)
+            server->recordStart();
+        else
+            server->recordStop();
+    }
+    else
+        ui->recordButton->setChecked(false);
 }
+

@@ -9,7 +9,7 @@ QJsonObject Request::toJson() const
         obj.insert("request", QString("registration"));
         break;
     case Channel:
-        obj.insert("request", QString("channel"));
+        obj.insert("request", QString("channel_open"));
         break;
     case ChannelClose:
         obj.insert("request", QString("channel_close"));

@@ -76,7 +76,7 @@ QTabBar::tab:!selected {
     margin-right: 2px; /* make non-selected tabs look smaller */
 }
 
-QGroupBox#clientsBox {
+QGroupBox#usersBox {
     border: 5px solid black;
 	border-image: url(:/gui/client-list-box) 5;
     padding: 0;
@@ -146,13 +146,14 @@ QListWidget, QWidget#speakersArea, QWidget#soundTab {
     border-bottom: 1px solid rgba(252,251,250,255);
 }
 
+/*
 QWidget#channelBox {
 	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(178,174,185, 255), stop:1 rgba(218,218,226, 255));
     border-top: 4px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(118, 118, 120, 255), stop:1 rgba(184, 184, 192, 255));
     border-left: 1px solid rgba(182,182,189,255);
     border-right: 1px solid rgba(184,184,192,255);
     border-bottom: 1px solid rgba(243,241,233,255);
-}
+}*/
 
 QGroupBox {
     border: 0;
@@ -283,11 +284,7 @@ QListView::item {
                                  stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                  stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
  }
-
-QLabel#labelClientListUp {
-	border-top: 1px solid qlineargradient(spread:reflect, x1:1, y1:0, x2:0, y2:0, stop:0 rgba(162, 162, 162, 0), stop:0.5 rgba(219, 173, 114, 255), stop:1 rgba(162, 162, 162, 0));
-   margin-top: 5px;
-}</string>
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -307,7 +304,7 @@ QLabel#labelClientListUp {
      <number>0</number>
     </property>
     <item>
-     <widget class="QGroupBox" name="clientsBox">
+     <widget class="QGroupBox" name="usersBox">
       <property name="minimumSize">
        <size>
         <width>200</width>
@@ -384,25 +381,10 @@ QLabel#labelClientListUp {
          <property name="frame">
           <bool>false</bool>
          </property>
-         <item>
-          <property name="text">
-           <string>255.255.255.255</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1.1.1.1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>2.2.2.24</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="clientList">
+        <widget class="QListWidget" name="userList">
          <property name="verticalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>

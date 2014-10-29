@@ -15,23 +15,6 @@
 #include "ns_core.h"
 #include "defines.h"
 
-int WebRtcNs_get_version(char* versionStr, short length) {
-  const char version[] = "NS 2.2.0";
-  const short versionLen = (short)strlen(version) + 1; // +1: null-termination
-
-  if (versionStr == NULL) {
-    return -1;
-  }
-
-  if (versionLen > length) {
-    return -1;
-  }
-
-  strncpy(versionStr, version, versionLen);
-
-  return 0;
-}
-
 int WebRtcNs_Create(NsHandle** NS_inst) {
   *NS_inst = (NsHandle*) malloc(sizeof(NSinst_t));
   if (*NS_inst != NULL) {

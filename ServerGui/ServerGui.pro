@@ -8,27 +8,32 @@ TEMPLATE = app
 SOURCES  += main.cpp \
     main_window.cpp \
 #    about_dialog.cpp \
-    channel_widget.cpp \
+#    channel_widget.cpp \
 #    settings_dialog.cpp \
 #    request_widget.cpp \
 #    vote_widget.cpp \
 #    client_widget.cpp \
 #    debug_dialog.cpp
+    settings.cpp \
+    speaker_widget.cpp
 
 HEADERS  += \
     main_window.h \
 #    about_dialog.h \
-    channel_widget.h \
+#    channel_widget.h \
 #    settings_dialog.h \
 #    request_widget.h \
 #    vote_widget.h \
 #    client_widget.h \
 #    debug_dialog.h
+    settings.h \
+    speaker_widget.h
 
 FORMS    += \
     main_window.ui \
 #    about_dialog.ui \
-    channel_widget.ui
+#    channel_widget.ui \
+    speaker_widget.ui
 
 RESOURCES += \
     resource.qrc
@@ -88,3 +93,13 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Supp
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Suppression/release/Suppression.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Suppression/debug/Suppression.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Suppression/libSuppression.a
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../3rd-party/Soxr/release/ -lSoxr
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../3rd-party/Soxr/debug/ -lSoxr
+else:unix: LIBS += -L$$OUT_PWD/../3rd-party/Soxr/ -lSoxr
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rd-party/Soxr/release/libSoxr.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rd-party/Soxr/debug/libSoxr.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rd-party/Soxr/release/Soxr.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../3rd-party/Soxr/debug/Soxr.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../3rd-party/Soxr/libSoxr.a

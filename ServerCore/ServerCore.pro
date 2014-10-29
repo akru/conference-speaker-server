@@ -1,4 +1,4 @@
-QT       = core network
+QT       = core network multimedia
 
 TARGET   = ServerCore
 TEMPLATE = lib
@@ -9,24 +9,30 @@ HEADERS += \
     connection.h \
     receiver.h \
     server.h \
-    licensing.h \
-    voting.h
+    voting.h \
+    recorder.h \
+    speaker.h
 
 SOURCES += \
     broadcaster.cpp \
     connection.cpp \
     receiver.cpp \
     server.cpp \
-    licensing.cpp \
-    voting.cpp
+    voting.cpp \
+    recorder.cpp \
+    speaker.cpp
 
-INCLUDEPATH += $$PWD/../Protocol $$PWD/../Speaker
-DEPENDPATH  += $$PWD/../Protocol $$PWD/../Speaker
+CONFIG(release, debug|release){
+message("Release with licensing")
 
-INCLUDEPATH += $$PWD/../Suppression
-DEPENDPATH  += $$PWD/../Suppression
+HEADERS += licensing.h
+SOURCES += licensing.cpp
 
 DEFINES     += NDEBUG
 
 INCLUDEPATH += $$PWD/../../cryptopp
 DEPENDPATH  += $$PWD/../../cryptopp
+}
+
+INCLUDEPATH += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr
+DEPENDPATH  += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr

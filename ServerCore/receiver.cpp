@@ -14,12 +14,6 @@ Receiver::Receiver(QHostAddress address, QObject *parent)
     }
     else
         throw(std::exception());
-    // Check speaker is working
-    if (speaker.isDisabled())
-        throw(std::exception());
-    // Connects with speaker
-    connect(&speaker, SIGNAL(audioAmpUpdated(int)), SLOT(updateAmp(int)));
-    connect(this, SIGNAL(sampleReceived(QByteArray)), &speaker, SLOT(play(QByteArray)));
 }
 
 Receiver::~Receiver()
@@ -30,11 +24,12 @@ Receiver::~Receiver()
 void Receiver::sockReadyRead()
 {
     QByteArray buf;
+    QHostAddress peer;
     // Receive audio sample
     qDebug() << "New data size" << sock.pendingDatagramSize();
     buf.resize(sock.pendingDatagramSize());
-    sock.readDatagram(buf.data(), buf.size());
+    sock.readDatagram(buf.data(), buf.size(), &peer);
     // Play sample
-    emit sampleReceived(buf);
+    emit sampleReceived(peer.toString(), buf);
 }
 

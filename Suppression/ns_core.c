@@ -12,10 +12,10 @@
 #include <math.h>
 //#include <stdio.h>
 #include <stdlib.h>
+#include <soxr.h>
 #include "noise_suppression.h"
 #include "ns_core.h"
 #include "windows_private.h"
-#include "fft4g.h"
 #include "signal_processing_library.h"
 
 // Set Feature Extraction Parameters
@@ -89,9 +89,8 @@ int WebRtcNs_InitCore(NSinst_t* inst, WebRtc_UWord32 fs) {
   inst->magnLen = inst->anaLen / 2 + 1; // Number of frequency bins
 
   // Initialize fft work arrays.
-  inst->ip[0] = 0; // Setting this triggers initialization.
   memset(inst->dataBuf, 0, sizeof(float) * ANAL_BLOCKL_MAX);
-  rdft(inst->anaLen, 1, inst->dataBuf, inst->ip, inst->wfft);
+  rdftf(inst->anaLen, 1, inst->dataBuf);
 
   memset(inst->dataBuf, 0, sizeof(float) * ANAL_BLOCKL_MAX);
   memset(inst->syntBuf, 0, sizeof(float) * ANAL_BLOCKL_MAX);
@@ -593,7 +592,7 @@ void WebRtcNs_SpeechNoiseProb(NSinst_t* inst, float* probSpeechFinal, float* snr
   float invLrt, gainPrior, indPrior;
   float logLrtTimeAvgKsum, besselTmp;
   float indicator0, indicator1, indicator2;
-  float tmpFloat1, tmpFloat2;
+  float tmpfloat1, tmpfloat2;
   float weightIndPrior0, weightIndPrior1, weightIndPrior2;
   float threshPrior0, threshPrior1, threshPrior2;
   float widthPrior, widthPrior0, widthPrior1, widthPrior2;
@@ -620,10 +619,10 @@ void WebRtcNs_SpeechNoiseProb(NSinst_t* inst, float* probSpeechFinal, float* snr
   // this is the average over all frequencies of the smooth log lrt
   logLrtTimeAvgKsum = 0.0;
   for (i = 0; i < inst->magnLen; i++) {
-    tmpFloat1 = (float)1.0 + (float)2.0 * snrLocPrior[i];
-    tmpFloat2 = (float)2.0 * snrLocPrior[i] / (tmpFloat1 + (float)0.0001);
-    besselTmp = (snrLocPost[i] + (float)1.0) * tmpFloat2;
-    inst->logLrtTimeAvg[i] += LRT_TAVG * (besselTmp - (float)log(tmpFloat1)
+    tmpfloat1 = (float)1.0 + (float)2.0 * snrLocPrior[i];
+    tmpfloat2 = (float)2.0 * snrLocPrior[i] / (tmpfloat1 + (float)0.0001);
+    besselTmp = (snrLocPost[i] + (float)1.0) * tmpfloat2;
+    inst->logLrtTimeAvg[i] += LRT_TAVG * (besselTmp - (float)log(tmpfloat1)
                                           - inst->logLrtTimeAvg[i]);
     logLrtTimeAvgKsum += inst->logLrtTimeAvg[i];
   }
@@ -646,28 +645,28 @@ void WebRtcNs_SpeechNoiseProb(NSinst_t* inst, float* probSpeechFinal, float* snr
       (logLrtTimeAvgKsum - threshPrior0)) + (float)1.0);
 
   //spectral flatness feature
-  tmpFloat1 = inst->featureData[0];
+  tmpfloat1 = inst->featureData[0];
   widthPrior = widthPrior0;
   //use larger width in tanh map for pause regions
-  if (sgnMap == 1 && (tmpFloat1 > threshPrior1)) {
+  if (sgnMap == 1 && (tmpfloat1 > threshPrior1)) {
     widthPrior = widthPrior1;
   }
-  if (sgnMap == -1 && (tmpFloat1 < threshPrior1)) {
+  if (sgnMap == -1 && (tmpfloat1 < threshPrior1)) {
     widthPrior = widthPrior1;
   }
   // compute indicator function: sigmoid map
-  indicator1 = (float)0.5 * ((float)tanh((float)sgnMap * 
-      widthPrior * (threshPrior1 - tmpFloat1)) + (float)1.0);
+  indicator1 = (float)0.5 * ((float)tanh((float)sgnMap *
+      widthPrior * (threshPrior1 - tmpfloat1)) + (float)1.0);
 
   //for template spectrum-difference
-  tmpFloat1 = inst->featureData[4];
+  tmpfloat1 = inst->featureData[4];
   widthPrior = widthPrior0;
   //use larger width in tanh map for pause regions
-  if (tmpFloat1 < threshPrior2) {
+  if (tmpfloat1 < threshPrior2) {
     widthPrior = widthPrior2;
   }
   // compute indicator function: sigmoid map
-  indicator2 = (float)0.5 * ((float)tanh(widthPrior * (tmpFloat1 - threshPrior2))
+  indicator2 = (float)0.5 * ((float)tanh(widthPrior * (tmpfloat1 - threshPrior2))
                              + (float)1.0);
 
   //combine the indicator function with the feature weights
@@ -706,7 +705,7 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
   float   energy1, energy2, gain, factor, factor1, factor2;
   float   signalEnergy, sumMagn;
   float   snrPrior, currentEstimateStsa;
-  float   tmpFloat1, tmpFloat2, tmpFloat3, probSpeech, probNonSpeech;
+  float   tmpfloat1, tmpfloat2, tmpfloat3, probSpeech, probNonSpeech;
   float   gammaNoiseTmp, gammaNoiseOld;
   float   noiseUpdateTmp, fTmp;
   float   winData[ANAL_BLOCKL_MAX];
@@ -780,7 +779,7 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
     //
     inst->blockInd++; // Update the block index only when we process a block.
     // FFT
-    rdft(inst->anaLen, 1, winData, inst->ip, inst->wfft);
+    rdftf(inst->anaLen, 1, winData);
 
     imag[0] = 0;
     real[0] = winData[0];
@@ -788,18 +787,18 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
     imag[inst->magnLen - 1] = 0;
     real[inst->magnLen - 1] = winData[1];
     magn[inst->magnLen - 1] = (float)(fabs(real[inst->magnLen - 1]) + 1.0f);
-    signalEnergy = (float)(real[0] * real[0]) + 
+    signalEnergy = (float)(real[0] * real[0]) +
                    (float)(real[inst->magnLen - 1] * real[inst->magnLen - 1]);
     sumMagn = magn[0] + magn[inst->magnLen - 1];
     if (inst->blockInd < END_STARTUP_SHORT) {
       inst->initMagnEst[0] += magn[0];
       inst->initMagnEst[inst->magnLen - 1] += magn[inst->magnLen - 1];
-      tmpFloat2 = log((float)(inst->magnLen - 1));
-      sum_log_i = tmpFloat2;
-      sum_log_i_square = tmpFloat2 * tmpFloat2;
-      tmpFloat1 = log(magn[inst->magnLen - 1]);
-      sum_log_magn = tmpFloat1;
-      sum_log_i_log_magn = tmpFloat2 * tmpFloat1;
+      tmpfloat2 = logf((float)(inst->magnLen - 1));
+      sum_log_i = tmpfloat2;
+      sum_log_i_square = tmpfloat2 * tmpfloat2;
+      tmpfloat1 = logf(magn[inst->magnLen - 1]);
+      sum_log_magn = tmpfloat1;
+      sum_log_i_log_magn = tmpfloat2 * tmpfloat1;
     }
     for (i = 1; i < inst->magnLen - 1; i++) {
       real[i] = winData[2 * i];
@@ -813,12 +812,12 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
       if (inst->blockInd < END_STARTUP_SHORT) {
         inst->initMagnEst[i] += magn[i];
         if (i >= kStartBand) {
-          tmpFloat2 = log((float)i);
-          sum_log_i += tmpFloat2;
-          sum_log_i_square += tmpFloat2 * tmpFloat2;
-          tmpFloat1 = log(magn[i]);
-          sum_log_magn += tmpFloat1;
-          sum_log_i_log_magn += tmpFloat2 * tmpFloat1;
+          tmpfloat2 = logf((float)i);
+          sum_log_i += tmpfloat2;
+          sum_log_i_square += tmpfloat2 * tmpfloat2;
+          tmpfloat1 = logf(magn[i]);
+          sum_log_magn += tmpfloat1;
+          sum_log_i_log_magn += tmpfloat2 * tmpfloat1;
         }
       }
     }
@@ -835,26 +834,26 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
       // Estimate White noise
       inst->whiteNoiseLevel += sumMagn / ((float)inst->magnLen) * inst->overdrive;
       // Estimate Pink noise parameters
-      tmpFloat1 = sum_log_i_square * ((float)(inst->magnLen - kStartBand));
-      tmpFloat1 -= (sum_log_i * sum_log_i);
-      tmpFloat2 = (sum_log_i_square * sum_log_magn - sum_log_i * sum_log_i_log_magn);
-      tmpFloat3 = tmpFloat2 / tmpFloat1;
+      tmpfloat1 = sum_log_i_square * ((float)(inst->magnLen - kStartBand));
+      tmpfloat1 -= (sum_log_i * sum_log_i);
+      tmpfloat2 = (sum_log_i_square * sum_log_magn - sum_log_i * sum_log_i_log_magn);
+      tmpfloat3 = tmpfloat2 / tmpfloat1;
       // Constrain the estimated spectrum to be positive
-      if (tmpFloat3 < 0.0f) {
-        tmpFloat3 = 0.0f;
+      if (tmpfloat3 < 0.0f) {
+        tmpfloat3 = 0.0f;
       }
-      inst->pinkNoiseNumerator += tmpFloat3;
-      tmpFloat2 = (sum_log_i * sum_log_magn);
-      tmpFloat2 -= ((float)(inst->magnLen - kStartBand)) * sum_log_i_log_magn;
-      tmpFloat3 = tmpFloat2 / tmpFloat1;
+      inst->pinkNoiseNumerator += tmpfloat3;
+      tmpfloat2 = (sum_log_i * sum_log_magn);
+      tmpfloat2 -= ((float)(inst->magnLen - kStartBand)) * sum_log_i_log_magn;
+      tmpfloat3 = tmpfloat2 / tmpfloat1;
       // Constrain the pink noise power to be in the interval [0, 1];
-      if (tmpFloat3 < 0.0f) {
-        tmpFloat3 = 0.0f;
+      if (tmpfloat3 < 0.0f) {
+        tmpfloat3 = 0.0f;
       }
-      if (tmpFloat3 > 1.0f) {
-        tmpFloat3 = 1.0f;
+      if (tmpfloat3 > 1.0f) {
+        tmpfloat3 = 1.0f;
       }
-      inst->pinkNoiseExp += tmpFloat3;
+      inst->pinkNoiseExp += tmpfloat3;
 
       // Calculate frequency independent parts of parametric noise estimate.
       if (inst->pinkNoiseExp == 0.0f) {
@@ -862,23 +861,23 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
         parametric_noise = inst->whiteNoiseLevel;
       } else {
         // Use pink noise estimate
-        parametric_num = exp(inst->pinkNoiseNumerator / (float)(inst->blockInd + 1));
+        parametric_num = expf(inst->pinkNoiseNumerator / (float)(inst->blockInd + 1));
         parametric_num *= (float)(inst->blockInd + 1);
         parametric_exp = inst->pinkNoiseExp / (float)(inst->blockInd + 1);
-        parametric_noise = parametric_num / pow((float)kStartBand, parametric_exp);
+        parametric_noise = parametric_num / powf((float)kStartBand, parametric_exp);
       }
       for (i = 0; i < inst->magnLen; i++) {
         // Estimate the background noise using the white and pink noise parameters
         if ((inst->pinkNoiseExp > 0.0f) && (i >= kStartBand)) {
           // Use pink noise estimate
-          parametric_noise = parametric_num / pow((float)i, parametric_exp);
+          parametric_noise = parametric_num / powf((float)i, parametric_exp);
         }
         theFilterTmp[i] = (inst->initMagnEst[i] - inst->overdrive * parametric_noise);
         theFilterTmp[i] /= (inst->initMagnEst[i] + (float)0.0001);
         // Weight quantile noise with modeled noise
         noise[i] *= (inst->blockInd);
-        tmpFloat2 = parametric_noise * (END_STARTUP_SHORT - inst->blockInd);
-        noise[i] += (tmpFloat2 / (float)(inst->blockInd + 1));
+        tmpfloat2 = parametric_noise * (END_STARTUP_SHORT - inst->blockInd);
+        noise[i] += (tmpfloat2 / (float)(inst->blockInd + 1));
         noise[i] /= END_STARTUP_SHORT;
       }
     }
@@ -927,9 +926,9 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
 #ifdef PROCESS_FLOW_1
     for (i = 0; i < inst->magnLen; i++) {
       // gain filter
-      tmpFloat1 = inst->overdrive + snrLocPrior[i];
-      tmpFloat2 = (float)snrLocPrior[i] / tmpFloat1;
-      theFilter[i] = (float)tmpFloat2;
+      tmpfloat1 = inst->overdrive + snrLocPrior[i];
+      tmpfloat2 = (float)snrLocPrior[i] / tmpfloat1;
+      theFilter[i] = (float)tmpfloat2;
     } // end of loop over freqs
 #endif
     // done with step 1: dd computation of prior and post snr
@@ -1019,9 +1018,9 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
       snrPrior = DD_PR_SNR * previousEstimateStsa[i] + ((float)1.0 - DD_PR_SNR)
                  * currentEstimateStsa;
       // gain filter
-      tmpFloat1 = inst->overdrive + snrPrior;
-      tmpFloat2 = (float)snrPrior / tmpFloat1;
-      theFilter[i] = (float)tmpFloat2;
+      tmpfloat1 = inst->overdrive + snrPrior;
+      tmpfloat2 = (float)snrPrior / tmpfloat1;
+      theFilter[i] = (float)tmpfloat2;
     } // end of loop over freqs
     // done with step3
 #endif
@@ -1073,7 +1072,7 @@ int WebRtcNs_ProcessCore(NSinst_t* inst,
       winData[2 * i] = real[i];
       winData[2 * i + 1] = imag[i];
     }
-    rdft(inst->anaLen, -1, winData, inst->ip, inst->wfft);
+    rdftf(inst->anaLen, -1, winData);
 
     for (i = 0; i < inst->anaLen; i++) {
       real[i] = 2.0f * winData[i] / inst->anaLen; // fft scaling

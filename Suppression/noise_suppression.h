@@ -20,20 +20,6 @@ extern "C" {
 #endif
 
 /*
- * This function returns the version number of the code.
- *
- * Input:
- *      - version       : Pointer to a character array where the version
- *                        info is stored.
- *      - length        : Length of version.
- *
- * Return value         :  0 - Ok
- *                        -1 - Error (probably length is not sufficient)
- */
-int WebRtcNs_get_version(char* version, short length);
-
-
-/*
  * This function creates an instance to the noise reduction structure
  *
  * Input:
