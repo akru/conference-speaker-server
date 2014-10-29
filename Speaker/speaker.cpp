@@ -14,8 +14,7 @@
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
     disabled(false),
-    audio(0),
-    audio_buffer(0)
+    audio(0)
 {   
     QAudioFormat format;
     // Set up the format, eg.
@@ -53,7 +52,6 @@ Speaker::Speaker(QObject *parent) :
 
     // Open audio device
     audio = new QAudioOutput(info, format);
-    audio_buffer = audio->start();
     // Connect audio sample processing signals
     connect(this,
             SIGNAL(sampleReady(QByteArray)),
@@ -132,10 +130,8 @@ void Speaker::incomingData(QString speaker, QByteArray packet)
 
 void Speaker::speakHeartbeat()
 {
-    // Disabled behaviour
-    if (disabled) return;
-
     QByteArray sample, sample_out(Filter::sample_length * 2, 0);
+    bool silence = true;
     foreach (Processing *p, proc.values()) {
         QTime t = QTime::currentTime();
         sample = p->take();
@@ -143,6 +139,8 @@ void Speaker::speakHeartbeat()
         // Empty sample when no data to process
         if (!sample.length())
             continue;
+        else
+            silence = false;
         QString speaker = proc.key(p);
         // Emit amplitude signal
         emit audioAmpUpdated(speaker, p->getAmp());
@@ -152,7 +150,8 @@ void Speaker::speakHeartbeat()
         sample_out = Processing::mix(sample, sample_out);
     }
     // Emit mixed sample
-    emit sampleReady(sample_out);
+    if (!silence)
+        emit sampleReady(sample_out);
 }
 
 void Speaker::play(QByteArray sample)
@@ -164,7 +163,7 @@ void Speaker::play(QByteArray sample)
                  sample.data(),     Filter::sample_length,   &idone,
                  sample_out.data(), Filter::sample_length*2, &odone);
     // Play buffer
-    audio_buffer->write(sample_out);
+    audio->start()->write(sample_out);
 }
 
 void Speaker::reloadFilterSettings()
