@@ -26,6 +26,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     // Setup UI elements
     setupUi();
+
+    userAppend("1.1.1.1");
+    channelRequest("1.1.1.1");
+    userAppend("1.1.1.2");
+    channelRequest("1.1.1.2");
+    userAppend("1.1.1.3");
+    channelRequest("1.1.1.3");
+    speakers.first()->setState(SpeakerWidget::Stream);
 }
 
 MainWindow::~MainWindow()
@@ -91,7 +99,7 @@ void MainWindow::userAppend(QString address)
 {
     Q_ASSERT(!userItem.contains(address));
     // Client label in client list
-    QString label = server->getUsers()[address].name;
+    QString label = "test";//server->getUsers()[address].name;
     QListWidgetItem *item = new QListWidgetItem(label);
     ui->userList->addItem(item);
     userItem.insert(address, item);
@@ -138,7 +146,7 @@ void MainWindow::channelRequest(QString address)
     Q_ASSERT(!speakers.contains(address));
 
     SpeakerWidget *w = new SpeakerWidget(address,
-                                         server->getUsers()[address],
+                                         UserInformation("Alexander Krupenkin"), //server->getUsers()[address],
                                          this);
     speakers.insert(address, w);
 

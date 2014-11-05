@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>543</width>
-    <height>143</height>
+    <width>627</width>
+    <height>131</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -21,8 +27,11 @@
 }
 
 QFrame#frame {
-    border: 1px solid rgba(80,80,80,80);
-	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(219, 173, 114, 80), stop:1 rgba(231, 231, 231, 0));
+    border-top: 2px solid rgba(241,240,230,255);
+    border-bottom: 2px solid rgba(171,162,153,255);
+    border-right: 2px solid rgba(157,152,145,255);
+    border-left: 2px solid rgba(218,206,196,255);
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0.006, y2:0, stop:0 rgba(214, 203, 189, 255), stop:1 rgba(238, 235, 235, 255));
 }
 
 QSlider {
@@ -53,6 +62,7 @@ QFrame#volumeFrame {
     border-radius: 3px;
     border: 0;
     background: rgba(14,64,112,255);
+    margin: 5px 0;
 }
 
 QProgressBar {
@@ -64,9 +74,32 @@ QProgressBar::chunk {
 	background-image: url(:/gui/volume-slider-sub-bg);
     margin-top: 0.5px;
     height: 5px;
+}
+
+QPushButton#acceptButton,
+QPushButton#acceptButton:checked,
+QPushButton#acceptButton:pressed,
+QPushButton#dismissButton,
+QPushButton#dismissButton:checked,
+QPushButton#dismissButton:pressed {
+    border: 0;
+    background: none;
+    padding: 0;
+}
+
+QSpinBox {
+    padding: 0;
+    margin: 0;
+    padding-left: 3px;
 }</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="topMargin">
+    <number>10</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QFrame" name="frame">
      <property name="styleSheet">
@@ -85,38 +118,80 @@ QProgressBar::chunk {
       <number>0</number>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="leftMargin">
+      <property name="spacing">
        <number>9</number>
+      </property>
+      <property name="leftMargin">
+       <number>15</number>
       </property>
       <property name="topMargin">
-       <number>9</number>
+       <number>1</number>
       </property>
       <property name="rightMargin">
-       <number>9</number>
+       <number>15</number>
       </property>
       <property name="bottomMargin">
-       <number>9</number>
+       <number>1</number>
       </property>
       <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
+       <widget class="QSpinBox" name="delayBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>55</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="wrapping">
+         <bool>false</bool>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::NoButtons</enum>
+        </property>
+        <property name="accelerated">
+         <bool>false</bool>
+        </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="suffix">
+         <string> min</string>
+        </property>
+        <property name="prefix">
          <string/>
         </property>
-        <property name="scaledContents">
-         <bool>false</bool>
+        <property name="value">
+         <number>1</number>
+        </property>
+        <property name="displayIntegerBase">
+         <number>10</number>
         </property>
        </widget>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>15</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>15</number>
+         <number>0</number>
         </property>
         <item>
          <widget class="QLabel" name="nameLabel">
@@ -155,13 +230,6 @@ QProgressBar::chunk {
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="acceptButton">
-        <property name="text">
-         <string>Accept</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QFrame" name="volumeFrame">
         <property name="enabled">
          <bool>true</bool>
@@ -182,6 +250,25 @@ QProgressBar::chunk {
          <property name="rightMargin">
           <number>3</number>
          </property>
+         <item>
+          <widget class="QSlider" name="volumeSlider">
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="invertedAppearance">
+            <bool>false</bool>
+           </property>
+           <property name="invertedControls">
+            <bool>false</bool>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksAbove</enum>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QProgressBar" name="volumeBar">
            <property name="maximumSize">
@@ -210,32 +297,47 @@ QProgressBar::chunk {
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QSlider" name="volumeSlider">
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="invertedAppearance">
-            <bool>false</bool>
-           </property>
-           <property name="invertedControls">
-            <bool>false</bool>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksAbove</enum>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="closeButton">
+       <widget class="QPushButton" name="acceptButton">
         <property name="text">
-         <string>Close</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="resource.qrc">
+          <normaloff>:/gui/accept-button</normaloff>:/gui/accept-button</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="dismissButton">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="resource.qrc">
+          <normaloff>:/gui/desmiss-button</normaloff>
+          <normalon>:/gui/dismiss-button-ressed</normalon>:/gui/desmiss-button</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -244,6 +346,8 @@ QProgressBar::chunk {
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

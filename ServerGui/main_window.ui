@@ -82,7 +82,7 @@ QGroupBox#usersBox {
     padding: 0;
 }
 
-QLineEdit, QComboBox, QDoubleSpinBox {
+QLineEdit, QComboBox, QDoubleSpinBox, QSpinBox {
     border-left: 1px solid rgba(191,181,171,255);
     border-right: 1px solid rgba(191,181,171,255);
     border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
@@ -93,7 +93,7 @@ QLineEdit, QComboBox, QDoubleSpinBox {
     font-size: 10pt;
 }
 
-QLineEdit:disabled, QComboBox:disabled, QDoubleSpinBox:disabled {
+QLineEdit:disabled, QComboBox:disabled, QDoubleSpinBox:disabled, QSpinBox:disabled {
     border-left: 1px solid rgba(180,180,180,255);
     border-right: 1px solid rgba(180,180,180,255);
     border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 50), stop:1 rgba(0, 0, 0, 10));
@@ -138,7 +138,10 @@ QScrollArea {
     border: 0;
 }
 
-QListWidget, QWidget#speakersArea, QWidget#soundTab {
+QListWidget,
+QWidget#speakersArea,
+QWidget#soundTab,
+QWidget#aboutTab {
 	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(224,219,213, 255), stop:1 rgba(253,255,248, 255));
     border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
     border-left: 1px solid rgba(188,186,184,255);
@@ -229,7 +232,10 @@ QPushButton#powerButton:checked,
 QPushButton#powerButton:pressed,
 QPushButton#recordButton,
 QPushButton#recordButton:checked,
-QPushButton#recordButton:pressed {
+QPushButton#recordButton:pressed,
+QPushButton#drophandsButton,
+QPushButton#drophandsButton:checked,
+QPushButton#drophandsButton:pressed {
     border: 0;
     background: none;
     padding: 0;
@@ -331,7 +337,7 @@ QListView::item {
         <number>7</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>15</number>
        </property>
        <property name="rightMargin">
         <number>9</number>
@@ -409,26 +415,6 @@ QListView::item {
          <property name="isWrapping" stdset="0">
           <bool>false</bool>
          </property>
-         <item>
-          <property name="text">
-           <string>Xeny Rakova</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Alisher Khassanov</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Alexander Krupenkin</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Alexander Borgul</string>
-          </property>
-         </item>
         </widget>
        </item>
       </layout>
@@ -582,6 +568,38 @@ QListView::item {
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="drophandsButton">
+              <property name="styleSheet">
+               <string notr="true">:pressed {
+image: url(:/gui/drophands-button-pressed);
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/gui/drophands-button</normaloff>
+                <normalon>:/gui/drophands-button-pressed</normalon>:/gui/drophands-button</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>48</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -662,14 +680,14 @@ QListView::item {
              <property name="fieldGrowthPolicy">
               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
              </property>
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="label_9">
                <property name="text">
                 <string>Question:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="3" column="0" colspan="2">
               <widget class="QRadioButton" name="simpleRB">
                <property name="text">
                 <string>Yes / No</string>
@@ -679,14 +697,14 @@ QListView::item {
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="4" column="0" colspan="2">
               <widget class="QRadioButton" name="customRB">
                <property name="text">
                 <string>Custom</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0" colspan="2">
+             <item row="5" column="0" colspan="2">
               <layout class="QFormLayout" name="customLayout">
                <property name="fieldGrowthPolicy">
                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -699,7 +717,7 @@ QListView::item {
                </property>
               </layout>
              </item>
-             <item row="7" column="0">
+             <item row="8" column="0">
               <widget class="QPushButton" name="pushButton">
                <property name="text">
                 <string>Start</string>
@@ -709,7 +727,7 @@ QListView::item {
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="6" column="1">
               <widget class="QPushButton" name="plusButton">
                <property name="maximumSize">
                 <size>
@@ -722,8 +740,15 @@ QListView::item {
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QTextEdit" name="textEdit"/>
+             <item row="1" column="1">
+              <widget class="QPlainTextEdit" name="plainTextEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>80</height>
+                </size>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -742,6 +767,9 @@ QListView::item {
             <layout class="QGridLayout" name="gridLayout_4">
              <item row="1" column="0" colspan="2">
               <layout class="QFormLayout" name="formLayout_4">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -1467,6 +1495,85 @@ QListView::item {
          <attribute name="toolTip">
           <string>About</string>
          </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <property name="leftMargin">
+           <number>25</number>
+          </property>
+          <property name="topMargin">
+           <number>15</number>
+          </property>
+          <property name="rightMargin">
+           <number>25</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_31">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="resource.qrc">:/gui/cslogo</pixmap>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_26">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="resource.qrc">:/gui/wtlogo</pixmap>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conference Speaker&lt;/span&gt; – программный комплекс, позволяющий организовывать любые конференции и публичные мероприятия, где в качестве микрофонов выступают мобильные устройства участников, а также участникам предоставляется возможность голосования и получения актуального расписания мероприятия.&lt;/p&gt;&lt;p&gt;«Вас не слышно без микрофона», «у вас недостаточно средств для аренды конференц-зала с оборудованием», устраиваете мероприятие, где «проводите голосования с помощью поднятых рук», «проводите частную презентацию или собрание с большим количеством присутствующих» - только немногие из ситуаций, где вам необходим Conference Speaker. Вам больше не требуется присутствие специально обученных людей для настройки оборудования и перемещения микрофонов от участника к участнику. Все что вам нужно – скачать и установить Conference Speaker, всю настройку система выполнит в автоматическом режиме. Вам остается только наслаждаться полным залом довольных участников. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>&lt;b&gt;Подробная инструкция по приобретению и оплате доступна здесь, по установке  и настройке доступна здесь.&lt;b&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_29">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;style&gt;p {margin:0}&lt;/style&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;По вопросам технической поддержки,&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;а также любым вопросам и предложениям&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;о сотрудничестве не стесняйтесь обращаться:&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;email: &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;support@confspeaker.ru&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;тел.: &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;+7905……. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_30">
+            <property name="text">
+             <string>ООО «Вистл техникс», 2014.
+Нам важно, чтобы Вы были услышаны!</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>

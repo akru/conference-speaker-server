@@ -23,6 +23,14 @@
         <file alias="volume-slider-bg">res/images/volume-slider-bg.png</file>
         <file alias="volume-slider-sub-bg">res/images/volume-slider-sub-bg.png</file>
         <file alias="progress-bar-bg">res/images/progress-bar-bg.png</file>
+        <file alias="drophands-button">res/images/button/drophands.png</file>
+        <file alias="drophands-button-pressed">res/images/button/drophands-pressed.png</file>
+        <file alias="cslogo">res/images/cslogo.png</file>
+        <file alias="wtlogo">res/images/wtlogo.png</file>
+        <file alias="accept-button">res/images/button/accept.png</file>
+        <file alias="accept-button-pressed">res/images/button/accept-pressed.png</file>
+        <file alias="desmiss-button">res/images/button/dismiss.png</file>
+        <file alias="dismiss-button-ressed">res/images/button/dismiss-pressed.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Gothic.ttf">res/fonts/Gothic.ttf</file>
