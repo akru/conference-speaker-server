@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>973</width>
+    <width>1021</width>
     <height>638</height>
    </rect>
   </property>
@@ -82,7 +82,12 @@ QGroupBox#usersBox {
     padding: 0;
 }
 
-QLineEdit, QComboBox, QDoubleSpinBox, QSpinBox {
+QLineEdit,
+QComboBox,
+QDoubleSpinBox,
+QSpinBox,
+QPlainTextEdit,
+QDateEdit {
     border-left: 1px solid rgba(191,181,171,255);
     border-right: 1px solid rgba(191,181,171,255);
     border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
@@ -141,7 +146,9 @@ QScrollArea {
 QListWidget,
 QWidget#speakersArea,
 QWidget#soundTab,
-QWidget#aboutTab {
+QWidget#aboutTab,
+QGroupBox#questionBox,
+QGroupBox#resultsBox {
 	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(224,219,213, 255), stop:1 rgba(253,255,248, 255));
     border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
     border-left: 1px solid rgba(188,186,184,255);
@@ -290,7 +297,12 @@ QListView::item {
                                  stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                  stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
  }
-</string>
+
+QDateEdit {
+    padding: 0;
+    margin: 0;
+    padding-left: 3px;
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -343,7 +355,7 @@ QListView::item {
         <number>9</number>
        </property>
        <property name="bottomMargin">
-        <number>12</number>
+        <number>15</number>
        </property>
        <item>
         <widget class="QLineEdit" name="labelName">
@@ -633,7 +645,7 @@ image: url(:/gui/drophands-button-pressed);
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>677</width>
+               <width>725</width>
                <height>499</height>
               </rect>
              </property>
@@ -672,22 +684,79 @@ image: url(:/gui/drophands-button-pressed);
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QGroupBox" name="groupBox">
-            <property name="title">
-             <string>New vote</string>
+           <widget class="QGroupBox" name="questionBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <layout class="QFormLayout" name="formLayout_5">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            <property name="title">
+             <string/>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <property name="leftMargin">
+              <number>25</number>
              </property>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_9">
+             <property name="topMargin">
+              <number>15</number>
+             </property>
+             <property name="rightMargin">
+              <number>25</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="spacing">
+              <number>15</number>
+             </property>
+             <item row="7" column="2">
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="7" column="3">
+              <widget class="QPushButton" name="startVoteButton">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
-                <string>Question:</string>
+                <string>Start</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Question</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QRadioButton" name="customRB">
+               <property name="text">
+                <string>Custom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
               <widget class="QRadioButton" name="simpleRB">
                <property name="text">
                 <string>Yes / No</string>
@@ -697,37 +766,56 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
-             <item row="4" column="0" colspan="2">
-              <widget class="QRadioButton" name="customRB">
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_32">
                <property name="text">
-                <string>Custom</string>
+                <string>Answers</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="0" colspan="2">
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="label_35">
+               <property name="text">
+                <string>Voting</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" colspan="2">
+              <widget class="QPlainTextEdit" name="questionTextEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>80</height>
+                </size>
+               </property>
+               <property name="placeholderText">
+                <string>Where are you from?</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1" rowspan="3" colspan="2">
               <layout class="QFormLayout" name="customLayout">
                <property name="fieldGrowthPolicy">
                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                </property>
                <property name="leftMargin">
-                <number>50</number>
+                <number>5</number>
                </property>
                <property name="rightMargin">
-                <number>50</number>
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
                </property>
               </layout>
              </item>
-             <item row="8" column="0">
-              <widget class="QPushButton" name="pushButton">
-               <property name="text">
-                <string>Start</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
+             <item row="6" column="3">
               <widget class="QPushButton" name="plusButton">
                <property name="maximumSize">
                 <size>
@@ -735,28 +823,50 @@ image: url(:/gui/drophands-button-pressed);
                  <height>20</height>
                 </size>
                </property>
-               <property name="text">
-                <string>+</string>
+               <property name="styleSheet">
+                <string notr="true"/>
                </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPlainTextEdit" name="plainTextEdit">
-               <property name="maximumSize">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resource.qrc">
+                 <normaloff>:/gui/combo-box-arrow</normaloff>:/gui/combo-box-arrow</iconset>
+               </property>
+               <property name="iconSize">
                 <size>
-                 <width>16777215</width>
-                 <height>80</height>
+                 <width>10</width>
+                 <height>10</height>
                 </size>
                </property>
               </widget>
+             </item>
+             <item row="4" column="3" rowspan="2">
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_2">
+           <widget class="QGroupBox" name="resultsBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="title">
-             <string>Results</string>
+             <string/>
             </property>
             <property name="flat">
              <bool>false</bool>
@@ -765,21 +875,101 @@ image: url(:/gui/drophands-button-pressed);
              <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="1" column="0" colspan="2">
-              <layout class="QFormLayout" name="formLayout_4">
+             <property name="leftMargin">
+              <number>25</number>
+             </property>
+             <property name="topMargin">
+              <number>15</number>
+             </property>
+             <property name="rightMargin">
+              <number>25</number>
+             </property>
+             <property name="spacing">
+              <number>15</number>
+             </property>
+             <item row="4" column="0" colspan="3">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="3" column="0" colspan="3">
+              <layout class="QFormLayout" name="resultsLayout">
                <property name="fieldGrowthPolicy">
                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                </property>
+               <property name="horizontalSpacing">
+                <number>50</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>15</number>
+               </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>25</number>
                </property>
                <property name="topMargin">
                 <number>0</number>
                </property>
               </layout>
              </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="pushButton_3">
+             <item row="1" column="1">
+              <widget class="QDateEdit" name="votingDateEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
+               <property name="showGroupSeparator" stdset="0">
+                <bool>false</bool>
+               </property>
+               <property name="time">
+                <time>
+                 <hour>0</hour>
+                 <minute>0</minute>
+                 <second>0</second>
+                </time>
+               </property>
+               <property name="displayFormat">
+                <string>dd.MM.yyyy hh:mm</string>
+               </property>
+               <property name="calendarPopup">
+                <bool>false</bool>
+               </property>
+               <property name="date">
+                <date>
+                 <year>2014</year>
+                 <month>1</month>
+                 <day>10</day>
+                </date>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="3">
+              <widget class="QLabel" name="resultQuestion">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QPushButton" name="popupResultsButton">
                <property name="maximumSize">
                 <size>
                  <width>50</width>
@@ -787,17 +977,17 @@ image: url(:/gui/drophands-button-pressed);
                 </size>
                </property>
                <property name="text">
-                <string>^_^</string>
+                <string>^^</string>
                </property>
                <property name="checkable">
                 <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="resultQuestion">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_33">
                <property name="text">
-                <string/>
+                <string>Voting results</string>
                </property>
               </widget>
              </item>
@@ -1472,18 +1662,6 @@ image: url(:/gui/drophands-button-pressed);
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="statsTab">
-         <attribute name="icon">
-          <iconset resource="resource.qrc">
-           <normaloff>:/gui/stats-button</normaloff>:/gui/stats-button</iconset>
-         </attribute>
-         <attribute name="title">
-          <string/>
-         </attribute>
-         <attribute name="toolTip">
-          <string>Stats</string>
-         </attribute>
-        </widget>
         <widget class="QWidget" name="aboutTab">
          <attribute name="icon">
           <iconset resource="resource.qrc">
@@ -1496,6 +1674,9 @@ image: url(:/gui/drophands-button-pressed);
           <string>About</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_7">
+          <property name="spacing">
+           <number>15</number>
+          </property>
           <property name="leftMargin">
            <number>25</number>
           </property>

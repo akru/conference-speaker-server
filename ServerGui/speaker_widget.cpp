@@ -54,7 +54,7 @@ void SpeakerWidget::on_acceptButton_clicked()
     emit requestAccepted(myAddress);
 }
 
-void SpeakerWidget::on_closeButton_clicked()
+void SpeakerWidget::on_dismissButton_clicked()
 {
     switch (state) {
     case Request:

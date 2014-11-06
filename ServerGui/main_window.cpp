@@ -18,7 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     settings(new Settings),
-    server(0)
+    server(0),
+    resultWidget(new QWidget)
 {
     // Loading fonts
     loadFonts();
@@ -39,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete resultWidget;
 }
 
 void MainWindow::loadFonts()
@@ -70,6 +72,17 @@ void MainWindow::setupUi()
     ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
     // Status label
     setStatus(statusStoped);
+    // Separate result widget
+    resultWidget->setLayout(new QHBoxLayout(resultWidget));
+    resultWidget->setWindowTitle(tr("Voting results"));
+    resultWidget->setWindowFlags(Qt::WindowTitleHint);
+    resultWidget->setStyleSheet(styleSheet());
+    resultWidget->setWindowIcon(windowIcon());
+    // Two default answer field
+    on_plusButton_clicked();
+    on_plusButton_clicked();
+    // Disable custom answers by default
+    on_customRB_toggled(false);
 }
 
 void MainWindow::setStatus(const char *status)
@@ -182,13 +195,14 @@ void MainWindow::serverStart()
     connect(server,
             SIGNAL(channelDisconnected(QString)),
             SLOT(speakerRemove(QString)));
-
-//    connect(server,  SIGNAL(voteResultsUpdated(VoteResults)),
-//            &voting, SLOT(updateResults(VoteResults)));
-//    connect(&voting, SIGNAL(voteNew(VotingInvite)),
-//            server,  SLOT(voteNew(VotingInvite)));
-//    connect(&voting, SIGNAL(voteStop()),
-//            server,  SLOT(voteStop()));
+    // Voting MGT
+    connect(server,
+            SIGNAL(voteResultsUpdated(VoteResults)),
+            SLOT(voteUpdateResults(VoteResults)));
+    connect(this,    SIGNAL(voteNew(VotingInvite)),
+            server,  SLOT(voteNew(VotingInvite)));
+    connect(this,    SIGNAL(voteStop()),
+            server,  SLOT(voteStop()));
     // Request MGT
     connect(server,
             SIGNAL(channelRequest(QString)),
@@ -235,3 +249,107 @@ void MainWindow::on_recordButton_toggled(bool checked)
         ui->recordButton->setChecked(false);
 }
 
+void MainWindow::on_startVoteButton_toggled(bool checked)
+{
+    if (!checked)
+    {
+        emit voteStop();
+        ui->startVoteButton->setText(tr("Start"));
+    }
+    else
+    {
+        if (ui->simpleRB->isChecked())
+            // Simple case
+            emit voteNew(VotingInvite(ui->questionTextEdit->toPlainText()));
+        else
+        {
+            QStringList answersText;
+            foreach (QLineEdit *l, answers) {
+                if (!l->text().isEmpty())
+                    answersText.append(l->text());
+            }
+            // Custom case
+            emit voteNew(VotingInvite(ui->questionTextEdit->toPlainText(),
+                                      VotingInvite::Custom,
+                                      answersText));
+        }
+        ui->startVoteButton->setText(tr("Stop"));
+    }
+}
+
+void MainWindow::voteUpdateResults(VoteResults results)
+{
+    static const char *resultLabelText    = "%1 / %2%";
+    // Set question
+    ui->resultQuestion->setText(results.invite.question);
+    // Clear fields
+    while (ui->resultsLayout->itemAt(0) != 0)
+    {
+        QLayoutItem *i = ui->resultsLayout->takeAt(0);
+        delete i->widget();
+        delete i;
+    }
+    // Calc count of members
+    int sumAnswers = 0;
+    foreach (int a, results.values) {
+        sumAnswers += a;
+    }
+    // Small hack for divByZero exception
+    if (!sumAnswers) sumAnswers = 1;
+    // Draw fields
+    QLabel *answer;
+    if (results.invite.mode == VotingInvite::Simple)
+    {
+        answer = new QLabel(tr(resultLabelText)
+                            .arg(results.values[0])
+                            .arg(results.values[0] * 100.0 / sumAnswers), this);
+        ui->resultsLayout->addRow(tr("Yes"), answer);
+        answer = new QLabel(tr(resultLabelText)
+                            .arg(results.values[1])
+                            .arg(results.values[1] * 100.0 / sumAnswers), this);
+        ui->resultsLayout->addRow(tr("No"), answer);
+    }
+    else
+    {
+        for (short i = 0; i < results.values.length() &&
+                          i < results.invite.answers.length(); ++i)
+        {
+            answer = new QLabel(tr(resultLabelText)
+                                .arg(results.values[i])
+                                .arg(results.values[i] * 100.0 / sumAnswers), this);
+            ui->resultsLayout->addRow(results.invite.answers[i], answer);
+        }
+    }
+    ui->votingDateEdit->setDateTime(QDateTime::currentDateTime());
+}
+
+void MainWindow::on_popupResultsButton_toggled(bool checked)
+{
+    if (checked)
+    {
+        ui->resultsBox->setParent(resultWidget);
+        resultWidget->layout()->addWidget(ui->resultsBox);
+        resultWidget->show();
+    }
+    else
+    {
+        ui->resultsBox->setParent(this);
+        ui->votingTab->layout()->addWidget(ui->resultsBox);
+        resultWidget->hide();
+    }
+}
+
+void MainWindow::on_plusButton_clicked()
+{
+    QString name = tr("Answer %1:").arg(ui->customLayout->rowCount() + 1);
+    answers.append(new QLineEdit(this));
+    ui->customLayout->addRow(name, answers.last());
+}
+
+void MainWindow::on_customRB_toggled(bool checked)
+{
+    foreach (QLineEdit *l, answers) {
+        l->setEnabled(checked);
+    }
+    ui->plusButton->setEnabled(checked);
+}

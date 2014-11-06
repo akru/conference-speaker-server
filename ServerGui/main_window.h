@@ -4,14 +4,17 @@
 #include <QMap>
 #include <QMainWindow>
 #include <user_information.h>
+#include <voting.h>
 
 #include "settings.h"
 
 class Server;
+class QLineEdit;
 class SpeakerWidget;
 class QListWidgetItem;
 
 typedef QMap<QString, QListWidgetItem*> ItemMap;
+typedef QList<QLineEdit*>               AnswerList;
 typedef QMap<QString, SpeakerWidget*>   SpeakerWidgetMap;
 
 namespace Ui {
@@ -29,6 +32,9 @@ signals:
     void requestAccepted(QString address);
     void requestDiscarded(QString address);
 
+    void voteStop();
+    void voteNew(VotingInvite);
+
 private slots:
     void userAppend(QString address);
     void userRemove(QString address);
@@ -39,13 +45,18 @@ private slots:
 
     void serverStart();
     void serverStop();
-
-    inline void serverRestart()
+    void serverRestart()
     { serverStop(); serverStart(); }
+
+    void voteUpdateResults(VoteResults results);
 
     void on_addressBox_currentIndexChanged(int index);
     void on_powerButton_toggled(bool checked);
     void on_recordButton_toggled(bool checked);
+    void on_startVoteButton_toggled(bool checked);
+    void on_popupResultsButton_toggled(bool checked);
+    void on_plusButton_clicked();
+    void on_customRB_toggled(bool checked);
 
 private:
     Ui::MainWindow  *ui;
@@ -54,6 +65,9 @@ private:
 
     ItemMap          userItem;
     SpeakerWidgetMap speakers;
+
+    QWidget         *resultWidget;
+    AnswerList       answers;
 
     void loadFonts();
     void setupUi();

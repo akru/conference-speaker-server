@@ -34,7 +34,7 @@ public slots:
 
 private slots:
     void on_acceptButton_clicked();
-    void on_closeButton_clicked();
+    void on_dismissButton_clicked();
     void on_volumeSlider_sliderMoved(int position);
 
 private:

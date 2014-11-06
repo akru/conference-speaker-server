@@ -306,7 +306,7 @@ void Server::voteNew(VotingInvite invite)
     delete voting;
     voting = new Voting(invite, this);
     // Connect signals
-    connect(this,   SIGNAL(voteRequest(QString,QJsonValue)),
+    connect(this,   SIGNAL(voteRequest(QString,QJsonObject)),
             voting, SLOT(vote(QString,QJsonObject)));
     connect(voting,
             SIGNAL(accepted(QString)),
@@ -343,6 +343,7 @@ void Server::voteDeny(QString address, QString error)
 
 void Server::voteReadyResults(VoteResults results)
 {
+    qDebug() << "Vote results updated";
     emit voteResultsUpdated(results);
 }
 
