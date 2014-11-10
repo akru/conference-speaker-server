@@ -28,10 +28,10 @@ void HSFilter::reloadSettings()
 {
     QSettings s(settingsFiltename(), QSettings::IniFormat);
     enable(s.value("hs-enable", true).toBool());
-    setTH(s.value("hs-papr", 1000).toFloat(),
-          s.value("hs-phpr", 1000).toFloat(),
-          s.value("hs-pnpr", 1000).toFloat(),
-          s.value("hs-ismd", 1000).toFloat());
+    setTH(s.value("hs-papr", 15).toFloat(),
+          s.value("hs-phpr", 15).toFloat(),
+          s.value("hs-pnpr", 15).toFloat(),
+          s.value("hs-ismd", 0.03).toFloat());
 }
 
 void HSFilter::processFilter(float sample[])

@@ -17,7 +17,6 @@ const char * statusConnected = "Working, clients connected";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    settings(new Settings(ui, this)),
     server(0),
     resultWidget(new QWidget)
 {
@@ -25,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFonts();
     // Setup UI
     ui->setupUi(this);
+    // Load settings
+    settings = new Settings(ui, this);
     // Setup UI elements
     setupUi();
 }
@@ -142,8 +143,8 @@ void MainWindow::channelConnect(QString address)
 
 void MainWindow::speakerRemove(QString address)
 {
-    Q_ASSERT(speakers.contains(address));
-    delete speakers.take(address);
+    if(speakers.contains(address))
+        delete speakers.take(address);
 }
 
 void MainWindow::channelRequest(QString address)

@@ -34,10 +34,10 @@ Settings::Settings(Ui::MainWindow *ui, QObject *parent)
 
     // HS
     ui->hsBox->setChecked(s.value("hs-enable", true).toBool());
-    ui->paprSpin->setValue(s.value("hs-papr", 1000).toFloat());
-    ui->phprSpin->setValue(s.value("hs-phpr", 1000).toFloat());
-    ui->pnprSpin->setValue(s.value("hs-pnpr", 1000).toFloat());
-    ui->ismdSpin->setValue(s.value("hs-ismd", 1000).toFloat());
+    ui->paprSpin->setValue(s.value("hs-papr", 15).toFloat());
+    ui->phprSpin->setValue(s.value("hs-phpr", 15).toFloat());
+    ui->pnprSpin->setValue(s.value("hs-pnpr", 15).toFloat());
+    ui->ismdSpin->setValue(s.value("hs-ismd", 0.03).toFloat());
 
     connect(ui->hsBox, SIGNAL(clicked()), SLOT(save()));
     connect(ui->paprSpin, SIGNAL(editingFinished()), SLOT(save()));
@@ -65,13 +65,13 @@ Settings::Settings(Ui::MainWindow *ui, QObject *parent)
 
     // Gate
     ui->gateBox->setChecked(s.value("gate-enable", true).toBool());
-    ui->raiseSpinBox->setValue(s.value("gate-raise", 0.05).toDouble());
-    ui->fallSpinBox->setValue(s.value("gate-fall", 0.2).toDouble());
+    ui->raiseSpinBox->setValue(s.value("gate-raise", -24.0).toDouble());
+    ui->fallSpinBox->setValue(s.value("gate-fall", -28.0).toDouble());
     ui->attackSpinBox->setValue(s.value("gate-attack", 0.1).toDouble());
     ui->holdSpinBox->setValue(s.value("gate-hold", 0.2).toDouble());
     ui->releaseSpinBox->setValue(s.value("gate-release", 0.1).toDouble());
 
-    connect(ui->nsBox, SIGNAL(clicked()), SLOT(save()));
+    connect(ui->gateBox, SIGNAL(clicked()), SLOT(save()));
     connect(ui->raiseSpinBox, SIGNAL(editingFinished()), SLOT(save()));
     connect(ui->fallSpinBox, SIGNAL(editingFinished()), SLOT(save()));
     connect(ui->attackSpinBox, SIGNAL(editingFinished()), SLOT(save()));
@@ -89,7 +89,7 @@ Settings::Settings(Ui::MainWindow *ui, QObject *parent)
     ui->cThresholdSpinBox->setValue(s.value("compressor-threshold", -12).toFloat());
     ui->cNoiseSpinBox->setValue(s.value("compressor-noise", -40).toFloat());
 
-    connect(ui->nsBox, SIGNAL(clicked()), SLOT(save()));
+    connect(ui->compressorBox, SIGNAL(clicked()), SLOT(save()));
     connect(ui->normalizeCheckBox, SIGNAL(clicked()), SLOT(save()));
     connect(ui->peakCheckBox, SIGNAL(clicked()), SLOT(save()));
     connect(ui->cAttackSpinBox, SIGNAL(editingFinished()), SLOT(save()));
@@ -120,10 +120,10 @@ void Settings::save()
     s.setValue("eq-slider-7", ui->verticalSlider_7->value());
 
     s.setValue("hs-enable", ui->hsBox->isChecked());
-    s.setValue("hs-papr", ui->paprEnabled->isChecked() ? ui->paprSpin->value() : 1000);
-    s.setValue("hs-phpr", ui->phprEnabled->isChecked() ? ui->phprSpin->value() : 1000);
-    s.setValue("hs-pnpr", ui->pnprEnabled->isChecked() ? ui->pnprSpin->value() : 1000);
-    s.setValue("hs-ismd", ui->ismdEnabled->isChecked() ? ui->ismdSpin->value() : 0);
+    s.setValue("hs-papr", ui->paprEnabled->isChecked() ? ui->paprSpin->value() : 15.0);
+    s.setValue("hs-phpr", ui->phprEnabled->isChecked() ? ui->phprSpin->value() : 15.0);
+    s.setValue("hs-pnpr", ui->pnprEnabled->isChecked() ? ui->pnprSpin->value() : 15.0);
+    s.setValue("hs-ismd", ui->ismdEnabled->isChecked() ? ui->ismdSpin->value() : 0.03);
 
     s.setValue("ns-enable", ui->nsBox->isChecked());
     if (ui->lowRadioButton->isChecked())
