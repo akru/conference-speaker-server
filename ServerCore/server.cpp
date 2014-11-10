@@ -71,6 +71,12 @@ Server::Server(const ServerInformation &info, QObject *parent)
 
 Server::~Server()
 {
+    foreach (Receiver *r, channels) {
+        channelClose(r->getPeerAddress().toString());
+    }
+    foreach (Connection *c, clients) {
+        userDrop(c->getAddress());
+    }
     server->close();
     delete speaker;
     delete recorder;
