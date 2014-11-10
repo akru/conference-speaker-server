@@ -10,8 +10,8 @@ Settings::Settings(Ui::MainWindow *ui, QObject *parent)
       ui(ui)
 {
     QSettings s(filename, QSettings::IniFormat);
-    info.name    = s.value("conference-name", "").toString();
-    info.address = s.value("ip-address", "").toString();
+    ui->labelName->setText(s.value("conference-name", "").toString());
+    ui->addressBox->setCurrentText(s.value("ip-address", "").toString());
 
     // Equalizer
     ui->eqBox->setChecked(s.value("eq-enable", true).toBool());
@@ -104,11 +104,20 @@ Settings::Settings(Ui::MainWindow *ui, QObject *parent)
     connect(ui->psBox, SIGNAL(clicked()), SLOT(save()));
 }
 
+ServerInformation Settings::info()
+{
+    ServerInformation info;
+    QSettings s(filename, QSettings::IniFormat);
+    info.name    = s.value("conference-name", "").toString();
+    info.address = s.value("ip-address", "").toString();
+    return info;
+}
+
 void Settings::save()
 {
     QSettings s(filename, QSettings::IniFormat);
-    s.setValue("conference-name", info.name);
-    s.setValue("ip-address", info.address);
+    s.setValue("conference-name", ui->labelName->text());
+    s.setValue("ip-address", ui->addressBox->currentText());
 
     s.setValue("eq-enable", ui->eqBox->isChecked());
     s.setValue("eq-slider-1", ui->verticalSlider->value());

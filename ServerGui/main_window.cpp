@@ -51,18 +51,9 @@ void MainWindow::loadFonts()
 
 void MainWindow::setupUi()
 {
-    // Conference name label
-    ui->labelName->setText(settings->info.name);
+    // Power button saves current settings
     connect(ui->powerButton, SIGNAL(clicked()),
             settings,        SLOT(save()));
-    // IP address box
-    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
-        if (address.protocol() == QAbstractSocket::IPv4Protocol
-                && !address.isLoopback())
-        ui->addressBox->addItem(address.toString());
-    }
-    int addrId = ui->addressBox->findText(settings->info.address);
-    ui->addressBox->setCurrentIndex(addrId);
     // Scroll boxes alignments
     ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
     // Status label
@@ -87,8 +78,6 @@ void MainWindow::setStatus(const char *status)
 
 void MainWindow::updateServerInfo()
 {
-    settings->info.name = ui->labelName->text();
-    settings->info.address = ui->addressBox->currentText();
     settings->save();
 
     if (server)
@@ -174,7 +163,7 @@ void MainWindow::channelRequest(QString address)
 
 void MainWindow::serverStart()
 {
-    server = new Server(settings->info);
+    server = new Server(settings->info());
     // User MGT
     connect(server,
             SIGNAL(userConnected(QString)),
