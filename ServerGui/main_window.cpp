@@ -347,3 +347,11 @@ void MainWindow::on_customRB_toggled(bool checked)
     }
     ui->plusButton->setEnabled(checked);
 }
+
+void MainWindow::on_drophandsButton_clicked()
+{
+    foreach (SpeakerWidget *w, speakers) {
+        if (w->getState() == SpeakerWidget::Request)
+            w->on_dismissButton_clicked();
+    }
+}

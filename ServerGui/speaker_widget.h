@@ -17,6 +17,9 @@ public:
                            QWidget *parent = 0);
     ~SpeakerWidget();
 
+    State getState() const
+    { return state; }
+
     enum State {
         Request,
         Stream
@@ -31,10 +34,10 @@ signals:
 public slots:
     void setState(State s);
     void setAmplitude(QString address, ushort amp);
+    void on_dismissButton_clicked();
 
 private slots:
     void on_acceptButton_clicked();
-    void on_dismissButton_clicked();
     void on_volumeSlider_sliderMoved(int position);
 
 private:

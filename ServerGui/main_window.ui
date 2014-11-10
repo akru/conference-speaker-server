@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>945</width>
-    <height>581</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="palette">
@@ -454,7 +454,7 @@ QDateEdit {
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="iconSize">
          <size>
@@ -648,7 +648,7 @@ image: url(:/gui/drophands-button-pressed);
                <x>0</x>
                <y>0</y>
                <width>649</width>
-               <height>442</height>
+               <height>469</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
