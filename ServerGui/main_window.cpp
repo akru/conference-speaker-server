@@ -187,9 +187,6 @@ void MainWindow::serverStart()
             SIGNAL(channelConnected(QString)),
             SLOT(channelConnect(QString)));
     connect(server,
-            SIGNAL(channelCloseRequest(QString)),
-            SLOT(speakerRemove(QString)));
-    connect(server,
             SIGNAL(channelDisconnected(QString)),
             SLOT(speakerRemove(QString)));
     // Voting MGT
