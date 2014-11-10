@@ -63,6 +63,8 @@ QFrame#volumeFrame {
     border: 0;
     background: rgba(14,64,112,255);
     margin: 5px 0;
+    width: 53px;
+    min-width: 53px;
 }
 
 QProgressBar {

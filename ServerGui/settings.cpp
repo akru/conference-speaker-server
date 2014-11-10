@@ -108,8 +108,8 @@ ServerInformation Settings::info()
 {
     ServerInformation info;
     QSettings s(filename, QSettings::IniFormat);
-    info.name    = s.value("conference-name", "").toString();
-    info.address = s.value("ip-address", "").toString();
+    info.name    = ui->labelName->text();
+    info.address = ui->addressBox->currentText();
     return info;
 }
 
