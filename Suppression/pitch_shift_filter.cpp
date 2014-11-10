@@ -57,7 +57,9 @@ float smbAtan2(float x, float y);
 PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
       pitchShift(1),
-      currentPitch(0)
+      currentPitch(0),
+      osamp(32),
+      pitchShiftCoef(0.04)
 //      iteration(0)
 { 
     memset(gInFIFO, 0, analyze_length*sizeof(float));
@@ -89,6 +91,7 @@ PitchShiftFilter::PitchShiftFilter()
         return;
     }
     shift_time.start();
+
     reloadSettings();
 }
 
@@ -100,8 +103,6 @@ void PitchShiftFilter::reloadSettings()
 {
     QSettings s(settingsFiltename(), QSettings::IniFormat);
     enable(s.value("ps-enable", true).toBool());
-    pitchShiftCoef = s.value("ps-coef", 0.04).toFloat();
-    osamp = s.value("ps-osamp", 32).toFloat();
     qDebug() << "PS settings reloaded";
 }
 

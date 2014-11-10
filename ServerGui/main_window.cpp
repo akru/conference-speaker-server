@@ -17,7 +17,7 @@ const char * statusConnected = "Working, clients connected";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    settings(new Settings),
+    settings(new Settings(ui, this)),
     server(0),
     resultWidget(new QWidget)
 {
@@ -203,7 +203,9 @@ void MainWindow::serverStart()
             server, SLOT(channelOpen(QString)));
     connect(this,   SIGNAL(requestDiscarded(QString)),
             server, SLOT(channelDeny(QString)));
-
+    // Load filter settings
+    connect(settings, SIGNAL(settingsSaved()),
+            server,   SLOT(channelReloadSettings()));
     // Update status
     setStatus(statusStarted);
 }
