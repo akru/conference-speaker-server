@@ -87,7 +87,7 @@ QPushButton#dismissButton:pressed {
     padding: 0;
 }
 
-QSpinBox {
+QLineEdit {
     padding: 0;
     margin: 0;
     padding-left: 3px;
@@ -134,48 +134,24 @@ QSpinBox {
        <number>1</number>
       </property>
       <item>
-       <widget class="QSpinBox" name="delayBox">
-        <property name="enabled">
-         <bool>true</bool>
+       <widget class="QLineEdit" name="delayBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="maximumSize">
          <size>
-          <width>55</width>
+          <width>50</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="wrapping">
-         <bool>false</bool>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
+        <property name="text">
+         <string>0 min</string>
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
-        </property>
-        <property name="accelerated">
-         <bool>false</bool>
-        </property>
-        <property name="keyboardTracking">
-         <bool>false</bool>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="suffix">
-         <string> min</string>
-        </property>
-        <property name="prefix">
-         <string/>
-        </property>
-        <property name="value">
-         <number>1</number>
-        </property>
-        <property name="displayIntegerBase">
-         <number>10</number>
         </property>
        </widget>
       </item>

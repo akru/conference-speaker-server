@@ -12,6 +12,11 @@ class SpeakerWidget : public QWidget
 {
     Q_OBJECT
 public:
+    enum State {
+        Request,
+        Stream
+    };
+
     explicit SpeakerWidget(const QString &address,
                            const UserInformation &info,
                            QWidget *parent = 0);
@@ -19,11 +24,6 @@ public:
 
     State getState() const
     { return state; }
-
-    enum State {
-        Request,
-        Stream
-    };
 
 signals:
     void requestAccepted(QString);
@@ -39,11 +39,13 @@ public slots:
 private slots:
     void on_acceptButton_clicked();
     void on_volumeSlider_sliderMoved(int position);
+    void stepUp();
 
 private:
     Ui::SpeakerWidget *ui;
     QString myAddress;
     State state;
+    uint stepVal;
 };
 
 #endif // SPEAKER_WIDGET_H

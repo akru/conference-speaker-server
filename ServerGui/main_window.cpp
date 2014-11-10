@@ -17,7 +17,6 @@ const char * statusConnected = "Working, clients connected";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    settings(new Settings(ui, this)),
     server(0),
     resultWidget(new QWidget)
 {
@@ -25,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFonts();
     // Setup UI
     ui->setupUi(this);
+    // Load settings
+    settings = new Settings(ui, this);
     // Setup UI elements
     setupUi();
 }
@@ -52,6 +53,8 @@ void MainWindow::setupUi()
 {
     // Conference name label
     ui->labelName->setText(settings->info.name);
+    connect(ui->powerButton, SIGNAL(clicked()),
+            settings,        SLOT(save()));
     // IP address box
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
         if (address.protocol() == QAbstractSocket::IPv4Protocol

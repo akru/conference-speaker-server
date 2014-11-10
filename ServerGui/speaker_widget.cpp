@@ -7,7 +7,8 @@ SpeakerWidget::SpeakerWidget(const QString &address,
                              QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SpeakerWidget),
-    myAddress(address)
+    myAddress(address),
+    stepVal(0)
 {
     ui->setupUi(this);
     ui->nameLabel->setText(info.name);
@@ -16,8 +17,8 @@ SpeakerWidget::SpeakerWidget(const QString &address,
     setState(Request);
 
     QTimer *t = new QTimer(this);
-    connect(t, SIGNAL(timeout()), ui->delayBox, SLOT(stepUp()));
-    t->setInterval(1000);
+    connect(t, SIGNAL(timeout()), SLOT(stepUp()));
+    t->setInterval(60000);
     t->start();
 }
 
@@ -75,4 +76,11 @@ void SpeakerWidget::setAmplitude(QString address, ushort amp)
 void SpeakerWidget::on_volumeSlider_sliderMoved(int position)
 {
     emit volumeChanged(myAddress, position / 100.0);
+}
+
+void SpeakerWidget::stepUp()
+{
+    static const char *stepLabel = "%1 min";
+    stepVal += 1;
+    ui->delayBox->setText(tr(stepLabel).arg(stepVal));
 }
