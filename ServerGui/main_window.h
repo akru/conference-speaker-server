@@ -50,7 +50,8 @@ private slots:
 
     void voteUpdateResults(VoteResults results);
 
-    void on_addressBox_currentIndexChanged(int index);
+    void updateAvailAddreses();
+
     void on_powerButton_toggled(bool checked);
     void on_recordButton_toggled(bool checked);
     void on_startVoteButton_toggled(bool checked);

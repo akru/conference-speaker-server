@@ -9,6 +9,7 @@
 #include <QHostAddress>
 #include <QMessageBox>
 #include <QSettings>
+#include <QTimer>
 
 const char * statusStoped    = "Server stoped";
 const char * statusStarted   = "Server started, waiting for clients...";
@@ -24,6 +25,12 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFonts();
     // Setup UI
     ui->setupUi(this);
+    // Update network ifaces
+    updateAvailAddreses();
+    QTimer *t = new QTimer(this);
+    t->setInterval(5000);
+    connect(t, SIGNAL(timeout()), SLOT(updateAvailAddreses()));
+    t->start();
     // Load settings
     settings = new Settings(ui, this);
     // Setup UI elements
@@ -207,12 +214,6 @@ void MainWindow::serverStop()
     setStatus(statusStoped);
 }
 
-void MainWindow::on_addressBox_currentIndexChanged(int index)
-{
-    Q_UNUSED(index)
-    updateServerInfo();
-}
-
 void MainWindow::on_powerButton_toggled(bool checked)
 {
     if (checked)
@@ -345,4 +346,16 @@ void MainWindow::on_drophandsButton_clicked()
         if (w->getState() == SpeakerWidget::Request)
             w->on_dismissButton_clicked();
     }
+}
+
+void MainWindow::updateAvailAddreses()
+{
+    QString cAddr = ui->addressBox->currentText();
+    ui->addressBox->clear();
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol
+                && !address.isLoopback())
+            ui->addressBox->addItem(address.toString());
+    }
+    ui->addressBox->setCurrentText(cAddr);
 }
