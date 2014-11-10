@@ -138,7 +138,9 @@ void MainWindow::channelConnect(QString address)
             SIGNAL(closeClicked(QString)),
             SLOT(speakerRemove(QString)));
 
-    // TODO: Boost widget to top
+    // Boost widget to top
+    ui->speakersArea->layout()->removeWidget(w);
+    ((QVBoxLayout *)ui->speakersArea->layout())->insertWidget(0, w);
 
     w->setState(SpeakerWidget::Stream);
 }
