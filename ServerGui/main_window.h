@@ -57,6 +57,7 @@ private slots:
     void on_popupResultsButton_toggled(bool checked);
     void on_plusButton_clicked();
     void on_customRB_toggled(bool checked);
+    void on_drophandsButton_clicked();
 
 private:
     Ui::MainWindow  *ui;
