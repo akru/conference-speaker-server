@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>945</width>
-    <height>608</height>
+    <width>987</width>
+    <height>622</height>
    </rect>
   </property>
   <property name="palette">
@@ -454,7 +454,7 @@ QDateEdit {
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="iconSize">
          <size>
@@ -647,8 +647,8 @@ image: url(:/gui/drophands-button-pressed);
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>649</width>
-               <height>469</height>
+               <width>691</width>
+               <height>483</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1066,6 +1066,12 @@ image: url(:/gui/drophands-button-pressed);
                <property name="text">
                 <string>Normalize</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="tristate">
+                <bool>false</bool>
+               </property>
               </widget>
              </item>
              <item row="4" column="0">
@@ -1076,10 +1082,39 @@ image: url(:/gui/drophands-button-pressed);
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="cAttackSpinBox"/>
+              <widget class="QDoubleSpinBox" name="cAttackSpinBox">
+               <property name="suffix">
+                <string> sec</string>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.050000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.200000000000000</double>
+               </property>
+              </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="cDecaySpinBox"/>
+              <widget class="QDoubleSpinBox" name="cDecaySpinBox">
+               <property name="suffix">
+                <string> sec</string>
+               </property>
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.050000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.200000000000000</double>
+               </property>
+              </widget>
              </item>
              <item row="5" column="0">
               <widget class="QLabel" name="label_20">
@@ -1089,7 +1124,20 @@ image: url(:/gui/drophands-button-pressed);
               </widget>
              </item>
              <item row="6" column="1">
-              <widget class="QDoubleSpinBox" name="cRatioSpinBox"/>
+              <widget class="QDoubleSpinBox" name="cRatioSpinBox">
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="value">
+                <double>5.000000000000000</double>
+               </property>
+              </widget>
              </item>
              <item row="6" column="0">
               <widget class="QLabel" name="label_22">
@@ -1106,15 +1154,31 @@ image: url(:/gui/drophands-button-pressed);
               </widget>
              </item>
              <item row="7" column="1">
-              <widget class="QDoubleSpinBox" name="cCompressionSpinBox"/>
+              <widget class="QDoubleSpinBox" name="cCompressionSpinBox">
+               <property name="singleStep">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.000000000000000</double>
+               </property>
+              </widget>
              </item>
              <item row="8" column="1">
               <widget class="QDoubleSpinBox" name="cThresholdSpinBox">
                <property name="suffix">
                 <string> db</string>
                </property>
+               <property name="decimals">
+                <number>0</number>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>-80.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>-6.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1137,8 +1201,17 @@ image: url(:/gui/drophands-button-pressed);
                <property name="suffix">
                 <string> db</string>
                </property>
+               <property name="decimals">
+                <number>0</number>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>-80.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>-24.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1163,72 +1236,120 @@ image: url(:/gui/drophands-button-pressed);
             <layout class="QFormLayout" name="formLayout_2">
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="raiseSpinBox">
+               <property name="suffix">
+                <string> dB</string>
+               </property>
+               <property name="decimals">
+                <number>0</number>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>-80.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100.000000000000000</double>
+                <double>0.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>-24.000000000000000</double>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>Raise TH</string>
+                <string>Open TH</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="fallSpinBox">
+               <property name="suffix">
+                <string> dB</string>
+               </property>
+               <property name="decimals">
+                <number>0</number>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>-80.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100.000000000000000</double>
+                <double>0.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>-28.000000000000000</double>
                </property>
               </widget>
              </item>
              <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="attackSpinBox">
+               <property name="suffix">
+                <string> sec</string>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100.000000000000000</double>
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
                </property>
               </widget>
              </item>
              <item row="3" column="1">
               <widget class="QDoubleSpinBox" name="holdSpinBox">
+               <property name="suffix">
+                <string> sec</string>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100.000000000000000</double>
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
               <widget class="QDoubleSpinBox" name="releaseSpinBox">
+               <property name="suffix">
+                <string> sec</string>
+               </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100.000000000000000</double>
+                <double>9.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_15">
                <property name="text">
-                <string>Fall TH</string>
+                <string>Close TH</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_16">
                <property name="text">
-                <string>Attach time</string>
+                <string>Attack time</string>
                </property>
               </widget>
              </item>
@@ -1437,8 +1558,8 @@ image: url(:/gui/drophands-button-pressed);
              <property name="spacing">
               <number>6</number>
              </property>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="phprSpin">
+             <item row="7" column="1">
+              <widget class="QDoubleSpinBox" name="ismdSpin">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -1454,12 +1575,17 @@ image: url(:/gui/drophands-button-pressed);
                <property name="decimals">
                 <number>2</number>
                </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>ISMD</string>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.030000000000000</double>
                </property>
               </widget>
              </item>
@@ -1473,17 +1599,10 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_2">
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>PHPR</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>PNPR</string>
+                <string>Slope deviation</string>
                </property>
               </widget>
              </item>
@@ -1502,46 +1621,10 @@ image: url(:/gui/drophands-button-pressed);
                 <string> dB</string>
                </property>
                <property name="decimals">
-                <number>2</number>
+                <number>0</number>
                </property>
-              </widget>
-             </item>
-             <item row="4" column="2">
-              <widget class="QCheckBox" name="ismdEnabled">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="ismdSpin">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QCheckBox" name="phprEnabled">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
+               <property name="value">
+                <double>15.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1560,14 +1643,63 @@ image: url(:/gui/drophands-button-pressed);
                 <string> dB</string>
                </property>
                <property name="decimals">
-                <number>2</number>
+                <number>0</number>
+               </property>
+               <property name="value">
+                <double>15.000000000000000</double>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label">
                <property name="text">
-                <string>PAPR</string>
+                <string>Bin energy</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="2">
+              <widget class="QCheckBox" name="ismdEnabled">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Local group</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="phprSpin">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="prefix">
+                <string/>
+               </property>
+               <property name="suffix">
+                <string> dB</string>
+               </property>
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="value">
+                <double>15.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Harmonics</string>
                </property>
               </widget>
              </item>
@@ -1581,18 +1713,28 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
+             <item row="5" column="2">
+              <widget class="QCheckBox" name="phprEnabled">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
             <zorder>ismdSpin</zorder>
-            <zorder>pnprSpin</zorder>
-            <zorder>label_2</zorder>
-            <zorder>label_3</zorder>
-            <zorder>pnprEnabled</zorder>
             <zorder>paprSpin</zorder>
             <zorder>label</zorder>
             <zorder>paprEnabled</zorder>
             <zorder>label_4</zorder>
-            <zorder>phprSpin</zorder>
             <zorder>ismdEnabled</zorder>
+            <zorder>label_2</zorder>
+            <zorder>label_3</zorder>
+            <zorder>phprSpin</zorder>
+            <zorder>pnprSpin</zorder>
+            <zorder>pnprEnabled</zorder>
             <zorder>phprEnabled</zorder>
            </widget>
           </item>
@@ -1609,6 +1751,9 @@ image: url(:/gui/drophands-button-pressed);
              <bool>false</bool>
             </property>
             <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
              <bool>true</bool>
             </property>
            </widget>
@@ -1633,8 +1778,14 @@ image: url(:/gui/drophands-button-pressed);
                <property name="text">
                 <string>High</string>
                </property>
-               <property name="checked">
+               <property name="checkable">
                 <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -1649,6 +1800,12 @@ image: url(:/gui/drophands-button-pressed);
               <widget class="QRadioButton" name="lowRadioButton">
                <property name="text">
                 <string>Low</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

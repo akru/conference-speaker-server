@@ -147,8 +147,8 @@ void MainWindow::channelConnect(QString address)
 
 void MainWindow::speakerRemove(QString address)
 {
-    Q_ASSERT(speakers.contains(address));
-    delete speakers.take(address);
+    if(speakers.contains(address))
+        delete speakers.take(address);
 }
 
 void MainWindow::channelRequest(QString address)
