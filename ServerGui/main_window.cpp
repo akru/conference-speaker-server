@@ -53,6 +53,8 @@ void MainWindow::setupUi()
 {
     // Conference name label
     ui->labelName->setText(settings->info.name);
+    connect(ui->powerButton, SIGNAL(clicked()),
+            settings,        SLOT(save()));
     // IP address box
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
         if (address.protocol() == QAbstractSocket::IPv4Protocol
@@ -136,7 +138,9 @@ void MainWindow::channelConnect(QString address)
             SIGNAL(closeClicked(QString)),
             SLOT(speakerRemove(QString)));
 
-    // TODO: Boost widget to top
+    // Boost widget to top
+    ui->speakersArea->layout()->removeWidget(w);
+    ((QVBoxLayout *)ui->speakersArea->layout())->insertWidget(0, w);
 
     w->setState(SpeakerWidget::Stream);
 }

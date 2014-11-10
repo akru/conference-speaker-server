@@ -59,7 +59,7 @@ PitchShiftFilter::PitchShiftFilter()
       pitchShift(1),
       currentPitch(0),
       osamp(32),
-      pitchShiftCoef(0.04)
+      pitchShiftCoef(0.04f)
 //      iteration(0)
 { 
     memset(gInFIFO, 0, analyze_length*sizeof(float));
