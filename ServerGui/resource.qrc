@@ -36,4 +36,7 @@
         <file alias="Gothic.ttf">res/fonts/Gothic.ttf</file>
         <file alias="GothicBold.ttf">res/fonts/GothicBold.ttf</file>
     </qresource>
+    <qresource prefix="/app-server">
+        <file alias="index.html">res/app-server/index.html</file>
+    </qresource>
 </RCC>

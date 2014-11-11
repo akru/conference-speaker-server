@@ -17,17 +17,23 @@
 #include <registration_request.h>
 #include <user_information.h>
 
+#include <app_server.h>
+
 #include <QDebug>
 
 Server::Server(const ServerInformation &info, QObject *parent)
     : QObject(parent),
       server(new QTcpServer(this)),
       broadcaster(new Broadcaster(this)),
+      appServer(new AppServer(this)),
       voting(0),
       speaker(new Speaker),
       recorder(new Recorder(users))
 {
     broadcaster->setServerInformation(info);
+    broadcaster->setAppInfo(AppInformation(info.address));
+
+    appServer->start(QThread::LowestPriority);
 
     connect(server, SIGNAL(newConnection()), SLOT(connectionNew()));
 

@@ -15,6 +15,7 @@
 class QTcpServer;
 class Connection;
 class Broadcaster;
+class AppServer;
 class Receiver;
 class Recorder;
 class Speaker;
@@ -91,6 +92,8 @@ private:
     QTcpServer   *server;
     // Broadcaster instance
     Broadcaster  *broadcaster;
+    // Application provider server
+    AppServer    *appServer;
     // Voting instance
     Voting       *voting;
     // Speaker instance

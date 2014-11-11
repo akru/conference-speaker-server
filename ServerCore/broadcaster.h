@@ -4,6 +4,7 @@
 #include <QUdpSocket>
 #include <QJsonDocument>
 #include <server_information.h>
+#include <app_information.h>
 #include <voting_invite.h>
 
 const int BROADCASTER_TIME_INTERVAL = 1000;
@@ -19,6 +20,8 @@ public slots:
 
     void setVotingInvite(VotingInvite invite);
     void unsetVotingInvite();
+
+    void setAppInfo(AppInformation info);
 
 private slots:
     void sendInformation();
