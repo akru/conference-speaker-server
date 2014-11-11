@@ -12,7 +12,7 @@
 static const int max_qint16 = 32768;
 
 Processing::Processing()
-    : gScaler(0.5f)
+    : gScaler(0.85f)
 {
     // Append filters
     filters.append(new AmpAnalyzeFilter); // WARNING: Must be first !!!

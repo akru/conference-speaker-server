@@ -70,6 +70,7 @@ QFrame#volumeFrame {
 QProgressBar {
     border: 0;
 	background-image: url(:/gui/volume-slider-bg);
+    width: 20px;
 }
 
 QProgressBar::chunk {
@@ -234,7 +235,7 @@ QLineEdit {
             <number>100</number>
            </property>
            <property name="value">
-            <number>50</number>
+            <number>85</number>
            </property>
            <property name="orientation">
             <enum>Qt::Vertical</enum>
