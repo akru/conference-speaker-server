@@ -626,6 +626,13 @@ image: url(:/gui/drophands-button-pressed);
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QPushButton" name="qrButton">
+              <property name="text">
+               <string>QR</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -648,7 +655,7 @@ image: url(:/gui/drophands-button-pressed);
                <x>0</x>
                <y>0</y>
                <width>691</width>
-               <height>483</height>
+               <height>471</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">

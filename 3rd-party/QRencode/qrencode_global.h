@@ -1,0 +1,12 @@
+#ifndef QRENCODE_GLOBAL_H
+#define QRENCODE_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(QRENCODE_LIBRARY)
+#  define QRENCODESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QRENCODESHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // QRENCODE_GLOBAL_H

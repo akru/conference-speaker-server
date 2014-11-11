@@ -3,6 +3,7 @@
 #include "speaker_widget.h"
 
 #include <server.h>
+#include <qrpage.h>
 
 #include <QFontDatabase>
 #include <QNetworkInterface>
@@ -358,4 +359,10 @@ void MainWindow::updateAvailAddreses()
             ui->addressBox->addItem(address.toString());
     }
     ui->addressBox->setCurrentText(cAddr);
+}
+
+void MainWindow::on_qrButton_clicked()
+{
+    QRPage p;
+    p.printPage("http://" + ui->addressBox->currentText() + ":" + QString::number(SERVER_APP_PORT));
 }
