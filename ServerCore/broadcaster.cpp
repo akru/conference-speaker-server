@@ -51,6 +51,15 @@ void Broadcaster::unsetVotingInvite()
     qDebug() << "New broadcast message:" << packetCache;
 }
 
+void Broadcaster::setAppInfo(AppInformation info)
+{
+    // Update message
+    message.insert("app", info.toJson());
+    // Update cache
+    packetCache = QJsonDocument(message).toJson();
+    qDebug() << "New broadcast message:" << packetCache;
+}
+
 void Broadcaster::sendInformation()
 {
 

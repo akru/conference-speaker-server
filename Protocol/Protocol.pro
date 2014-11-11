@@ -12,7 +12,8 @@ SOURCES  += \
     registration_request.cpp \
     channel_information.cpp \
     channel_response.cpp \
-    voting_invite.cpp
+    voting_invite.cpp \
+    app_information.cpp
 
 HEADERS  += \
     user_information.h \
@@ -23,4 +24,5 @@ HEADERS  += \
     registration_request.h \
     channel_information.h \
     channel_response.h \
-    voting_invite.h
+    voting_invite.h \
+    app_information.h

@@ -34,5 +34,5 @@ INCLUDEPATH += $$PWD/../../cryptopp
 DEPENDPATH  += $$PWD/../../cryptopp
 }
 
-INCLUDEPATH += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr
-DEPENDPATH  += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr
+INCLUDEPATH += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr $$PWD/../3rd-party/AppServer
+DEPENDPATH  += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr $$PWD/../3rd-party/AppServer
