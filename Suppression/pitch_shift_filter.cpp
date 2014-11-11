@@ -52,14 +52,13 @@
 
 void smbFft(float *fftBuffer, long fftFrameSize, long sign);
 float smbAtan2(float x, float y);
-//double smbAtan2(double x, double y);
 
 PitchShiftFilter::PitchShiftFilter()
     : gRover(false),
       pitchShift(1),
       currentPitch(0),
       osamp(32),
-      pitchShiftCoef(0.04f)
+      pitchShiftCoef(0.01f)
 //      iteration(0)
 { 
     memset(gInFIFO, 0, analyze_length*sizeof(float));
@@ -119,9 +118,9 @@ void PitchShiftFilter::processFilter(float sample[])
         //avg 8 - 13 ms with PS time 800
     }
 
-    float input[analyze_length];
-    float output[analyze_length];
-
+//    float input[analyze_length];
+//    float output[analyze_length];
+    float output[sample_length];
 //    for (int i = 0; i < sample_length; ++i)
 //    {
 //        if(sample[i] < -1.0 && sample[i] >= 1.0)
@@ -129,35 +128,37 @@ void PitchShiftFilter::processFilter(float sample[])
 //    }
 
     // Scaling up for analyze
-    size_t idone, odone;
+//    size_t idone, odone;
 //    QTime rt = QTime::currentTime();
-    soxr_process(widener,
-                 sample,    sample_length,      &idone,
-                 input,     analyze_length,     &odone);
+//    soxr_process(widener,
+//                 sample,    sample_length,      &idone,
+//                 input,     analyze_length,     &odone);
 //    qDebug() << "PS widener engine" << soxr_engine(widener)
 //             << "delay" << soxr_delay(widener)
 //             << "idone:" << idone << "odone:" << odone;
 
     // Protecting against the NaN
-    for(short i = 0; i < analyze_length; i++){
-        if(isnan(input[i])) {
-            input[i] = 0.;
+//    for(short i = 0; i < analyze_length; i++){
+//        if(isnan(input[i])) {
+//            input[i] = 0.;
 //            qDebug() << "Got a NaN after resampling!";
-        }
-    }
+//        }
+//    }
 //    qDebug() << "resampler time" << rt.elapsed() << "ms";
 
 //    QTime t = QTime::currentTime();
     if(currentPitch) // Pitch up
     {
         pitchShift = 1 + pitchShiftCoef;
-        smbPitchShift(analyze_length, analyze_length, input, output);
+//        smbPitchShift(analyze_length, analyze_length, input, output);
+        smbPitchShift(sample_length, sample_length, sample, output);
         //     qDebug() << "Pitch up";
     }
     else // Pitch down
     {
         pitchShift = 1 - pitchShiftCoef;
-        smbPitchShift(analyze_length, analyze_length, input, output);
+//        smbPitchShift(analyze_length, analyze_length, input, output);
+        smbPitchShift(sample_length, sample_length, sample, output);
         //     qDebug() << "Pitch down";
     }
 //    qDebug() << "PS Elapsed" << t.elapsed() << "ms";
@@ -168,13 +169,13 @@ void PitchShiftFilter::processFilter(float sample[])
 
 //    for (int i = 0; i < analyze_length; i++)
 //        output[i] = input[i];
-//    for (int i = 0; i < sample_length; ++i)
-//        sample[i] = output[i];
+    for (int i = 0; i < sample_length; ++i)
+        sample[i] = output[i];
 
     // Resampling to actual freq 22050 Hz
-    soxr_process(zipper,
-                 output,    analyze_length,      &idone,
-                 sample,     sample_length,      &odone);
+//    soxr_process(zipper,
+//                 output,    analyze_length,      &idone,
+//                 sample,     sample_length,      &odone);
 //    qDebug() << "PS zipper engine" << soxr_engine(zipper)
 //             << "delay" << soxr_delay(zipper)
 //             << "idone:" << idone << "odone:" << odone;
@@ -248,7 +249,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				imag = gFFTworksp[2*k+1];
 
 				/* compute magnitude and phase */
-				magn = 2.*sqrt(real*real + imag*imag);
+                magn = 2.*sqrt(real*real + imag*imag);
                 phase = smbAtan2(imag,real);
 
 				/* compute phase difference */
@@ -281,11 +282,16 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
             memset(gSynMagn, 0, fftFrameSize*sizeof(float));
             memset(gSynFreq, 0, fftFrameSize*sizeof(float));
 			for (k = 0; k <= fftFrameSize2; k++) { 
-				index = k*pitchShift;
-				if (index <= fftFrameSize2) { 
-					gSynMagn[index] += gAnaMagn[k]; 
-					gSynFreq[index] = gAnaFreq[k] * pitchShift; 
-				} 
+                index = k*pitchShift;
+//                index = k;
+                if (index <= fftFrameSize2) { // true for every pitchShift <= 1
+                    gSynMagn[index] = gAnaMagn[k];
+                    gSynFreq[index] = gAnaFreq[k] * pitchShift;
+//                    if (pitchShift < 1)
+//                        gSynFreq[index] = gAnaFreq[k] - 0;
+//                    else
+//                        gSynFreq[index] = gAnaFreq[k] + 0;
+                }
 			}
 			
 			/* ***************** SYNTHESIS ******************* */
@@ -296,8 +302,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				magn = gSynMagn[k];
 				tmp = gSynFreq[k];
 
-				/* subtract bin mid frequency */
-//                tmp -= (double)k*freqPerBin;
+                /* subtract bin mid frequency */
                 tmp -= (float)k*freqPerBin;
 
 				/* get bin deviation from freq deviation */
@@ -306,8 +311,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				/* take osamp into account */
 				tmp = 2.*M_PI*tmp/osamp;
 
-				/* add the overlap phase advance back in */
-//                tmp += (double)k*expct;
+                /* add the overlap phase advance back in */
                 tmp += (float)k*expct;
 
 				/* accumulate delta phase to get bin phase */
@@ -317,7 +321,7 @@ void PitchShiftFilter::smbPitchShift(long numSampsToProcess,
 				/* get real and imag part and re-interleave */
 				gFFTworksp[2*k] = magn*cos(phase);
 				gFFTworksp[2*k+1] = magn*sin(phase);
-			} 
+            }
 
 			/* zero negative frequencies */
             for (k = fftFrameSize+2; k < 2*fftFrameSize; k++) gFFTworksp[k] = 0.;
@@ -423,10 +427,8 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign)
     
 */
 
-//double smbAtan2(double x, double y)
 float smbAtan2(float x, float y)
 {
-//  double signx;
   float signx;
   if (x > 0.) signx = 1.;  
   else signx = -1.;
