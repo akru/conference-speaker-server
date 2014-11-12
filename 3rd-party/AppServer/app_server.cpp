@@ -35,6 +35,8 @@ AppServer::AppServer(QObject *parent)
 
 AppServer::~AppServer()
 {
+    terminate();
+    wait();
     mg_destroy_server(&server);
 }
 

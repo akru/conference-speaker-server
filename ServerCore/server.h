@@ -31,8 +31,10 @@ class Server : public QObject
 public:
     explicit Server(const ServerInformation &info, QObject *parent = 0);
     ~Server();
+    bool isEnabled() const
+    { return listenEnabled; }
     // Getters
-    inline const UserMap & getUsers() const
+    const UserMap & getUsers() const
     { return users; }
     Speaker * getSpeaker() const
     { return speaker; }
@@ -58,6 +60,7 @@ signals:
 
     void recordStarted();
     void recordStoped();
+    void recordDirectoryChanged(QString path);
 
 public slots:
     void userDrop(QString address);
@@ -75,6 +78,7 @@ public slots:
 
     void recordStart();
     void recordStop();
+    void recordSetDirectory(QString path);
 
 private slots:
     void connectionNew();
@@ -110,6 +114,8 @@ private:
     // Licensing policy
     Licensing                      license;
 #endif
+    // Listening flag
+    bool listenEnabled;
 };
 
 #endif // SERVER_H

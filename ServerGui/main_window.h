@@ -62,6 +62,8 @@ private slots:
     void on_drophandsButton_clicked();
     void on_qrButton_clicked();
 
+    void on_storageSelectButton_clicked();
+
 private:
     Ui::MainWindow    *ui;
     Settings          *settings;

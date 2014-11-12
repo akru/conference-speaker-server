@@ -9,6 +9,7 @@
 #include <QFontDatabase>
 #include <QNetworkInterface>
 #include <QHostAddress>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
 #include <QTimer>
@@ -68,7 +69,6 @@ void MainWindow::setupUi()
     // Status label
     setStatus(statusStoped);
     // Separate result widget
-    resultWidget->setLayout(new QHBoxLayout(resultWidget));
     resultWidget->setWindowTitle(tr("Voting results"));
     resultWidget->setStyleSheet(styleSheet());
     resultWidget->setWindowIcon(windowIcon());
@@ -172,6 +172,14 @@ void MainWindow::channelRequest(QString address)
 void MainWindow::serverStart()
 {
     server = new Server(settings->info());
+    if (!server->isEnabled())
+    {
+        QMessageBox::critical(this,
+                              tr("Server fault"),
+                              tr("Unable to start server"));
+        serverStop();
+        return;
+    }
     // User MGT
     connect(server,
             SIGNAL(userConnected(QString)),
@@ -207,6 +215,8 @@ void MainWindow::serverStart()
     // Load filter settings
     connect(settings, SIGNAL(settingsSaved()),
             server,   SLOT(channelReloadSettings()));
+    // Set storage path
+    server->recordSetDirectory(ui->storageEdit->text());
     // Update status
     setStatus(statusStarted);
 }
@@ -359,4 +369,13 @@ void MainWindow::on_qrButton_clicked()
 {
     QRPage p;
     p.printPage("http://" + ui->addressBox->currentText() + ":" + QString::number(SERVER_APP_PORT));
+}
+
+void MainWindow::on_storageSelectButton_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("Open records directory"));
+    if (server)
+        server->recordSetDirectory(path);
+    ui->storageEdit->setText(path);
+    settings->save();
 }
