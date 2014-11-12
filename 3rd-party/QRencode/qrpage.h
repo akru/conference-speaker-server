@@ -14,7 +14,7 @@ public:
 private:
     void writeSVG_writeRect(QTextStream &svg, int x, int y, int width,
                             const QString &col, float opacity);
-    QByteArray writeSVG(const QString &string);
+    QString writeSVG(const QString &string);
 };
 
 #endif // QRPAGE_H
