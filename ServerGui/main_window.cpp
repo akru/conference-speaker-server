@@ -1,12 +1,15 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "speaker_widget.h"
+#include "vote_results_widget.h"
 
 #include <server.h>
+#include <qrpage.h>
 
 #include <QFontDatabase>
 #include <QNetworkInterface>
 #include <QHostAddress>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
 #include <QTimer>
@@ -19,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     server(0),
-    resultWidget(new QWidget)
+    resultWidget(new VoteResultsWidget)
 {
     // Loading fonts
     loadFonts();
@@ -66,9 +69,7 @@ void MainWindow::setupUi()
     // Status label
     setStatus(statusStoped);
     // Separate result widget
-    resultWidget->setLayout(new QHBoxLayout(resultWidget));
     resultWidget->setWindowTitle(tr("Voting results"));
-    resultWidget->setWindowFlags(Qt::WindowTitleHint);
     resultWidget->setStyleSheet(styleSheet());
     resultWidget->setWindowIcon(windowIcon());
     // Two default answer field
@@ -171,6 +172,14 @@ void MainWindow::channelRequest(QString address)
 void MainWindow::serverStart()
 {
     server = new Server(settings->info());
+    if (!server->isEnabled())
+    {
+        QMessageBox::critical(this,
+                              tr("Server fault"),
+                              tr("Unable to start server"));
+        serverStop();
+        return;
+    }
     // User MGT
     connect(server,
             SIGNAL(userConnected(QString)),
@@ -189,6 +198,8 @@ void MainWindow::serverStart()
     connect(server,
             SIGNAL(voteResultsUpdated(VoteResults)),
             SLOT(voteUpdateResults(VoteResults)));
+    connect(server,       SIGNAL(voteResultsUpdated(VoteResults)),
+            resultWidget, SLOT(voteUpdateResults(VoteResults)));
     connect(this,    SIGNAL(voteNew(VotingInvite)),
             server,  SLOT(voteNew(VotingInvite)));
     connect(this,    SIGNAL(voteStop()),
@@ -204,6 +215,8 @@ void MainWindow::serverStart()
     // Load filter settings
     connect(settings, SIGNAL(settingsSaved()),
             server,   SLOT(channelReloadSettings()));
+    // Set storage path
+    server->recordSetDirectory(ui->storageEdit->text());
     // Update status
     setStatus(statusStarted);
 }
@@ -312,17 +325,9 @@ void MainWindow::voteUpdateResults(VoteResults results)
 void MainWindow::on_popupResultsButton_toggled(bool checked)
 {
     if (checked)
-    {
-        ui->resultsBox->setParent(resultWidget);
-        resultWidget->layout()->addWidget(ui->resultsBox);
         resultWidget->show();
-    }
     else
-    {
-        ui->resultsBox->setParent(this);
-        ui->votingTab->layout()->addWidget(ui->resultsBox);
-        resultWidget->hide();
-    }
+        resultWidget->close();
 }
 
 void MainWindow::on_plusButton_clicked()
@@ -358,4 +363,19 @@ void MainWindow::updateAvailAddreses()
             ui->addressBox->addItem(address.toString());
     }
     ui->addressBox->setCurrentText(cAddr);
+}
+
+void MainWindow::on_qrButton_clicked()
+{
+    QRPage p;
+    p.printPage("http://" + ui->addressBox->currentText() + ":" + QString::number(SERVER_APP_PORT));
+}
+
+void MainWindow::on_storageSelectButton_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("Open records directory"));
+    if (server)
+        server->recordSetDirectory(path);
+    ui->storageEdit->setText(path);
+    settings->save();
 }

@@ -34,6 +34,7 @@ void SpeakerWidget::setState(State s)
         ui->volumeFrame->hide();
         ui->titleLabel->hide();
         ui->companyLabel->hide();
+        ui->avatar->hide();
         ui->acceptButton->show();
         ui->delayBox->show();
         setMaximumHeight(50);
@@ -42,6 +43,7 @@ void SpeakerWidget::setState(State s)
         ui->volumeFrame->show();
         ui->titleLabel->show();
         ui->companyLabel->show();
+        ui->avatar->show();
         ui->acceptButton->hide();
         ui->delayBox->hide();
         setMaximumHeight(130);

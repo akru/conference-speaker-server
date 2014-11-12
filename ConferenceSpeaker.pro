@@ -8,5 +8,6 @@ SUBDIRS += \
     ServerCore   \
     ServerGui    \
     ServerTests  \
-    SuppressionTests
+    SuppressionTests \
+    3rd-party/QRencode
 

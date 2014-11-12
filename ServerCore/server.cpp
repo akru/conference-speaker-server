@@ -68,11 +68,13 @@ Server::Server(const ServerInformation &info, QObject *parent)
             recorder, SLOT(start()));
     connect(this,     SIGNAL(recordStoped()),
             recorder, SLOT(stop()));
+    connect(this,     SIGNAL(recordDirectoryChanged(QString)),
+            recorder, SLOT(setRecordDirectory(QString)));
 
     QHostAddress hostAddress = QHostAddress(info.address);
     // Listening port
-    qDebug() << "Listening" << info.address << SERVER_CONNECTION_PORT <<
-    server->listen(hostAddress, SERVER_CONNECTION_PORT);
+    listenEnabled = server->listen(hostAddress, SERVER_CONNECTION_PORT);
+    qDebug() << "Listening" << info.address << SERVER_CONNECTION_PORT << listenEnabled;
 }
 
 Server::~Server()
@@ -382,4 +384,9 @@ void Server::recordStart()
 void Server::recordStop()
 {
     emit recordStoped();
+}
+
+void Server::recordSetDirectory(QString path)
+{
+    emit recordDirectoryChanged(path);
 }

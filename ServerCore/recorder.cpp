@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QDebug>
 
 Recorder::Recorder(const UserMap &users, QObject *parent)
     : QObject(parent),
@@ -21,6 +22,7 @@ Recorder::~Recorder()
 
 void Recorder::setRecordDirectory(QString d)
 {
+    qDebug() << "Storage path changed to" << d;
     recordDir = d;
 }
 

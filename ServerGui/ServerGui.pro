@@ -1,4 +1,4 @@
-QT       = core gui network multimedia
+QT       = core gui network multimedia svg printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -8,16 +8,19 @@ TEMPLATE = app
 SOURCES  += main.cpp \
     main_window.cpp \
     settings.cpp \
-    speaker_widget.cpp
+    speaker_widget.cpp \
+    vote_results_widget.cpp
 
 HEADERS  += \
     main_window.h \
     settings.h \
-    speaker_widget.h
+    speaker_widget.h \
+    vote_results_widget.h
 
 FORMS    += \
     main_window.ui \
-    speaker_widget.ui
+    speaker_widget.ui \
+    vote_results_widget.ui
 
 RESOURCES += \
     resource.qrc
@@ -28,8 +31,8 @@ TRANSLATIONS += \
 
 ## Include & link libraries
 
-INCLUDEPATH += $$PWD/../ServerCore $$PWD/../Protocol
-DEPENDPATH += $$PWD/../ServerCore $$PWD/../Protocol
+INCLUDEPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode
+DEPENDPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ServerCore/release/ -lServerCore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ServerCore/debug/ -lServerCore
@@ -54,3 +57,7 @@ else:unix: LIBS += -L$$OUT_PWD/../3rd-party/Soxr/ -lSoxr
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../3rd-party/AppServer/release/ -lAppServer
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../3rd-party/AppServer/debug/ -lAppServer
 else:unix: LIBS += -L$$OUT_PWD/../3rd-party/AppServer/ -lAppServer
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../3rd-party/QRencode/release/ -lQRencode
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../3rd-party/QRencode/debug/ -lQRencode
+else:unix: LIBS += -L$$OUT_PWD/../3rd-party/QRencode/ -lQRencode

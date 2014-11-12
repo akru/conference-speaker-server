@@ -244,7 +244,10 @@ QPushButton#recordButton:checked,
 QPushButton#recordButton:pressed,
 QPushButton#drophandsButton,
 QPushButton#drophandsButton:checked,
-QPushButton#drophandsButton:pressed {
+QPushButton#drophandsButton:pressed,
+QPushButton#popupResultsButton,
+QPushButton#popupResultsButton:checked,
+QPushButton#popupResultsButton:pressed {
     border: 0;
     background: none;
     padding: 0;
@@ -626,6 +629,13 @@ image: url(:/gui/drophands-button-pressed);
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QPushButton" name="qrButton">
+              <property name="text">
+               <string>QR</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -979,9 +989,23 @@ image: url(:/gui/drophands-button-pressed);
                 </size>
                </property>
                <property name="text">
-                <string>^^</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resource.qrc">
+                 <normaloff>:/gui/flowbote-button</normaloff>
+                 <normalon>:/gui/flowvote-button-pressed</normalon>:/gui/flowbote-button</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
                </property>
                <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="flat">
                 <bool>true</bool>
                </property>
               </widget>

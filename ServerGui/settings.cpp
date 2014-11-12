@@ -102,6 +102,9 @@ Settings::Settings(Ui::MainWindow *ui, QObject *parent)
     // Pitch shift
     ui->psBox->setChecked(s.value("ps-enable", true).toBool());
     connect(ui->psBox, SIGNAL(clicked()), SLOT(save()));
+
+    // Records storage
+    ui->storageEdit->setText(s.value("records-storage", "").toString());
 }
 
 ServerInformation Settings::info()
@@ -163,6 +166,8 @@ void Settings::save()
     s.setValue("compressor-noise", ui->cNoiseSpinBox->value());
 
     s.setValue("ps-enable", ui->psBox->isChecked());
+
+    s.setValue("records-storage", ui->storageEdit->text());
 
     emit settingsSaved();
 }

@@ -12,6 +12,7 @@ class Server;
 class QLineEdit;
 class SpeakerWidget;
 class QListWidgetItem;
+class VoteResultsWidget;
 
 typedef QMap<QString, QListWidgetItem*> ItemMap;
 typedef QList<QLineEdit*>               AnswerList;
@@ -59,17 +60,20 @@ private slots:
     void on_plusButton_clicked();
     void on_customRB_toggled(bool checked);
     void on_drophandsButton_clicked();
+    void on_qrButton_clicked();
+
+    void on_storageSelectButton_clicked();
 
 private:
-    Ui::MainWindow  *ui;
-    Settings        *settings;
-    Server          *server;
+    Ui::MainWindow    *ui;
+    Settings          *settings;
+    Server            *server;
 
-    ItemMap          userItem;
-    SpeakerWidgetMap speakers;
+    ItemMap            userItem;
+    SpeakerWidgetMap   speakers;
 
-    QWidget         *resultWidget;
-    AnswerList       answers;
+    VoteResultsWidget *resultWidget;
+    AnswerList         answers;
 
     void loadFonts();
     void setupUi();
