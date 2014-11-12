@@ -8,16 +8,19 @@ TEMPLATE = app
 SOURCES  += main.cpp \
     main_window.cpp \
     settings.cpp \
-    speaker_widget.cpp
+    speaker_widget.cpp \
+    vote_results_widget.cpp
 
 HEADERS  += \
     main_window.h \
     settings.h \
-    speaker_widget.h
+    speaker_widget.h \
+    vote_results_widget.h
 
 FORMS    += \
     main_window.ui \
-    speaker_widget.ui
+    speaker_widget.ui \
+    vote_results_widget.ui
 
 RESOURCES += \
     resource.qrc

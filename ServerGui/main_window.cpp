@@ -1,6 +1,7 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "speaker_widget.h"
+#include "vote_results_widget.h"
 
 #include <server.h>
 #include <qrpage.h>
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     server(0),
-    resultWidget(new QWidget)
+    resultWidget(new VoteResultsWidget)
 {
     // Loading fonts
     loadFonts();
@@ -69,7 +70,6 @@ void MainWindow::setupUi()
     // Separate result widget
     resultWidget->setLayout(new QHBoxLayout(resultWidget));
     resultWidget->setWindowTitle(tr("Voting results"));
-    resultWidget->setWindowFlags(Qt::WindowTitleHint);
     resultWidget->setStyleSheet(styleSheet());
     resultWidget->setWindowIcon(windowIcon());
     // Two default answer field
@@ -190,6 +190,8 @@ void MainWindow::serverStart()
     connect(server,
             SIGNAL(voteResultsUpdated(VoteResults)),
             SLOT(voteUpdateResults(VoteResults)));
+    connect(server,       SIGNAL(voteResultsUpdated(VoteResults)),
+            resultWidget, SLOT(voteUpdateResults(VoteResults)));
     connect(this,    SIGNAL(voteNew(VotingInvite)),
             server,  SLOT(voteNew(VotingInvite)));
     connect(this,    SIGNAL(voteStop()),
@@ -313,17 +315,9 @@ void MainWindow::voteUpdateResults(VoteResults results)
 void MainWindow::on_popupResultsButton_toggled(bool checked)
 {
     if (checked)
-    {
-        ui->resultsBox->setParent(resultWidget);
-        resultWidget->layout()->addWidget(ui->resultsBox);
         resultWidget->show();
-    }
     else
-    {
-        ui->resultsBox->setParent(this);
-        ui->votingTab->layout()->addWidget(ui->resultsBox);
-        resultWidget->hide();
-    }
+        resultWidget->close();
 }
 
 void MainWindow::on_plusButton_clicked()

@@ -31,6 +31,8 @@
         <file alias="accept-button-pressed">res/images/button/accept-pressed.png</file>
         <file alias="desmiss-button">res/images/button/dismiss.png</file>
         <file alias="dismiss-button-ressed">res/images/button/dismiss-pressed.png</file>
+        <file alias="flowbote-button">res/images/button/flowvote.png</file>
+        <file alias="flowvote-button-pressed">res/images/button/flowvote-pressed.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Gothic.ttf">res/fonts/Gothic.ttf</file>
