@@ -1,4 +1,4 @@
-QT      += svg printsupport
+QT      += printsupport webkitwidgets
 
 TARGET   = QRencode
 TEMPLATE = lib

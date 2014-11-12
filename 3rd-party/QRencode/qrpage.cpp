@@ -2,10 +2,8 @@
 #include "qrencode.h"
 
 #include <QPrintDialog>
-#include <QSvgRenderer>
-#include <QTextDocument>
-#include <QPainter>
 #include <QPrinter>
+#include <QWebView>
 
 #include <QDebug>
 
@@ -29,15 +27,14 @@ void QRPage::printPage(const QString &string)
     if (dialog.exec())
     {
         printer.setFullPage(true);
-        QByteArray svg = writeSVG(string);
-        QSvgRenderer render(svg);
-        QRectF qrPose(QPointF(250, 250), QSizeF(2000,2000));
-        QPainter page(&printer);
-        render.render(&page, qrPose);
+        QString svg = writeSVG(string);
+        QWebView view;
+        view.setHtml(svg);
+        view.print(&printer);
     }
 }
 
-QByteArray QRPage::writeSVG(const QString &string)
+QString QRPage::writeSVG(const QString &string)
 {
     unsigned char *row, *p;
     int x, y, x0, pen;
