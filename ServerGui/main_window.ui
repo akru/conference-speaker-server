@@ -247,7 +247,10 @@ QPushButton#drophandsButton:checked,
 QPushButton#drophandsButton:pressed,
 QPushButton#popupResultsButton,
 QPushButton#popupResultsButton:checked,
-QPushButton#popupResultsButton:pressed {
+QPushButton#popupResultsButton:pressed,
+QPushButton#qrButton,
+QPushButton#qrButton:checked,
+QPushButton#qrButton:pressed {
     border: 0;
     background: none;
     padding: 0;
@@ -532,6 +535,12 @@ QDateEdit {
                 <height>42</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Conference Speaker power</string>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
               <property name="icon">
                <iconset resource="resource.qrc">
                 <normaloff>:/gui/power-button</normaloff>
@@ -565,6 +574,12 @@ QDateEdit {
             </item>
             <item>
              <widget class="QPushButton" name="recordButton">
+              <property name="toolTip">
+               <string>Record conference</string>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
               <property name="icon">
                <iconset resource="resource.qrc">
                 <normaloff>:/gui/record-button</normaloff>
@@ -586,6 +601,9 @@ QDateEdit {
             </item>
             <item>
              <widget class="QPushButton" name="drophandsButton">
+              <property name="toolTip">
+               <string>Close all requests</string>
+              </property>
               <property name="styleSheet">
                <string notr="true">:pressed {
 image: url(:/gui/drophands-button-pressed);
@@ -631,8 +649,22 @@ image: url(:/gui/drophands-button-pressed);
             </item>
             <item>
              <widget class="QPushButton" name="qrButton">
+              <property name="toolTip">
+               <string>Generate QR code</string>
+              </property>
               <property name="text">
-               <string>QR</string>
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/gui/qr-button</normaloff>
+                <normalon>:/gui/qr-button-pressed</normalon>:/gui/qr-button</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>48</width>
+                <height>48</height>
+               </size>
               </property>
              </widget>
             </item>
