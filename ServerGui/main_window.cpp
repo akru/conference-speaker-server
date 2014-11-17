@@ -367,8 +367,11 @@ void MainWindow::updateAvailAddreses()
 
 void MainWindow::on_qrButton_clicked()
 {
+    ui->qrButton->setCheckable(true);
+    ui->qrButton->setChecked(true);
     QRPage p;
     p.printPage("http://" + ui->addressBox->currentText() + ":" + QString::number(SERVER_APP_PORT));
+    ui->qrButton->setCheckable(false);
 }
 
 void MainWindow::on_storageSelectButton_clicked()
