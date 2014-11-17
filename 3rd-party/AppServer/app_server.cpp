@@ -35,7 +35,7 @@ AppServer::AppServer(QObject *parent)
     mg_set_option(server, "listening_port", "35080");
     // Load storage to memory
     QFile ix(":/app-server/index.html"); ix.open(QIODevice::ReadOnly);
-    addRouteData("/", QString::fromLatin1(ix.readAll()).arg(header_1).arg(header_2).toUtf8());
+    addRouteData("/", QString::fromLatin1(ix.readAll()).arg(tr(header_1)).arg(tr(header_2)).toUtf8());
     addRouteFile("/logo.png", ":/app-server/logo.png");
     addRouteFile("/apple.png", ":/app-server/apple.png");
     addRouteFile("/android.png", ":/app-server/android.png");
