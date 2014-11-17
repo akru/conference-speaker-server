@@ -42,5 +42,10 @@
     </qresource>
     <qresource prefix="/app-server">
         <file alias="index.html">res/app-server/index.html</file>
+        <file alias="android.png">res/app-server/android.png</file>
+        <file alias="apple.png">res/app-server/apple.png</file>
+        <file alias="logo.png">res/app-server/logo.png</file>
+        <file alias="wtlogo.png">res/app-server/wtlogo.png</file>
+        <file alias="cs.apk">res/app-server/cs.apk</file>
     </qresource>
 </RCC>

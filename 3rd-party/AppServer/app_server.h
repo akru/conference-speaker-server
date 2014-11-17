@@ -17,6 +17,7 @@ public:
 
     void run();
     void addRouteFile(const QString &route, const QString &resname);
+    void addRouteData(const QString &route, const QByteArray &res);
 
 private:
     mg_server *server;

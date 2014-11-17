@@ -4,7 +4,7 @@
 static const QString uriTemplate = "http://%1:%2/app/%3/cs.%4";
 static const QString android     = "android";
 static const QString ios         = "ios";
-static const QString androidExt  = "app";
+static const QString androidExt  = "apk";
 static const QString iosExt      = "ipa";
 
 AppInformation::AppInformation(const QString &address, int version)

@@ -4,8 +4,69 @@
     <meta charset="utf-8" />
     <title>Conference Speaker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+body, html { padding: 0; margin: 0; background: #122433; }
+h2, h4 { font-family: verdana; color: #122433; text-align: center; }
+#header {
+	padding: 15px;
+	background: #1C364C;
+}
+#logo {
+	margin: 0 auto;
+	padding: 0 15px;
+	min-width:  240px;
+	max-width: 320px;
+	width: 100%;
+}
+#logo img { width: 50%; }
+#wrapper {
+	background: #183044;
+	min-width:  240px;
+	max-width: 320px;
+	width: 85%; height: 100%;
+	margin: 0 auto;
+	padding: 0 15px;
+}
+#container {
+	background: linear-gradient(to bottom,
+		rgba(255,255,255,0) 0%,
+		rgba(255,255,255,0.97) 18%,
+		rgba(255,255,255,1) 36%,
+		rgba(255,255,255,1) 37%,
+		rgba(255,255,255,0.76) 59%,
+		rgba(255,255,255,0.76) 82%,
+		rgba(254,230,192,1) 100%);
+	padding: 50px 15px 15px 15px;
+}
+#download img {
+	float: left;
+	width: 40%;
+	margin: 15px 5% 50px 5%;
+}
+#wtlogo {
+	display: block;
+	margin: 0 auto;
+}
+	</style>
 </head>
 <body>
-    <h1>Hello!</h1>
+	<div id="header">
+		<div id="logo">
+			<img src="logo.png"/>
+		</div>
+	</div>
+	<div style="background: #183044;">
+	<div id="wrapper">
+		<div id="container">
+			<h4>%1</h4>
+			<div id="download">
+				<a href="/app/ios/cs.ipa"><img src="apple.png"/></a>
+				<a href="/app/android/cs.apk"><img src="android.png"/></a>
+			</div>
+			<h4>%2</h4>
+			<img id="wtlogo" src="wtlogo.png"/>
+		</div>
+	</div>
+	</div>
 </body>
 </html>

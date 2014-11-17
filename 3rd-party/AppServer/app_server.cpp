@@ -5,6 +5,9 @@
 #include <QTime>
 #include <QDebug>
 
+static const char *header_1 = "Загрузите приложение для вашей платформы:";
+static const char *header_2 = "Нам важно, чтобы вы были услышаны!";
+
 static URIMap storage;
 
 static int event_handler(struct mg_connection *conn, enum mg_event ev) {
@@ -18,6 +21,7 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev) {
                 return MG_TRUE;   // Mark as processed
             }
         }
+        qDebug() << "Not found";
         return MG_FALSE;  // Rest of the events are not processed
     } else {
         return MG_FALSE;  // Rest of the events are not processed
@@ -30,7 +34,13 @@ AppServer::AppServer(QObject *parent)
 {
     mg_set_option(server, "listening_port", "35080");
     // Load storage to memory
-    addRouteFile("/", ":/app-server/index.html");
+    QFile ix(":/app-server/index.html"); ix.open(QIODevice::ReadOnly);
+    addRouteData("/", QString::fromLatin1(ix.readAll()).arg(header_1).arg(header_2).toUtf8());
+    addRouteFile("/logo.png", ":/app-server/logo.png");
+    addRouteFile("/apple.png", ":/app-server/apple.png");
+    addRouteFile("/android.png", ":/app-server/android.png");
+    addRouteFile("/wtlogo.png", ":/app-server/wtlogo.png");
+    addRouteFile("/app/android/cs.apk", ":/app-server/cs.apk");
 }
 
 AppServer::~AppServer()
@@ -52,4 +62,9 @@ void AppServer::addRouteFile(const QString &route, const QString &resname)
     QFile res(resname);
     res.open(QIODevice::ReadOnly);
     storage.insert(route, res.readAll());
+}
+
+void AppServer::addRouteData(const QString &route, const QByteArray &res)
+{
+    storage.insert(route, res);
 }
