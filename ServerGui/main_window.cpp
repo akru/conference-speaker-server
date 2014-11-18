@@ -18,6 +18,9 @@ const char * statusStoped    = "Server stoped";
 const char * statusStarted   = "Server started, waiting for clients...";
 const char * statusConnected = "Working, clients connected";
 
+const char * qrPageHeader1   = "Mobile application for your OS:";
+const char * qrPageHeader2   = "Glad to hear you!";
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -370,7 +373,10 @@ void MainWindow::on_qrButton_clicked()
     ui->qrButton->setCheckable(true);
     ui->qrButton->setChecked(true);
     QRPage p;
-    p.printPage("http://" + ui->addressBox->currentText() + ":" + QString::number(SERVER_APP_PORT));
+    QString addr = "http://" + ui->addressBox->currentText() + ":" + QString::number(SERVER_APP_PORT);
+    QString androidAddr = addr + "/app/android/cs.apk";
+    QString iosAddr = addr + "/app/ios/cs.ipk";
+    p.printPage(addr, androidAddr, iosAddr, tr(qrPageHeader1), tr(qrPageHeader2));
     ui->qrButton->setCheckable(false);
 }
 

@@ -4,6 +4,7 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QWebView>
+#include <QFile>
 
 #include <QDebug>
 
@@ -12,24 +13,30 @@ static const int dpi = 72;
 static const QRecLevel level = QR_ECLEVEL_L;
 static const unsigned int fg_color[4] = {0, 0, 0, 255};
 static const unsigned int bg_color[4] = {255, 255, 255, 255};
-static const int margin = 4;
+static const int margin = 2;
 static const int rle = 0;
-static const int size = 3;
+static const int size = 5;
 
 QRPage::QRPage()
 {
 }
 
-void QRPage::printPage(const QString &string)
+void QRPage::printPage(const QString &addr,
+                       const QString &androidAddr,
+                       const QString &iosAddr,
+                       const QString &h1,
+                       const QString &h2)
 {
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog dialog(&printer);
     if (dialog.exec())
     {
         printer.setFullPage(true);
-        QString svg = writeSVG(string);
+        QFile ix(":/qr-code/index.html"); ix.open(QIODevice::ReadOnly);
+        QString page = QString::fromLatin1(ix.readAll())
+                .arg(h1, writeSVG(androidAddr), writeSVG(iosAddr), addr, h2);
         QWebView view;
-        view.setHtml(svg);
+        view.setHtml(page);
         view.print(&printer);
     }
 }
@@ -73,7 +80,7 @@ QString QRPage::writeSVG(const QString &string)
     bg_opacity = (float)bg_color[3] / 255;
 
     /* XML declaration */
-    svg << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+    //svg << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
 
     /* DTD
        No document type specified because "while a DTD is provided in [the SVG]

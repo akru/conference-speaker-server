@@ -48,4 +48,10 @@
         <file alias="wtlogo.png">res/app-server/wtlogo.png</file>
         <file alias="cs.apk">res/app-server/cs.apk</file>
     </qresource>
+    <qresource prefix="/qr-code">
+        <file alias="header.png">res/qr-code/header.png</file>
+        <file alias="index.html">res/qr-code/index.html</file>
+        <file alias="logo.png">res/qr-code/logo.png</file>
+        <file alias="wtlogo.png">res/qr-code/wtlogo.png</file>
+    </qresource>
 </RCC>

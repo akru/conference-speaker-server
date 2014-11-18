@@ -4,8 +4,69 @@
     <meta charset="utf-8" />
     <title>Conference Speaker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+body, html { padding: 0; margin: 0; background: #FFF; }
+h2, h4 { font-family: verdana; color: #122433; text-align: center; }
+#header {
+	padding: 40px 0 0 0;
+}
+#logo {
+	margin: 0 auto;
+	padding: 0 15px;
+	min-width:  240px;
+	max-width: 640px;
+	width: 100%;
+}
+#logo img { width: 50%; }
+#wrapper {
+	min-width:  240px;
+	max-width: 640px;
+	width: 85%; height: 100%;
+	margin: 0 auto;
+	padding: 0 15px;
+}
+#container {
+	padding: 50px 15px 15px 15px;
+}
+#download svg {
+	margin: 15px auto;
+}
+#download div {
+	float: left;
+	margin: 0 6%;
+}
+#wtlogo {
+	display: block;
+	margin: 0 auto;
+	width: 20%;
+}
+	</style>
 </head>
 <body>
-    <h1>Hello!</h1>
+	<div id="header">
+		<div id="logo">
+			<img src="qrc:/qr-code/logo.png" style="margin-left: 15px"/>
+		</div>
+		
+	</div>
+	<div id="wrapper">
+		<img src="qrc:/qr-code/header.png" style="width: 100%; margin: 0; padding: 0;"/>
+		<div id="container">
+			<h4>%1</h4>
+			<div id="download">
+				<div>
+					%2
+					<h4>Android</h4>
+				</div>
+				<div>
+					%3
+					<h4>iOS</h4>
+				</div>
+			</div>
+			<h4 style="clear: both">%4</h4>
+			<h4 style="padding-top: 50px">%5</h4>
+			<img id="wtlogo" src="qrc:/qr-code/wtlogo.png"/>
+		</div>
+	</div>
 </body>
 </html>
