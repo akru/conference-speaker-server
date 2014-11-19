@@ -57,7 +57,7 @@ void Voting::vote(QString address, QJsonObject request)
         if (answer.toBool())
             results.values[0] += 1;
         else
-            results.values[1] += 2;
+            results.values[1] += 1;
         break;
     case VotingInvite::Custom:
         if (!answer.isDouble())
