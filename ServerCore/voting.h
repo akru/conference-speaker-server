@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QStringList>
+#include <QVector>
 
 struct VoteResults
 {
@@ -17,7 +18,7 @@ struct VoteResults
      *   Custom - values has as long elements as answers in a question.
      * Values of elements is a count of clients with this answer.
      */
-    QList<uint>  values;
+    QVector<uint>  values;
 };
 
 class Voting : public QObject

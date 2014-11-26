@@ -42,10 +42,6 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Protocol/release/ -
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Protocol/debug/ -lProtocol
 else:unix: LIBS += -L$$OUT_PWD/../Protocol/ -lProtocol
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Speaker/release/ -lSpeaker
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Speaker/debug/ -lSpeaker
-else:unix: LIBS += -L$$OUT_PWD/../Speaker/ -lSpeaker
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Suppression/release/ -lSuppression
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Suppression/debug/ -lSuppression
 else:unix: LIBS += -L$$OUT_PWD/../Suppression/ -lSuppression

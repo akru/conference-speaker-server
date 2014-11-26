@@ -184,6 +184,13 @@ void Server::connectionReadyRead(Connection *client)
             qDebug() << "New channel close request from" << client->getAddress();
             emit channelCloseRequest(client->getAddress());
             break;
+        case Request::Vote:
+            qDebug() << "New vote request from" << client->getAddress();
+            emit voteRequest(client->getAddress(), packet);
+            break;
+        default:
+            qWarning() << "Unknown request from:" << client->getAddress()
+                       << packet;
         }
     } catch (BadPacket) {
         qDebug() << "Bad packet: " << buffer;

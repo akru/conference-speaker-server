@@ -1,4 +1,5 @@
 #include "voting.h"
+#include <QDebug>
 
 Voting::Voting(const VotingInvite &invite,
                QObject *parent)
@@ -12,10 +13,7 @@ Voting::Voting(const VotingInvite &invite,
         results.values.append(0);
         break;
     case VotingInvite::Custom:
-        foreach (const QString &a, invite.answers) {
-            Q_UNUSED(a)
-            results.values.append(0);
-        }
+        results.values.fill(0, invite.answers.size());
         break;
     }
 }
@@ -29,6 +27,7 @@ void Voting::vote(QString address, QJsonObject request)
 {
     if (voters.contains(address))
     {
+        qDebug() << "Vote denied from" << address << "double vote";
         emit denied(address, "try to double vote");
         return;
     }
@@ -36,6 +35,7 @@ void Voting::vote(QString address, QJsonObject request)
     QJsonValue uuid = request["uuid"];
     if (uuid.isUndefined() || QUuid(uuid.toString()) != results.invite.uuid)
     {
+        qDebug() << "Vote denied from" << address << "mismatch uuid";
         emit denied(address, "mismatch vote id");
         return;
     }
@@ -43,6 +43,7 @@ void Voting::vote(QString address, QJsonObject request)
     QJsonValue answer = request["answer"];
     if (answer.isUndefined())
     {
+        qDebug() << "Vote denied from" << address << "unexist answer";
         emit denied(address, "answer does not exist");
         return;
     }
@@ -51,6 +52,7 @@ void Voting::vote(QString address, QJsonObject request)
     case VotingInvite::Simple:
         if (!answer.isBool())
         {
+            qDebug() << "Vote denied from" << address << "broken bool answer";
             emit denied(address, "answer does not bool");
             return;
         }
@@ -60,8 +62,9 @@ void Voting::vote(QString address, QJsonObject request)
             results.values[1] += 1;
         break;
     case VotingInvite::Custom:
-        if (!answer.isDouble())
+        if (!answer.isDouble() || answer.toInt() >= results.values.size())
         {
+            qDebug() << "Vote denied from" << address << "broken answer";
             emit denied(address, "answer does not integer");
             return;
         }
@@ -71,4 +74,5 @@ void Voting::vote(QString address, QJsonObject request)
     voters.append(address);
     emit accepted(address);
     emit resultsUpdated(results);
+    qDebug() << "Vote accepted from" << address;
 }
