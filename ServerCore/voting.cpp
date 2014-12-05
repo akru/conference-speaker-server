@@ -62,7 +62,7 @@ void Voting::vote(QString address, QJsonObject request)
             results.values[1] += 1;
         break;
     case VotingInvite::Custom:
-        if (!answer.isDouble() || answer.toInt() >= results.values.size())
+        if (!answer.isDouble() || answer.toInt() < 0 || answer.toInt() >= results.values.size())
         {
             qDebug() << "Vote denied from" << address << "broken answer";
             emit denied(address, "answer does not integer");
