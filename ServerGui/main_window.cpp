@@ -14,12 +14,20 @@
 #include <QSettings>
 #include <QTimer>
 
+/*
 const char * statusStoped    = "Server stoped";
 const char * statusStarted   = "Server started, waiting for clients...";
 const char * statusConnected = "Working, clients connected";
 
 const char * qrPageHeader1   = "Mobile application for your OS:";
 const char * qrPageHeader2   = "Glad to hear you!";
+*/
+const char * statusStoped    = "Сервер выключен.";
+const char * statusStarted   = "Сервер запущен, ожидаются подключения...";
+const char * statusConnected = "Сервер запущен.";
+
+const char * qrPageHeader1   = "Мобильное приложение для вышей ОС:";
+const char * qrPageHeader2   = "Нам важно, чтобы Вы были услышаны!";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -84,7 +92,7 @@ void MainWindow::setupUi()
 
 void MainWindow::setStatus(const char *status)
 {
-    ui->statusLabel->setText(tr(status));
+    ui->statusLabel->setText(status);
 }
 
 void MainWindow::updateServerInfo()

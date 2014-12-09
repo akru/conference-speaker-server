@@ -26,8 +26,8 @@ RESOURCES += \
     resource.qrc
 
 TRANSLATIONS += \
-    csgui_en.ts \
-    csgui_ru.ts
+    csgui_en_US.ts \
+    csgui_ru_RU.ts
 
 ## Include & link libraries
 
