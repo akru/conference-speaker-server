@@ -5,6 +5,7 @@ AGCFilter::AGCFilter()
     : maxAmp(0), firstSample(true)
 {
     enable(true);
+    speakingTime.start();
 }
 
 AGCFilter::~AGCFilter()
@@ -32,7 +33,7 @@ void AGCFilter::analyzeMax(float sample[])
 
 void AGCFilter::gainSample(float sample[])
 {
-    if(!maxAmp) return;
+    if(!maxAmp || speakingTime.elapsed() < AGC_TUNING_TIME ) return;
 
     const float scaler = 1.0 / maxAmp;
     for (short i = 0; i < sample_length; ++i)
