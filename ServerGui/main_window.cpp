@@ -105,7 +105,8 @@ void MainWindow::updateServerInfo()
 
 void MainWindow::userAppend(QString address)
 {
-    Q_ASSERT(!userItem.contains(address) && server->getUsers().contains(address));
+    if(userItem.contains(address) || !server->getUsers().contains(address))
+        return;
     // Client label in client list
     QString label = server->getUsers()[address].name;
     QListWidgetItem *item = new QListWidgetItem(label);
@@ -117,14 +118,16 @@ void MainWindow::userAppend(QString address)
 
 void MainWindow::userRemove(QString address)
 {
-    Q_ASSERT(userItem.contains(address));
+    if(!userItem.contains(address))
+        return;
     // Drop client from list
     delete userItem.take(address);
 }
 
 void MainWindow::channelConnect(QString address)
 {
-    Q_ASSERT(speakers.contains(address));
+    if(!speakers.contains(address))
+        return;
     SpeakerWidget *w = speakers[address];
 
     connect(w,      SIGNAL(volumeChanged(QString,qreal)),
@@ -153,7 +156,8 @@ void MainWindow::speakerRemove(QString address)
 
 void MainWindow::channelRequest(QString address)
 {
-    Q_ASSERT(!speakers.contains(address) && server->getUsers().contains(address));
+    if(speakers.contains(address) || !server->getUsers().contains(address))
+        return;
 
     SpeakerWidget *w = new SpeakerWidget(address,
                                          server->getUsers()[address],
