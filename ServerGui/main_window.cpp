@@ -215,6 +215,9 @@ void MainWindow::serverStart()
     connect(server,
             SIGNAL(channelRequest(QString)),
             SLOT(channelRequest(QString)));
+    connect(server,
+            SIGNAL(channelCloseRequest(QString)),
+            SLOT(speakerRemove(QString)));
     connect(this,   SIGNAL(requestAccepted(QString)),
             server, SLOT(channelOpen(QString)));
     connect(this,   SIGNAL(requestDiscarded(QString)),

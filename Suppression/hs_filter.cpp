@@ -11,7 +11,7 @@ HSFilter::HSFilter(EqualizerFilter *eq)
     Q_ASSERT(eq);
     // Initialize fft work array
     memset(dft_buf, 0, sizeof(float) * HS::dft_buffer_len);
-#ifdef QT_DEBUG
+#ifdef HS_DEBUG
     qDebug() << "HS_INIT: PAPR_TH =" << PAPR_TH
              << "PHPR_TH =" << PHPR_TH
              << "PNPR_TH =" << PNPR_TH
@@ -44,7 +44,7 @@ void HSFilter::processFilter(float sample[])
         return;
     }
     // Print freq information
-#ifdef QT_DEBUG
+#ifdef HS_DEBUG
     qDebug() << "Detected" << freq_count << "hoOowling:";
     for (short i = 0; i < freq_count; ++i)
         qDebug() << i + 1 << ">" << howling_freq[i] << "Hz";

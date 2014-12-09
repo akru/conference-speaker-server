@@ -22,7 +22,7 @@ static const short maximal_freq = 11025;
 static const float filter_step = 0.1f;
 }
 
-#define HS_DEBUG
+//#define HS_DEBUG
 
 class HSFilter : public Filter
 {
