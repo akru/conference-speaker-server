@@ -20,7 +20,8 @@ HEADERS  += \
 FORMS    += \
     main_window.ui \
     speaker_widget.ui \
-    vote_results_widget.ui
+    vote_results_widget.ui \
+    sound_user_mode.ui
 
 RESOURCES += \
     resource.qrc
