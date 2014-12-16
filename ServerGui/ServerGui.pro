@@ -21,7 +21,8 @@ FORMS    += \
     main_window.ui \
     speaker_widget.ui \
     vote_results_widget.ui \
-    sound_user_mode.ui
+    sound_user_mode.ui \
+    sound_expert_mode.ui
 
 RESOURCES += \
     resource.qrc
