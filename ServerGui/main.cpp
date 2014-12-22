@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QTranslator myappTranslator;
-    myappTranslator.load("csgui_" + QLocale::system().name());
+    myappTranslator.load(a.applicationDirPath() + "/csgui_" + QLocale::system().name());
     a.installTranslator(&myappTranslator);
 
     // Create main window

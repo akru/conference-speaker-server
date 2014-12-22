@@ -29,13 +29,17 @@ class Server : public QObject
 {
     Q_OBJECT
 public:
-    explicit Server(const ServerInformation &info, QObject *parent = 0);
+    explicit Server(const ServerInformation &info,
+                    const QString &adminPassword = "admin",
+                    QObject *parent = 0);
     ~Server();
     bool isEnabled() const
     { return listenEnabled; }
     // Getters
     const UserMap & getUsers() const
     { return users; }
+    const ChannelMap & getChannels() const
+    { return channels; }
     Speaker * getSpeaker() const
     { return speaker; }
     Recorder * getRecorder() const
@@ -104,12 +108,14 @@ private:
     Speaker      *speaker;
     // Speaker recorder
     Recorder     *recorder;
+
     // User information by address map
     UserMap       users;
     // Channel information by address map
     ChannelMap    channels;
     // Connection by address map
     ConnectionMap clients;
+
 #ifndef QT_DEBUG
     // Licensing policy
     Licensing                      license;

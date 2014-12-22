@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Conference Speaker :: Remote admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<link rel="stylesheet" href="bootstrap-theme.min.css">
+	<script src="jquery.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script>
+	function mkItem(id, hdr, text) {
+		return "<div class=\"list-group-item\"><a onclick=openCh(\"" + id + "\") href=\"#\" class=\"list-group-item-heading\">"
+						  +  hdr + "</a><button class=\"btn btn-xs btn-danger pull-right\" onclick=closeCh(\"" + id  
+						  + "\")>Close</button><p class=\"list-group-item-text\">" + text + "</p></div>";
+	}
+	function openCh(id) {
+		console.log("accept:" + id);
+		$.post("/accept", id);
+	}
+	function closeCh(id) {
+		console.log("close:" + id);
+		$.post("/close", id);
+	}
+	$(function() {
+		window.setInterval(function() {
+			$.ajax({url:"/list"}).done(function(chInfo){
+				chInfo = JSON.parse(chInfo);
+				$(".list-group").html("");
+				$.each(chInfo["channels"], function(k, v) {
+					var name = chInfo["users"][v]["name"];
+					var title = chInfo["users"][v]["title"];
+					$(".list-group").append(mkItem(v, name, title));
+				});
+				$(".list-group-item").addClass("active");
+				$.each(chInfo["requests"], function(k, v) {
+					var name = chInfo["users"][v]["name"];
+					var title = chInfo["users"][v]["title"];
+					$(".list-group").append(mkItem(v, name, title));
+				});
+			});
+		}, 500);
+	});
+	</script>
+</head>
+<body>
+	<div class="container">
+		<div class="page-header">
+			<h3>Conference Speaker <small>Remote admin</small><h3>
+		</div>
+		<div class="list-group"></div>
+		<hr>
+		<h5 class="pull-right"><em>Whistle Technics LLC</em></h5>
+	</div>
+</body>
+</html>

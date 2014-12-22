@@ -11,5 +11,6 @@ class BadPacket
 static const quint16 SERVER_DISCOVER_PORT    = 35000;
 static const quint16 SERVER_CONNECTION_PORT  = 35001;
 static const quint16 SERVER_APP_PORT         = 35080;
+static const quint16 SERVER_WS_PORT          = 35081;
 
 #endif // CS_PACKET_H

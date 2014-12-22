@@ -47,6 +47,11 @@
         <file alias="logo.png">res/app-server/logo.png</file>
         <file alias="wtlogo.png">res/app-server/wtlogo.png</file>
         <file alias="cs.apk">res/app-server/cs.apk</file>
+        <file alias="admin.html">res/app-server/admin.html</file>
+        <file alias="bootstrap.min.css">res/app-server/bootstrap.min.css</file>
+        <file alias="bootstrap.min.js">res/app-server/bootstrap.min.js</file>
+        <file alias="bootstrap-theme.min.css">res/app-server/bootstrap-theme.min.css</file>
+        <file alias="jquery.min.js">res/app-server/jquery.min.js</file>
     </qresource>
     <qresource prefix="/qr-code">
         <file alias="header.png">res/qr-code/header.png</file>

@@ -186,7 +186,10 @@ void MainWindow::channelRequest(QString address)
 
 void MainWindow::serverStart()
 {
-    server = new Server(settings->info());
+    if (!ui->raPasswordEdit->text().isEmpty())
+        server = new Server(settings->info(), ui->raPasswordEdit->text());
+    else
+        server = new Server(settings->info());
     if (!server->isEnabled())
     {
         QMessageBox::critical(this,

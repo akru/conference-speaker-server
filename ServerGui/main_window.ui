@@ -410,6 +410,16 @@ QDateEdit {
         </widget>
        </item>
        <item>
+        <widget class="QLineEdit" name="raPasswordEdit">
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="placeholderText">
+          <string>Remote admin password</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QListWidget" name="userList">
          <property name="verticalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>

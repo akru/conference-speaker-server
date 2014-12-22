@@ -21,11 +21,13 @@
 
 #include <QDebug>
 
-Server::Server(const ServerInformation &info, QObject *parent)
+Server::Server(const ServerInformation &info,
+               const QString &adminPassword,
+               QObject *parent)
     : QObject(parent),
       server(new QTcpServer(this)),
       broadcaster(new Broadcaster(this)),
-      appServer(new AppServer(this)),
+      appServer(new AppServer(this, adminPassword)),
       voting(0),
       speaker(new Speaker),
       recorder(new Recorder(users))
@@ -203,7 +205,12 @@ void Server::connectionReadyRead(Connection *client)
 
 void Server::userRegister(QString address, UserInformation info)
 {
-    Q_ASSERT(clients.contains(address));
+    if(!clients.contains(address))
+    {
+        qWarning() << "Unconnected user at address" << address
+                   << "unable to register!";
+        return;
+    }
 
     Response res;
     // When users not cointains user record
@@ -245,17 +252,27 @@ void Server::userDrop(QString address)
 
 void Server::channelDeny(QString address)
 {
-    Q_ASSERT(clients.contains(address));
+    if(!clients.contains(address))
+    {
+        qWarning() << "Unregistered address" << address;
+        return;
+    }
 
     qDebug() << "Channel request denied";
     Response res(Request::Channel, Response::Error, "Access denied");
     QJsonObject result = res.toJson();
     clients[address]->write(result);
+    // Emit disconnected signal
+    emit channelDisconnected(address);
 }
 
 void Server::channelOpen(QString address)
 {
-    Q_ASSERT(clients.contains(address));
+    if(!clients.contains(address))
+    {
+        qWarning() << "Unregistered address" << address;
+        return;
+    }
 
     QJsonObject result;
     // Unregistered user
@@ -313,6 +330,11 @@ void Server::channelClose(QString address)
         // Emit disconnected signal
         emit channelDisconnected(address);
     }
+    else
+    {
+        qWarning() << "Unregistered channel address" << address;
+        return;
+    }
 }
 
 
@@ -357,7 +379,11 @@ void Server::voteAccept(QString address)
 
 void Server::voteDeny(QString address, QString error)
 {
-    Q_ASSERT(clients.contains(address));
+    if(!clients.contains(address))
+    {
+        qWarning() << "Unregistered client" << address;
+        return;
+    }
     Response res(Request::Vote, Response::Error, error);
     clients[address]->write(res.toJson());
 }
