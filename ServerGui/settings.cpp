@@ -56,6 +56,8 @@ Settings::Settings(Ui::MainWindow *ui,
     connect(ex->cThresholdSpinBox,   SIGNAL(editingFinished()), SLOT(save()));
     connect(ex->cNoiseSpinBox,       SIGNAL(editingFinished()), SLOT(save()));
 
+    connect(ex->psBox, SIGNAL(clicked()), SLOT(save()));
+
     connect(ex->loadSettings, SIGNAL(clicked()), SLOT(loadAsDialog()));
     connect(ex->saveSettings, SIGNAL(clicked()), SLOT(saveAsDialog()));
     connect(ex->loadDefault,  SIGNAL(clicked()), SLOT(loadDefault()));
@@ -112,7 +114,7 @@ void Settings::load()
 void Settings::loadAsDialog()
 {
     QString fname = QFileDialog::getOpenFileName(this,
-                                                 tr("Open preset file"), "", \
+                                                 tr("Open preset file"), "",
                                                  tr("Sound filters preset (*.ini)"));
     if (!fname.isEmpty())
         loadAs(fname);
@@ -131,7 +133,7 @@ void Settings::save()
 void Settings::saveAsDialog()
 {
     QString fname = QFileDialog::getSaveFileName(this,
-                                                 tr("Save preset file"), "", \
+                                                 tr("Save preset file"), "",
                                                  tr("Sound filters preset (*.ini)"));
     if (!fname.isEmpty())
         saveAs(fname);
@@ -145,6 +147,8 @@ void Settings::loadAs(QString fname)
 
     // Equalizer
     ex->eqBox->setChecked(s.value("eq-enable", true).toBool());
+    us->eqBox->setChecked(s.value("eq-enable", true).toBool());
+
     ex->verticalSlider->setValue(s.value("eq-slider-1", 50).toInt());
     ex->verticalSlider_2->setValue(s.value("eq-slider-2", 50).toInt());
     ex->verticalSlider_3->setValue(s.value("eq-slider-3", 50).toInt());
@@ -155,6 +159,7 @@ void Settings::loadAs(QString fname)
 
     // HS
     ex->hsBox->setChecked(s.value("hs-enable", true).toBool());
+    us->hsBox->setChecked(s.value("hs-enable", true).toBool());
     ex->paprSpin->setValue(s.value("hs-papr", 15).toFloat());
     ex->phprSpin->setValue(s.value("hs-phpr", 15).toFloat());
     ex->pnprSpin->setValue(s.value("hs-pnpr", 15).toFloat());
@@ -164,13 +169,17 @@ void Settings::loadAs(QString fname)
     ex->nsBox->setChecked(s.value("ns-enable", true).toBool());
     QString level = s.value("ns-level", "low").toString();
     if (level == "low")
-        ex->lowRadioButton->setChecked(true);
-    else
     {
-        if (level == "medium")
-            ex->mediumRadioButton->setChecked(true);
-        else
-            ex->highRadioButton->setChecked(true);
+        ex->lowRadioButton->setChecked(true);
+        us->lowRadioButton->setChecked(true);
+    } else if (level == "medium")
+    {
+        ex->mediumRadioButton->setChecked(true);
+        us->mediumRadioButton->setChecked(true);
+    } else
+    {
+        ex->highRadioButton->setChecked(true);
+        us->highRadioButton->setChecked(true);
     }
 
 
@@ -184,6 +193,8 @@ void Settings::loadAs(QString fname)
 
     // Compressor
     ex->compressorBox->setChecked(s.value("compressor-enable", true).toBool());
+    us->compressorBox->setChecked(s.value("compressor-enable", true).toBool());
+
     ex->normalizeCheckBox->setChecked(s.value("compressor-normalize",true).toBool());
     ex->peakCheckBox->setChecked(s.value("compressor-peak", false).toBool());
     ex->cAttackSpinBox->setValue(s.value("compressor-attack", 0.2).toFloat());
@@ -195,7 +206,7 @@ void Settings::loadAs(QString fname)
 
     // Pitch shift
     ex->psBox->setChecked(s.value("ps-enable", true).toBool());
-    connect(ex->psBox, SIGNAL(clicked()), SLOT(save()));
+    us->psBox->setChecked(s.value("ps-enable", true).toBool());
 
     // Records storage
     ui->storageEdit->setText(s.value("records-storage", "").toString());
