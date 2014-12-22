@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>579</width>
+    <height>418</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="5" column="0">
+    <widget class="QCheckBox" name="eqPresetBox">
+     <property name="text">
+      <string>Eq_preset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QGroupBox" name="recordBox">
+     <property name="title">
+      <string>Record conference</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="storageLabel">
+        <property name="text">
+         <string>Storage directory:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="storageEdit"/>
+      </item>
+      <item>
+       <widget class="QToolButton" name="storageSelectButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="6" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
+    <widget class="QGroupBox" name="noiseControlBox">
+     <property name="title">
+      <string>noiseControl</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="highRadioButton">
+        <property name="text">
+         <string>High</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="mediumRadioButton">
+        <property name="text">
+         <string>Medium</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="lowRadioButton">
+        <property name="text">
+         <string>Low</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="compressionBox">
+     <property name="text">
+      <string>Compression</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
+    <widget class="QGroupBox" name="feedbackControlBox">
+     <property name="title">
+      <string>feedbackControl</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="hsBox">
+        <property name="text">
+         <string>Howling supression</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="psBox">
+        <property name="text">
+         <string>Pitch shifting</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="loadDefaultSettings">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>load default</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
