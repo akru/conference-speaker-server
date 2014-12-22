@@ -20,6 +20,8 @@ typedef QMap<QString, SpeakerWidget*>   SpeakerWidgetMap;
 
 namespace Ui {
 class MainWindow;
+class SoundExpertMode;
+class SoundUserMode;
 }
 
 class MainWindow : public QMainWindow
@@ -52,6 +54,7 @@ private slots:
     void voteUpdateResults(VoteResults results);
 
     void updateAvailAddreses();
+    void updateSoundMode();
 
     void on_powerButton_toggled(bool checked);
     void on_recordButton_toggled(bool checked);
@@ -65,6 +68,9 @@ private slots:
 
 private:
     Ui::MainWindow    *ui;
+    Ui::SoundExpertMode *soundExpert;
+    Ui::SoundUserMode   *soundUser;
+    QWidget            wSoundExpert, wSoundUser;
     Settings          *settings;
     Server            *server;
 

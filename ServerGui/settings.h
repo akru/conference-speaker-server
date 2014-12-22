@@ -6,13 +6,18 @@
 
 namespace Ui {
 class MainWindow;
+class SoundExpertMode;
+class SoundUserMode;
 }
 
 class Settings : public QObject
 {
     Q_OBJECT
 public:
-    Settings(Ui::MainWindow *ui, QObject *parent = 0);
+    Settings(Ui::MainWindow *ui,
+             Ui::SoundExpertMode *ex,
+             Ui::SoundUserMode *us,
+             QObject *parent = 0);
 
     /* Settings rows */
     // Server information loaded
@@ -25,10 +30,22 @@ signals:
 public slots:
     // Setting save slot (dumps settings rows to disk)
     void save();
+    void saveAsDialog();
+    void saveAs(QString fname);
+
+    void load();
+    void loadAsDialog();
+    void loadDefault();
+    void loadAs(QString fname);
+
+private slots:
+    void usNoiseControl();
 
 private:
-    QString filename;
-    Ui::MainWindow *ui;
+    QString             filename;
+    Ui::MainWindow      *ui;
+    Ui::SoundExpertMode *ex;
+    Ui::SoundUserMode   *us;
 };
 
 #endif // SETTINGS_H

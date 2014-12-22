@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>SoundExpertMode</class>
+ <widget class="QWidget" name="SoundExpertMode">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -204,7 +204,6 @@
           <zorder>verticalSlider</zorder>
           <zorder>label_8</zorder>
           <zorder>label_34</zorder>
-          <zorder>groupBox_3</zorder>
          </widget>
         </item>
        </layout>
@@ -839,39 +838,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Record the conference</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_25">
-        <property name="text">
-         <string>Storage directory:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="storageEdit">
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="storageSelectButton">
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>

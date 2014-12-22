@@ -1,5 +1,7 @@
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "ui_sound_expert_mode.h"
+#include "ui_sound_user_mode.h"
 #include "speaker_widget.h"
 #include "vote_results_widget.h"
 
@@ -32,6 +34,8 @@ const char * qrPageHeader2   = "Нам важно, чтобы Вы были ус
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    soundExpert(new Ui::SoundExpertMode),
+    soundUser(new Ui::SoundUserMode),
     server(0),
     resultWidget(new VoteResultsWidget)
 {
@@ -39,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFonts();
     // Setup UI
     ui->setupUi(this);
+    soundExpert->setupUi(&wSoundExpert);
+    soundUser->setupUi(&wSoundUser);
     // Update network ifaces
     updateAvailAddreses();
     QTimer *t = new QTimer(this);
@@ -46,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(t, SIGNAL(timeout()), SLOT(updateAvailAddreses()));
     t->start();
     // Load settings
-    settings = new Settings(ui, this);
+    settings = new Settings(ui, soundExpert, soundUser, this);
     // Setup UI elements
     setupUi();
 }
@@ -75,6 +81,10 @@ void MainWindow::setupUi()
     // Power button saves current settings
     connect(ui->powerButton, SIGNAL(clicked()),
             settings,        SLOT(save()));
+    // Sound mode switcher
+    connect(ui->rbExpertMode, SIGNAL(clicked()), SLOT(updateSoundMode()));
+    connect(ui->rbUserMode,   SIGNAL(clicked()), SLOT(updateSoundMode()));
+    updateSoundMode();
     // Scroll boxes alignments
     ui->speakersArea->layout()->setAlignment(Qt::AlignTop);
     // Status label
@@ -405,4 +415,23 @@ void MainWindow::on_storageSelectButton_clicked()
         server->recordSetDirectory(path);
     ui->storageEdit->setText(path);
     settings->save();
+}
+
+void MainWindow::updateSoundMode()
+{
+    //
+    if (ui->rbUserMode->isChecked())
+    { // User mode
+        ui->soundProps->layout()->removeWidget(&wSoundExpert);
+        ui->soundProps->layout()->addWidget(&wSoundUser);
+        wSoundExpert.hide();
+        wSoundUser.show();
+    }
+    else
+    { // Expert mode
+        ui->soundProps->layout()->removeWidget(&wSoundUser);
+        ui->soundProps->layout()->addWidget(&wSoundExpert);
+        wSoundUser.hide();
+        wSoundExpert.show();
+    }
 }

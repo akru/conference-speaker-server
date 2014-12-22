@@ -1079,7 +1079,7 @@ image: url(:/gui/drophands-button-pressed);
           <property name="topMargin">
            <number>16</number>
           </property>
-          <item row="7" column="0" colspan="3">
+          <item row="2" column="0" colspan="2">
            <widget class="QGroupBox" name="groupBox_3">
             <property name="title">
              <string>Record the conference</string>
@@ -1112,769 +1112,84 @@ image: url(:/gui/drophands-button-pressed);
             </layout>
            </widget>
           </item>
-          <item row="1" column="2" rowspan="3">
-           <widget class="QGroupBox" name="compressorBox">
+          <item row="0" column="0" colspan="2">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="title">
-             <string>Compressor</string>
+             <string>Mode</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QFormLayout" name="formLayout_3">
-             <property name="horizontalSpacing">
-              <number>3</number>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="spacing">
+              <number>25</number>
              </property>
-             <property name="verticalSpacing">
-              <number>6</number>
+             <property name="leftMargin">
+              <number>25</number>
              </property>
-             <item row="0" column="0" colspan="2">
-              <widget class="QCheckBox" name="normalizeCheckBox">
+             <property name="rightMargin">
+              <number>25</number>
+             </property>
+             <item>
+              <widget class="QRadioButton" name="rbUserMode">
                <property name="text">
-                <string>Normalize</string>
+                <string>User</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
                </property>
-               <property name="tristate">
-                <bool>false</bool>
-               </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_19">
+             <item>
+              <widget class="QRadioButton" name="rbExpertMode">
                <property name="text">
-                <string>Attack time</string>
+                <string>Expert</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="cAttackSpinBox">
-               <property name="suffix">
-                <string> sec</string>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
-               <property name="decimals">
-                <number>2</number>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
                </property>
-               <property name="maximum">
-                <double>10.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.050000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.200000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="cDecaySpinBox">
-               <property name="suffix">
-                <string> sec</string>
-               </property>
-               <property name="maximum">
-                <double>10.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.050000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.200000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>Decay time</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QDoubleSpinBox" name="cRatioSpinBox">
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>100.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.500000000000000</double>
-               </property>
-               <property name="value">
-                <double>5.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="label_22">
-               <property name="text">
-                <string>Ratio</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="label_21">
-               <property name="text">
-                <string>Compression</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QDoubleSpinBox" name="cCompressionSpinBox">
-               <property name="singleStep">
-                <double>0.500000000000000</double>
-               </property>
-               <property name="value">
-                <double>2.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="1">
-              <widget class="QDoubleSpinBox" name="cThresholdSpinBox">
-               <property name="suffix">
-                <string> db</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>-80.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>-6.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="0">
-              <widget class="QLabel" name="label_23">
-               <property name="text">
-                <string>Threshold</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="0">
-              <widget class="QLabel" name="label_24">
-               <property name="text">
-                <string>Noise floor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="1">
-              <widget class="QDoubleSpinBox" name="cNoiseSpinBox">
-               <property name="suffix">
-                <string> db</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>-80.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>-24.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <widget class="QCheckBox" name="peakCheckBox">
-               <property name="text">
-                <string>Peak</string>
-               </property>
-              </widget>
+              </spacer>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="3" column="1" rowspan="2">
-           <widget class="QGroupBox" name="gateBox">
-            <property name="title">
-             <string>Gate</string>
+          <item row="1" column="0" colspan="2">
+           <widget class="QFrame" name="soundProps">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QFormLayout" name="formLayout_2">
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="raiseSpinBox">
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>-80.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>-24.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_7">
-               <property name="text">
-                <string>Open TH</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="fallSpinBox">
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>-80.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>-28.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="attackSpinBox">
-               <property name="suffix">
-                <string> sec</string>
-               </property>
-               <property name="minimum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>10.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="holdSpinBox">
-               <property name="suffix">
-                <string> sec</string>
-               </property>
-               <property name="decimals">
-                <number>2</number>
-               </property>
-               <property name="minimum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>10.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="releaseSpinBox">
-               <property name="suffix">
-                <string> sec</string>
-               </property>
-               <property name="minimum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>9.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_15">
-               <property name="text">
-                <string>Close TH</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_16">
-               <property name="text">
-                <string>Attack time</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_17">
-               <property name="text">
-                <string>Hold time</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_18">
-               <property name="text">
-                <string>Release time</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="1" rowspan="2">
-           <widget class="QGroupBox" name="hsBox">
-            <property name="title">
-             <string>Howling suppression</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <property name="spacing">
-              <number>6</number>
+              <number>0</number>
              </property>
-             <item row="7" column="1">
-              <widget class="QDoubleSpinBox" name="ismdSpin">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>2</number>
-               </property>
-               <property name="minimum">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.030000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QCheckBox" name="paprEnabled">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Slope deviation</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="pnprSpin">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="value">
-                <double>15.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="paprSpin">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="value">
-                <double>15.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Bin energy</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="2">
-              <widget class="QCheckBox" name="ismdEnabled">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>Local group</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="phprSpin">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="prefix">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string> dB</string>
-               </property>
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="value">
-                <double>15.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>Harmonics</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QCheckBox" name="pnprEnabled">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="2">
-              <widget class="QCheckBox" name="phprEnabled">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-            <zorder>ismdSpin</zorder>
-            <zorder>paprSpin</zorder>
-            <zorder>label</zorder>
-            <zorder>paprEnabled</zorder>
-            <zorder>label_4</zorder>
-            <zorder>ismdEnabled</zorder>
-            <zorder>label_2</zorder>
-            <zorder>label_3</zorder>
-            <zorder>phprSpin</zorder>
-            <zorder>pnprSpin</zorder>
-            <zorder>pnprEnabled</zorder>
-            <zorder>phprEnabled</zorder>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QGroupBox" name="psBox">
-            <property name="styleSheet">
-             <string notr="true">padding: 0;
-</string>
-            </property>
-            <property name="title">
-             <string>Pitch shifting</string>
-            </property>
-            <property name="flat">
-             <bool>false</bool>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2" rowspan="2">
-           <widget class="QGroupBox" name="nsBox">
-            <property name="title">
-             <string>Noise suppression</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <property name="spacing">
-              <number>6</number>
-             </property>
-             <item>
-              <widget class="QRadioButton" name="highRadioButton">
-               <property name="text">
-                <string>High</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
-               </property>
-               <property name="autoRepeat">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="mediumRadioButton">
-               <property name="text">
-                <string>Medium</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="lowRadioButton">
-               <property name="text">
-                <string>Low</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-               <property name="autoExclusive">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="0" rowspan="5">
-           <widget class="QGroupBox" name="eqBox">
-            <property name="title">
-             <string>Equalizer</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <property name="horizontalSpacing">
-              <number>16</number>
-             </property>
-             <item row="1" column="4">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string> 5k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="5">
-              <widget class="QSlider" name="verticalSlider_6">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string> 3k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QLabel" name="label_10">
-               <property name="text">
-                <string> 1k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="6">
-              <widget class="QLabel" name="label_14">
-               <property name="text">
-                <string>10k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="4">
-              <widget class="QSlider" name="verticalSlider_5">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QSlider" name="verticalSlider_3">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="5">
-              <widget class="QLabel" name="label_13">
-               <property name="text">
-                <string> 8k</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="6">
-              <widget class="QSlider" name="verticalSlider_7">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QSlider" name="verticalSlider_4">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSlider" name="verticalSlider_2">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksAbove</enum>
-               </property>
-               <property name="tickInterval">
-                <number>5</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QSlider" name="verticalSlider">
-               <property name="value">
-                <number>50</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>250</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>500</string>
-               </property>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
