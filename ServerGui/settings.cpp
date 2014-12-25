@@ -64,16 +64,16 @@ Settings::Settings(Ui::MainWindow *ui,
 
     connect(us->loadDefaultSettings, SIGNAL(clicked()), SLOT(loadDefault()));
 
-    connect(us->compressionBox, SIGNAL(toggled(bool)),
+    connect(us->compressorBox, SIGNAL(toggled(bool)),
             ex->compressorBox,  SLOT(setChecked(bool)));
-    connect(us->eqPresetBox, SIGNAL(toggled(bool)),
+    connect(us->eqBox, SIGNAL(toggled(bool)),
             ex->eqBox, SLOT(setChecked(bool)));
     connect(us->psBox, SIGNAL(toggled(bool)),
             ex->psBox, SLOT(setChecked(bool)));
     connect(us->hsBox, SIGNAL(toggled(bool)),
             ex->hsBox, SLOT(setChecked(bool)));
-    connect(us->compressionBox, SIGNAL(toggled(bool)), SLOT(save()));
-    connect(us->eqPresetBox, SIGNAL(toggled(bool)),    SLOT(save()));
+    connect(us->compressorBox, SIGNAL(toggled(bool)), SLOT(save()));
+    connect(us->eqBox, SIGNAL(toggled(bool)),    SLOT(save()));
     connect(us->psBox, SIGNAL(toggled(bool)),          SLOT(save()));
     connect(us->hsBox, SIGNAL(toggled(bool)),          SLOT(save()));
 
@@ -84,17 +84,41 @@ Settings::Settings(Ui::MainWindow *ui,
 
 void Settings::usNoiseControl()
 {
+    QSettings s(filename, QSettings::IniFormat);
     if (us->highRadioButton->isChecked())
     { // High
+        s.setValue("ns-enable", true);
+        s.setValue("ns-level", "medium");
 
+        s.setValue("gate-enable",  true);
+        s.setValue("gate-raise",   -21.0);
+        s.setValue("gate-fall",    -25.0);
+        s.setValue("gate-attack",  0.10);
+        s.setValue("gate-hold",    0.20);
+        s.setValue("gate-release", 0.10);
     } else if (us->mediumRadioButton->isChecked())
     { // Medium
+        s.setValue("ns-enable", true);
+        s.setValue("ns-level", "low");
 
+        s.setValue("gate-enable",  true);
+        s.setValue("gate-raise",   -31.0);
+        s.setValue("gate-fall",    -35.0);
+        s.setValue("gate-attack",  0.05);
+        s.setValue("gate-hold",    0.20);
+        s.setValue("gate-release", 0.10);
     } else
     { // Low
+        s.setValue("ns-enable", false);
 
+        s.setValue("gate-enable",  true);
+        s.setValue("gate-raise",   -31.0);
+        s.setValue("gate-fall",    -35.0);
+        s.setValue("gate-attack",  0.05);
+        s.setValue("gate-hold",    0.20);
+        s.setValue("gate-release", 0.20);
     }
-    save();
+    load();
 }
 
 ServerInformation Settings::info()
@@ -113,7 +137,7 @@ void Settings::load()
 
 void Settings::loadAsDialog()
 {
-    QString fname = QFileDialog::getOpenFileName(this,
+    QString fname = QFileDialog::getOpenFileName(0,
                                                  tr("Open preset file"), "",
                                                  tr("Sound filters preset (*.ini)"));
     if (!fname.isEmpty())
@@ -132,7 +156,7 @@ void Settings::save()
 
 void Settings::saveAsDialog()
 {
-    QString fname = QFileDialog::getSaveFileName(this,
+    QString fname = QFileDialog::getSaveFileName(0,
                                                  tr("Save preset file"), "",
                                                  tr("Sound filters preset (*.ini)"));
     if (!fname.isEmpty())
@@ -171,17 +195,18 @@ void Settings::loadAs(QString fname)
     if (level == "low")
     {
         ex->lowRadioButton->setChecked(true);
-        us->lowRadioButton->setChecked(true);
+        us->mediumRadioButton->setChecked(true);
     } else if (level == "medium")
     {
         ex->mediumRadioButton->setChecked(true);
-        us->mediumRadioButton->setChecked(true);
+        us->highRadioButton->setChecked(true);
     } else
     {
         ex->highRadioButton->setChecked(true);
         us->highRadioButton->setChecked(true);
     }
-
+    if (!s.value("ns-enable", true).toBool())
+        us->lowRadioButton->setChecked(true);
 
     // Gate
     ex->gateBox->setChecked(s.value("gate-enable", true).toBool());

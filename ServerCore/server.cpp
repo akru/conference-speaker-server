@@ -252,9 +252,9 @@ void Server::userDrop(QString address)
 
 void Server::channelDeny(QString address)
 {
-    if(!clients.contains(address))
+    if(!clients.contains(address) || channels.contains(address))
     {
-        qWarning() << "Unregistered address" << address;
+        qWarning() << "Unregistered or accepted address" << address;
         return;
     }
 

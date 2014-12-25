@@ -10,9 +10,10 @@
 	<script src="bootstrap.min.js"></script>
 	<script>
 	function mkItem(id, hdr, text) {
-		return "<div class=\"list-group-item\"><a onclick=openCh(\"" + id + "\") href=\"#\" class=\"list-group-item-heading\">"
-						  +  hdr + "</a><button class=\"btn btn-xs btn-danger pull-right\" onclick=closeCh(\"" + id  
-						  + "\")>Close</button><p class=\"list-group-item-text\">" + text + "</p></div>";
+		return "<div class=\"list-group-item\">" +
+			   "<a href=# class=\"btn btn-danger\" style=\"float: right\" onclick=closeCh(\"" + id + "\")>Close</a>" +
+			   "<div onclick=openCh(\"" + id + "\") style=\"width: 90%\">" + 
+			   "<a href=\"#\" class=\"list-group-item-heading\">" +  hdr + "</a><p class=\"list-group-item-text\">" + text + "</p></div></div>";
 	}
 	function openCh(id) {
 		console.log("accept:" + id);
