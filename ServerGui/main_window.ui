@@ -143,6 +143,14 @@ QScrollArea {
     border: 0;
 }
 
+QScrollArea#soundExpertArea {
+    background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(224,219,213, 255), stop:1 rgba(253,255,248, 255));
+    border-top: 3px solid qlineargradient(spread:pad, x1:0, y1:0.357955, x2:0, y2:1, stop:0 rgba(0, 0, 0, 90), stop:1 rgba(0, 0, 0, 20));
+    border-left: 1px solid rgba(188,186,184,255);
+    border-right: 1px solid rgba(188,186,184,255);
+    border-bottom: 1px solid rgba(252,251,250,255);
+}
+
 QListWidget,
 QWidget#speakersArea,
 QWidget#soundTab,
@@ -470,7 +478,7 @@ QDateEdit {
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="iconSize">
          <size>
