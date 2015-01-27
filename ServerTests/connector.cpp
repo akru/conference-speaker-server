@@ -44,7 +44,7 @@ void Connector::sockReadyRead()
         else
             qDebug() << "Registratuion fail:" << res.message;
     }
-    if (res.type == Request::Channel)
+    if (res.type == Request::ChannelOpen)
     {
         if (res.result == Response::Success)
         {
@@ -90,7 +90,7 @@ void Connector::startTransmit()
     }
 
     // Send transmit request packet
-    Request req(Request::Channel);
+    Request req(Request::ChannelOpen);
     QByteArray buffer = QJsonDocument(req.toJson()).toJson();
     sock.write(buffer);
     qDebug() << "Channel request:" << buffer;

@@ -1,7 +1,7 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
-#include "server.h"
+#include "gate.h"
 #include <QThread>
 #include <QDebug>
 
@@ -9,7 +9,7 @@ class Recorder : public QObject
 {
     Q_OBJECT
 public:
-    Recorder(const UserMap &users, QObject *parent = 0);
+    Recorder(QObject *parent = 0);
     ~Recorder();
 
 public slots:
@@ -21,12 +21,11 @@ public slots:
         qDebug() << "Record stoped";
         recordStarted = false;
     }
-    void record(QString speaker, QByteArray sample);
+    void record(User *speaker, QByteArray sample);
     void record(QByteArray sample);
     void setRecordDirectory(QString d);
 
 private:
-    const UserMap &users;
     QString recordDir;
     bool recordStarted;
     QThread myThread;

@@ -6,21 +6,21 @@ CONFIG  += staticlib
 
 HEADERS += \
     broadcaster.h \
-    connection.h \
     receiver.h \
-    server.h \
     voting.h \
     recorder.h \
-    speaker.h
+    speaker.h \
+    gate.h \
+    user.h
 
 SOURCES += \
     broadcaster.cpp \
-    connection.cpp \
     receiver.cpp \
-    server.cpp \
     voting.cpp \
     recorder.cpp \
-    speaker.cpp
+    speaker.cpp \
+    gate.cpp \
+    user.cpp
 
 CONFIG(release, debug|release){
 message("Release with licensing")
@@ -34,5 +34,5 @@ INCLUDEPATH += $$PWD/../../cryptopp
 DEPENDPATH  += $$PWD/../../cryptopp
 }
 
-INCLUDEPATH += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr $$PWD/../3rd-party/AppServer
-DEPENDPATH  += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr $$PWD/../3rd-party/AppServer
+INCLUDEPATH += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr
+DEPENDPATH  += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr

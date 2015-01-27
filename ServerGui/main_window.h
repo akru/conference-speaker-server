@@ -2,21 +2,25 @@
 #define MAIN_WINDOW_H
 
 #include <QMap>
+#include <QLineEdit>
 #include <QMainWindow>
+#include <QListWidgetItem>
+
 #include <user_information.h>
+#include <broadcaster.h>
+#include <recorder.h>
 #include <voting.h>
+#include <user.h>
 
 #include "settings.h"
 
-class Server;
-class QLineEdit;
+class Gate;
 class SpeakerWidget;
-class QListWidgetItem;
 class VoteResultsWidget;
 
-typedef QMap<QString, QListWidgetItem*> ItemMap;
-typedef QList<QLineEdit*>               AnswerList;
-typedef QMap<QString, SpeakerWidget*>   SpeakerWidgetMap;
+typedef QMap<User*, QListWidgetItem*> ItemMap;
+typedef QList<QLineEdit*>             AnswerList;
+typedef QMap<User*, SpeakerWidget*>   SpeakerWidgetMap;
 
 namespace Ui {
 class MainWindow;
@@ -39,12 +43,16 @@ signals:
     void voteNew(VotingInvite);
 
 private slots:
-    void userAppend(QString address);
-    void userRemove(QString address);
+    void userAppend(User *user);
+    void userRemove();
 
-    void channelRequest(QString address);
-    void channelConnect(QString address);
-    void speakerRemove(QString address);
+    void requestRegistration(UserInformation info);
+    void requestChannelOpen();
+    void requestChannelClose();
+    void requestVote(QJsonObject request);
+
+    void channelWidgetRemove();
+    void channelWidgetBoost();
 
     void serverStart();
     void serverStop();
@@ -67,18 +75,22 @@ private slots:
     void on_storageSelectButton_clicked();
 
 private:
-    Ui::MainWindow    *ui;
+    Ui::MainWindow      *ui;
     Ui::SoundExpertMode *soundExpert;
     Ui::SoundUserMode   *soundUser;
-    QWidget            wSoundExpert, wSoundUser;
-    Settings          *settings;
-    Server            *server;
+    QWidget              wSoundExpert, wSoundUser;
+    Settings            *settings;
+    Gate                *server;
+    Voting              *vote;
 
-    ItemMap            userItem;
-    SpeakerWidgetMap   speakers;
+    ItemMap              userItem;
+    SpeakerWidgetMap     speakers;
 
-    VoteResultsWidget *resultWidget;
-    AnswerList         answers;
+    VoteResultsWidget   *resultWidget;
+    AnswerList           answers;
+
+    Broadcaster          broadcaster;
+    Recorder             recorder;
 
     void loadFonts();
     void setupUi();

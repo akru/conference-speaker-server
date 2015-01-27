@@ -3,33 +3,28 @@
 
 #include <QUdpSocket>
 #include <channel_information.h>
+#include "user.h"
 
 class Receiver : public QObject
 {
     Q_OBJECT
 public:
-    explicit Receiver(QHostAddress address, QObject *parent = 0);
+    explicit Receiver(const QHostAddress &address,
+                      QObject *parent = 0);
     ~Receiver();
 
-    ChannelInformation getChannelInfo() const
-    {
-        return channel;
-    }
-
-    QHostAddress getPeerAddress() const
-    {
-        return sock.peerAddress();
-    }
+    inline const ChannelInformation & getChannelInfo() const
+    { return channelInfo; }
 
 signals:
-    void sampleReceived(QString, QByteArray);
+    void sampleReceived(User*, QByteArray);
 
 private slots:
     void sockReadyRead();
 
 private:
     QUdpSocket         sock;
-    ChannelInformation channel;
+    ChannelInformation channelInfo;
 };
 
 #endif // RECEIVER_H

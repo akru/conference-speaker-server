@@ -1,15 +1,16 @@
 #include "receiver.h"
 #include <QHostAddress>
 
-Receiver::Receiver(QHostAddress address, QObject *parent)
+Receiver::Receiver(const QHostAddress &address,
+                   QObject *parent)
     : QObject(parent)
 {
     // Bind socket
     if (sock.bind(address))
     {
-        channel = ChannelInformation(sock.localAddress().toString(),
-                                     sock.localPort());
-        qDebug() << "Init channel port:" << sock.localPort();
+        channelInfo = ChannelInformation(
+                    sock.localAddress().toString(),
+                    sock.localPort());
         connect(&sock, SIGNAL(readyRead()), SLOT(sockReadyRead()));
     }
     else
@@ -29,7 +30,12 @@ void Receiver::sockReadyRead()
     qDebug() << "New data size" << sock.pendingDatagramSize();
     buf.resize(sock.pendingDatagramSize());
     sock.readDatagram(buf.data(), buf.size(), &peer);
-    // Play sample
-    emit sampleReceived(peer.toString(), buf);
+    // Emit sample by user
+    User *user = qobject_cast<User *>(parent());
+    // Cast check
+    if (!user) return;
+    // Sender simple check
+    if (user->getID() == User::ID(peer))
+        emit sampleReceived(user, buf);
 }
 

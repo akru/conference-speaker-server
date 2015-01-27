@@ -1,7 +1,9 @@
 #include "app_server.h"
+#include "user_adapter.h"
 #include "mongoose.h"
 
-#include <server.h>
+#include <gate.h>
+#include <user.h>
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -17,16 +19,9 @@ static const char *header_2 = "Нам важно, чтобы вы были ус�
 static URIMap     storage;
 static char       ha1[33];
 
-struct ServerInfo {
-    ServerInfo(const UserMap &u, const ChannelMap &c)
-        : users(u), channels(c) {}
-    const UserMap    &users;
-    const ChannelMap &channels;
-    QList<QString>   requests;
-};
-
-static AppServer  *instance;
-static ServerInfo *srv;
+static AppServer  *self = 0;
+static QList<User*> users;
+static QList<User*> requests;
 
 static int static_handler(struct mg_connection *conn) {
 //    qDebug() << "STATIC_APP_SERVER" << QTime::currentTime().toString()
@@ -61,73 +56,45 @@ static int remote_admin_handler(struct mg_connection *conn)
     {
         QJsonObject msg;
         QJsonObject userMap;
-        foreach (const QString &id, srv->users.keys()) {
-            userMap.insert(id, srv->users[id].toJson());
+        QJsonArray channels;
+        foreach (const User *u, users) {
+            userMap.insert(u->getID().show(), u->getInfo().toJson());
+            if (u->getState() == User::Speak)
+                channels.append(u->getID().show());
         }
         msg.insert("users", userMap);
-        msg.insert("channels", QJsonArray::fromStringList(srv->channels.keys()));
-        msg.insert("requests", QJsonArray::fromStringList(srv->requests));
+        msg.insert("channels", channels);
+
+        QJsonArray reqs;
+        foreach (const User *u, requests) {
+            reqs.append(u->getID().show());
+        }
+        msg.insert("requests", reqs);
+
         QByteArray packet = QJsonDocument(msg).toJson();
         mg_send_data(conn, packet.data(), packet.size());
         return MG_REQUEST_PROCESSED;
 
     } else if (request == QStringLiteral("/accept"))
     {
-        instance->channelOpen(content);
+        self->channelOpen(content);
         mg_printf(conn, "OK");
         return MG_REQUEST_PROCESSED;
     } else if (request == QStringLiteral("/close"))
     {
-        if (srv->requests.contains(content))
-            instance->channelDeny(content);
-        else
-            instance->channelClose(content);
+        self->channelClose(content);
         mg_printf(conn, "OK");
         return MG_REQUEST_PROCESSED;
     }
     return MG_REQUEST_NOT_PROCESSED;
 }
 
-AppServer::AppServer(Server *parent,
-                     const QString &adminPassword)
-    : QThread(parent),
+AppServer::AppServer(const QString &adminPassword)
+    : QThread(0),
       staticServer(mg_create_server(NULL)),
       remoteAdminServer(mg_create_server(NULL))
 {
-
-    instance = this;
-    // Calc HA1 by username, realm and password
-    char _ha1[100];
-    sprintf(_ha1, "admin:Conference Speaker:%s",
-            adminPassword.toStdString().data());
-    mg_md5(ha1, _ha1, NULL);
-
-    srv = new ServerInfo(parent->getUsers(),
-                         parent->getChannels());
-
-    connect(this, SIGNAL(channelIsOpen(QString)),
-            parent, SLOT(channelOpen(QString)));
-    connect(this, SIGNAL(channelIsDeny(QString)),
-            parent, SLOT(channelDeny(QString)));
-    connect(this, SIGNAL(channelIsClose(QString)),
-            parent, SLOT(channelClose(QString)));
-
-    connect(parent,
-            SIGNAL(channelRequest(QString)),
-            SLOT(appendRequest(QString)));
-    connect(parent,
-            SIGNAL(channelConnected(QString)),
-            SLOT(removeRequest(QString)));
-    connect(parent,
-            SIGNAL(channelCloseRequest(QString)),
-            SLOT(removeRequest(QString)));
-    connect(parent,
-            SIGNAL(channelDisconnected(QString)),
-            SLOT(removeRequest(QString)));
-    connect(parent,
-            SIGNAL(userDisconnected(QString)),
-            SLOT(removeRequest(QString)));
-
+    setAdminPassword(adminPassword);
 
     mg_set_option(remoteAdminServer, "listening_port", "35081");
     mg_set_auth_handler(remoteAdminServer, auth_handler);
@@ -149,6 +116,8 @@ AppServer::AppServer(Server *parent,
     addRouteFile("/bootstrap-theme.min.css", ":/app-server/bootstrap-theme.min.css");
     addRouteFile("/bootstrap.min.js", ":/app-server/bootstrap.min.js");
     addRouteFile("/jquery.min.js", ":/app-server/jquery.min.js");
+
+    start(QThread::LowestPriority);
 }
 
 AppServer::~AppServer()
@@ -157,7 +126,91 @@ AppServer::~AppServer()
     wait();
     mg_destroy_server(&staticServer);
     mg_destroy_server(&remoteAdminServer);
-    delete srv;
+}
+
+AppServer * AppServer::instance()
+{
+    if (!self)
+        self = new AppServer();
+    return self;
+}
+
+void AppServer::setAdminPassword(const QString &password)
+{
+    // Calc HA1 by username, realm and password
+    char _ha1[100];
+    sprintf(_ha1, "admin:Conference Speaker:%s",
+            password.toStdString().data());
+    mg_md5(ha1, _ha1, NULL);
+}
+
+void AppServer::connectGate(Gate *gate)
+{
+    users.clear(); requests.clear();
+    connect(gate, SIGNAL(connected(User*)), SLOT(appendUser(User*)));
+}
+
+void AppServer::appendUser(User *user)
+{
+    users.append(user);
+    connect(user, SIGNAL(disconnected()), SLOT(removeUser()));
+    connect(user, SIGNAL(requestChannelOpen()), SLOT(appendRequest()));
+    connect(user, SIGNAL(channelOpened()), SLOT(remoteRequest()));
+    connect(user, SIGNAL(channelClosed()), SLOT(remoteRequest()));
+}
+
+void AppServer::removeUser()
+{
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    users.removeOne(user);
+}
+
+void AppServer::appendRequest()
+{
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    if (!requests.contains(user))
+        requests.append(user);
+}
+
+void AppServer::remoteRequest()
+{
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    if (requests.contains(user))
+        requests.removeOne(user);
+}
+
+void AppServer::channelOpen(QString id)
+{
+    User::ID uid(id);
+    foreach (User *u, users) {
+        if(u->getID() == uid)
+        {
+            UserAdapter(u).openChannel();
+            break;
+        }
+    }
+}
+
+void AppServer::channelClose(QString id)
+{
+    User::ID uid(id);
+    foreach (User *u, users) {
+        if(u->getID() == uid)
+        {
+            // TODO: Too dangerous! >:-|
+            if (requests.contains(u))
+                UserAdapter(u).denyChannel();
+            else
+                UserAdapter(u).closeChannel();
+            break;
+        }
+    }
 }
 
 void AppServer::run()
@@ -180,14 +233,4 @@ void AppServer::addRouteFile(const QString &route, const QString &resname)
 void AppServer::addRouteData(const QString &route, const QByteArray &res)
 {
     storage.insert(route, res);
-}
-
-void AppServer::appendRequest(QString address)
-{
-    srv->requests.append(address);
-}
-
-void AppServer::removeRequest(QString address)
-{
-    srv->requests.removeAll(address);
 }

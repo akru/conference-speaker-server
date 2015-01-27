@@ -7,7 +7,7 @@ struct Request
 {
     enum Type {
         Registration,
-        Channel,
+        ChannelOpen,
         ChannelClose,
         Vote
     };

@@ -7,13 +7,14 @@
 #include <app_information.h>
 #include <voting_invite.h>
 
-const int BROADCASTER_TIME_INTERVAL = 1000;
-
 class Broadcaster : public QObject
 {
     Q_OBJECT
 public:
     explicit Broadcaster(QObject *parent = 0);
+    // Every time the message send
+    static const uint    timeInterval = 1000;
+    static const quint16 discoverPort = 35000;
 
 public slots:
     void setServerInformation(ServerInformation info);

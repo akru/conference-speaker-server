@@ -5,7 +5,11 @@
 #include "speaker_widget.h"
 #include "vote_results_widget.h"
 
-#include <server.h>
+#include <gate.h>
+#include <user.h>
+#include <response.h>
+
+#include <app_server.h>
 #include <qrpage.h>
 
 #include <QFontDatabase>
@@ -37,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     soundExpert(new Ui::SoundExpertMode),
     soundUser(new Ui::SoundUserMode),
     server(0),
+    vote(0),
     resultWidget(new VoteResultsWidget)
 {
     // Loading fonts
@@ -121,85 +126,114 @@ void MainWindow::updateServerInfo()
     }
 }
 
-void MainWindow::userAppend(QString address)
+void MainWindow::userAppend(User *user)
 {
-    if(userItem.contains(address) || !server->getUsers().contains(address))
-        return;
-    // Client label in client list
-    QString label = server->getUsers()[address].name;
-    QListWidgetItem *item = new QListWidgetItem(label);
+    connect(user, SIGNAL(disconnected()), SLOT(userRemove()));
+    connect(user, SIGNAL(requestRegistration(UserInformation)),
+                  SLOT(requestRegistration(UserInformation)));
+    connect(user, SIGNAL(requestChannelOpen()),
+                  SLOT(requestChannelOpen()));
+    connect(user, SIGNAL(requestChannelClose()),
+                  SLOT(requestChannelClose()));
+    connect(user, SIGNAL(requestVote(QJsonObject)),
+                  SLOT(requestVote(QJsonObject)));
+}
+
+void MainWindow::userRemove()
+{
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    // Cleaning user list
+    if (userItem.contains(user))
+        delete userItem.take(user);
+    // Cleaning speaker widget
+    if (speakers.contains(user))
+        delete speakers.take(user);
+}
+
+void MainWindow::requestRegistration(UserInformation info)
+{
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    // Append item into user list
+    QListWidgetItem *item = new QListWidgetItem(info.name);
     ui->userList->addItem(item);
-    userItem.insert(address, item);
-    // Update status
-    setStatus(statusConnected);
+    userItem.insert(user, item);
+    // Register user
+    user->registration(info);
 }
 
-void MainWindow::userRemove(QString address)
+void MainWindow::requestChannelOpen()
 {
-    if(!userItem.contains(address))
-        return;
-    // Drop client from list
-    delete userItem.take(address);
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    // Speaker widget exist check
+    if (speakers.contains(user))
+    {
+        qWarning() << "Speaker already exist for user";
+    }
+    else
+    {
+        SpeakerWidget *w = new SpeakerWidget(user, this);
+        connect(w, SIGNAL(dismiss()), SLOT(channelWidgetRemove()));
+        speakers.insert(user, w);
+        ui->speakersArea->layout()->addWidget(w);
+        w->show();
+    }
+}
+void MainWindow::requestChannelClose()
+{
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    // Send response
+    user->channelAction(ChClose);
+
 }
 
-void MainWindow::channelConnect(QString address)
+void MainWindow::requestVote(QJsonObject request)
 {
-    if(!speakers.contains(address))
-        return;
-    SpeakerWidget *w = speakers[address];
+    User *user = qobject_cast<User *>(sender());
+    // Cast check
+    if (!user) return;
+    // Check that voting started
+    if (!vote)
+    {
+        Response res(Request::Vote, Response::Error, "Vote not started");
+        user->voteResponse(res.toJson());
+    }
+    else
+        user->voteResponse(vote->vote(user->getID(), request));
+}
 
-    connect(w,      SIGNAL(volumeChanged(QString,qreal)),
-            server, SLOT(channelVolume(QString,qreal)));
-    connect(server, SIGNAL(channelAmpUpdated(QString,ushort)),
-            w,      SLOT(setAmplitude(QString,ushort)));
+void MainWindow::channelWidgetRemove()
+{
+    SpeakerWidget *w = qobject_cast<SpeakerWidget *>(sender());
+    // Cast check
+    if (!w) return;
+    // Delete when contains
+    if (speakers.values().contains(w))
+        delete speakers.take(speakers.key(w));
+}
 
-    connect(w,      SIGNAL(closeClicked(QString)),
-            server, SLOT(channelClose(QString)));
-    connect(w,
-            SIGNAL(closeClicked(QString)),
-            SLOT(speakerRemove(QString)));
-
+void MainWindow::channelWidgetBoost()
+{
+    SpeakerWidget *w = qobject_cast<SpeakerWidget *>(sender());
+    // Cast check
+    if (!w) return;
     // Boost widget to top
     ui->speakersArea->layout()->removeWidget(w);
     ((QVBoxLayout *)ui->speakersArea->layout())->insertWidget(0, w);
-
-    w->setState(SpeakerWidget::Stream);
-}
-
-void MainWindow::speakerRemove(QString address)
-{
-    if(speakers.contains(address))
-        delete speakers.take(address);
-}
-
-void MainWindow::channelRequest(QString address)
-{
-    if(speakers.contains(address) || !server->getUsers().contains(address))
-        return;
-
-    SpeakerWidget *w = new SpeakerWidget(address,
-                                         server->getUsers()[address],
-                                         this);
-    speakers.insert(address, w);
-
-    connect(w,      SIGNAL(requestAccepted(QString)),
-            server, SLOT(channelOpen(QString)));
-    connect(w,      SIGNAL(requestDiscarded(QString)),
-            server, SLOT(channelDeny(QString)));
-    connect(w,
-            SIGNAL(requestDiscarded(QString)),
-            SLOT(speakerRemove(QString)));
-
-    ui->speakersArea->layout()->addWidget(w);
-    w->show();
 }
 
 void MainWindow::serverStart()
 {
-    if (!ui->raPasswordEdit->text().isEmpty())
-        server = new Server(settings->info(), ui->raPasswordEdit->text());
-    else
-        server = new Server(settings->info());
+    server = new Gate(this, settings->info().address);
+    connect(server, SIGNAL(connected(User*)), SLOT(userAppend(User*)));
+    // Check gate enabling
     if (!server->isEnabled())
     {
         QMessageBox::critical(this,
@@ -208,46 +242,13 @@ void MainWindow::serverStart()
         serverStop();
         return;
     }
-    // User MGT
-    connect(server,
-            SIGNAL(userConnected(QString)),
-            SLOT(userAppend(QString)));
-    connect(server,
-            SIGNAL(userDisconnected(QString)),
-            SLOT(userRemove(QString)));
-    // Channel MGT
-    connect(server,
-            SIGNAL(channelConnected(QString)),
-            SLOT(channelConnect(QString)));
-    connect(server,
-            SIGNAL(channelDisconnected(QString)),
-            SLOT(speakerRemove(QString)));
-    // Voting MGT
-    connect(server,
-            SIGNAL(voteResultsUpdated(VoteResults)),
-            SLOT(voteUpdateResults(VoteResults)));
-    connect(server,       SIGNAL(voteResultsUpdated(VoteResults)),
-            resultWidget, SLOT(voteUpdateResults(VoteResults)));
-    connect(this,    SIGNAL(voteNew(VotingInvite)),
-            server,  SLOT(voteNew(VotingInvite)));
-    connect(this,    SIGNAL(voteStop()),
-            server,  SLOT(voteStop()));
-    // Request MGT
-    connect(server,
-            SIGNAL(channelRequest(QString)),
-            SLOT(channelRequest(QString)));
-    connect(server,
-            SIGNAL(channelCloseRequest(QString)),
-            SLOT(speakerRemove(QString)));
-    connect(this,   SIGNAL(requestAccepted(QString)),
-            server, SLOT(channelOpen(QString)));
-    connect(this,   SIGNAL(requestDiscarded(QString)),
-            server, SLOT(channelDeny(QString)));
-    // Load filter settings
-    connect(settings, SIGNAL(settingsSaved()),
-            server,   SLOT(channelReloadSettings()));
-    // Set storage path
-    server->recordSetDirectory(ui->storageEdit->text());
+    // Set broadcast information
+    broadcaster.setServerInformation(settings->info());
+    // Connect to appServer
+    AppServer::instance()->connectGate(server);
+    if (!ui->raPasswordEdit->text().isEmpty())
+        AppServer::instance()->
+                setAdminPassword(ui->raPasswordEdit->text());
     // Update status
     setStatus(statusStarted);
 }
@@ -271,9 +272,9 @@ void MainWindow::on_recordButton_toggled(bool checked)
     if (server)
     {
         if (checked)
-            server->recordStart();
+            recorder.start();
         else
-            server->recordStop();
+            recorder.stop();
     }
     else
         ui->recordButton->setChecked(false);
@@ -283,14 +284,19 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
 {
     if (!checked)
     {
-        emit voteStop();
+        if (vote) { delete vote; vote = 0; }
+        broadcaster.unsetVotingInvite();
         ui->startVoteButton->setText(tr("Start"));
     }
     else
     {
         if (ui->simpleRB->isChecked())
             // Simple case
-            emit voteNew(VotingInvite(ui->questionTextEdit->toPlainText()));
+        {
+            VotingInvite vi(ui->questionTextEdit->toPlainText());
+            vote = new Voting(vi, this);
+            broadcaster.setVotingInvite(vi);
+        }
         else
         {
             QStringList answersText;
@@ -299,10 +305,14 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
                     answersText.append(l->text());
             }
             // Custom case
-            emit voteNew(VotingInvite(ui->questionTextEdit->toPlainText(),
-                                      VotingInvite::Custom,
-                                      answersText));
+            VotingInvite vi(ui->questionTextEdit->toPlainText(),
+                            VotingInvite::Custom,
+                            answersText);
+            vote = new Voting(vi, this);
+            broadcaster.setVotingInvite(vi);
         }
+        connect(vote, SIGNAL(resultsUpdated(VoteResults)),
+                      SLOT(voteUpdateResults(VoteResults)));
         ui->startVoteButton->setText(tr("Stop"));
     }
 }
@@ -411,8 +421,7 @@ void MainWindow::on_qrButton_clicked()
 void MainWindow::on_storageSelectButton_clicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Open records directory"));
-    if (server)
-        server->recordSetDirectory(path);
+    recorder.setRecordDirectory(path);
     ui->storageEdit->setText(path);
     settings->save();
 }

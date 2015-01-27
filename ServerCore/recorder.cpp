@@ -1,17 +1,22 @@
 #include "recorder.h"
+#include "speaker.h"
 
 #include <QCoreApplication>
 #include <QFile>
 #include <QDebug>
 
-Recorder::Recorder(const UserMap &users, QObject *parent)
+Recorder::Recorder(QObject *parent)
     : QObject(parent),
-      users(users),
       recordDir(QCoreApplication::applicationDirPath()),
       recordStarted(false)
 {
     moveToThread(&myThread);
     myThread.start(QThread::LowestPriority);
+
+    Speaker *s = Speaker::instance();
+    connect(s, SIGNAL(sampleReady(QByteArray)), SLOT(record(QByteArray)));
+    connect(s, SIGNAL(sampleReady(User*,QByteArray)),
+               SLOT(record(User*,QByteArray)));
 }
 
 Recorder::~Recorder()
@@ -36,14 +41,13 @@ void Recorder::record(QByteArray sample)
     f.write(sample);
 }
 
-void Recorder::record(QString speaker, QByteArray sample)
+void Recorder::record(User *speaker, QByteArray sample)
 {
-    Q_ASSERT(users.contains(speaker));
     if (!recordStarted)
         return;
 
     const QString filename = recordDir + "/"
-            + users[speaker].name + "-" + users[speaker].company +".raw";
+            + speaker->getInfo().name + "-" + speaker->getInfo().company +".raw";
     QFile f(filename);
     f.open(QIODevice::Append);
     f.write(sample);

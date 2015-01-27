@@ -1,8 +1,8 @@
 #ifndef SPEAKER_WIDGET_H
 #define SPEAKER_WIDGET_H
 
+#include <user.h>
 #include <QWidget>
-#include <user_information.h>
 
 namespace Ui {
 class SpeakerWidget;
@@ -17,8 +17,7 @@ public:
         Stream
     };
 
-    explicit SpeakerWidget(const QString &address,
-                           const UserInformation &info,
+    explicit SpeakerWidget(User *user,
                            QWidget *parent = 0);
     ~SpeakerWidget();
 
@@ -26,26 +25,30 @@ public:
     { return state; }
 
 signals:
-    void requestAccepted(QString);
-    void requestDiscarded(QString);
-    void closeClicked(QString);
-    void volumeChanged(QString address, qreal volume);
+    void dismiss();
+    void volumeChanged(User*, qreal);
 
 public slots:
     void setState(State s);
-    void setAmplitude(QString address, ushort amp);
+    void setAmplitude(User *user, ushort amp);
     void on_dismissButton_clicked();
 
 private slots:
     void on_acceptButton_clicked();
     void on_volumeSlider_sliderMoved(int position);
     void stepUp();
+    void connectSpeaker();
+
+    void channelOpened()
+    { setState(Stream); }
+    void channelClosed()
+    { emit dismiss(); }
 
 private:
     Ui::SpeakerWidget *ui;
-    QString myAddress;
-    State state;
-    uint stepVal;
+    User              *user;
+    State              state;
+    uint               stepVal;
 };
 
 #endif // SPEAKER_WIDGET_H

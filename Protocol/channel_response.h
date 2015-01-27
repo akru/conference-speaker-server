@@ -7,7 +7,7 @@
 struct ChannelResponse : public Response
 {
     ChannelResponse(ChannelInformation info = ChannelInformation())
-        : Response(Request::Channel, Response::Success),
+        : Response(Request::ChannelOpen, Response::Success),
           channel(info)
     {}
 

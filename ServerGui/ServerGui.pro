@@ -33,8 +33,8 @@ TRANSLATIONS += \
 
 ## Include & link libraries
 
-INCLUDEPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode
-DEPENDPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode
+INCLUDEPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode $$PWD/../3rd-party/AppServer
+DEPENDPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode $$PWD/../3rd-party/AppServer
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ServerCore/release/ -lServerCore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ServerCore/debug/ -lServerCore

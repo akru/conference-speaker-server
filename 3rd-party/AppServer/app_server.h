@@ -1,41 +1,38 @@
 #ifndef APP_SERVER_H
 #define APP_SERVER_H
 
-#include "appserver_global.h"
 #include <QThread>
 #include <QMap>
+#include <user.h>
 
-class Server;
+class Gate;
 struct mg_server;
 typedef QMap<QString, QByteArray> URIMap;
 
-class APPSERVERSHARED_EXPORT AppServer : public QThread
+class AppServer : public QThread
 {
     Q_OBJECT
-public:
-    AppServer(Server *parent,
-              const QString &adminPassword = "admin");
+    AppServer(const QString &adminPassword = "admin");
     ~AppServer();
+
+public:
+    static AppServer * instance();
 
     void run();
     void addRouteFile(const QString &route, const QString &resname);
     void addRouteData(const QString &route, const QByteArray &res);
 
-    void channelDeny(QString address)
-    { emit channelIsDeny(address); }
-    void channelOpen(QString address)
-    { emit channelIsOpen(address); }
-    void channelClose(QString address)
-    { emit channelIsClose(address); }
+    void setAdminPassword(const QString &password);
+    void connectGate(Gate *gate);
 
-signals:
-    void channelIsDeny(QString address);
-    void channelIsOpen(QString address);
-    void channelIsClose(QString address);
+    void channelOpen(QString id);
+    void channelClose(QString id);
 
 private slots:
-    void appendRequest(QString address);
-    void removeRequest(QString address);
+    void appendUser(User *user);
+    void removeUser();
+    void appendRequest();
+    void remoteRequest();
 
 private:
     mg_server *staticServer;

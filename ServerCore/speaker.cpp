@@ -1,4 +1,5 @@
 #include "speaker.h"
+#include "user.h"
 #include "../Suppression/filter.h"
 
 #include <QTime>
@@ -10,6 +11,8 @@
 #include <soxr.h>
 
 #include <QDebug>
+
+static Speaker *self = 0;
 
 Speaker::Speaker(QObject *parent) :
     QObject(parent),
@@ -68,31 +71,39 @@ Speaker::Speaker(QObject *parent) :
     heartbeat.start();
 }
 
-Speaker::~Speaker()
+//Speaker::~Speaker()
+//{
+//    // Stop audio
+//    if (audio)
+//    {
+//        audio->stop();
+//        delete audio;
+//    }
+//    // Delete processing cycle
+//    foreach (Processing *p, proc.values()) {
+//        delete p;
+//    }
+//    // Delete resampler
+//    soxr_delete(resampler);
+//    // Terminate thread
+//    myThread.terminate();
+//    myThread.wait();
+//}
+
+Speaker * Speaker::instance()
 {
-    // Stop audio
-    if (audio)
-    {
-        audio->stop();
-        delete audio;
-    }
-    // Delete processing cycle
-    foreach (Processing *p, proc.values()) {
-        delete p;
-    }
-    // Delete resampler
-    soxr_delete(resampler);
-    // Terminate thread
-    myThread.terminate();
-    myThread.wait();
+    // Singletone constructor
+    if (!self)
+        self = new Speaker(0);
+    return self;
 }
 
-void Speaker::speakerNew(QString id)
+void Speaker::speakerNew(User *id)
 {
     proc.insert(id, new Processing);
 }
 
-void Speaker::speakerDelete(QString id)
+void Speaker::speakerDelete(User *id)
 {
     delete proc.take(id);
 }
@@ -106,13 +117,13 @@ void Speaker::setVolume(qreal volume)
     audio->setVolume(volume);
 }
 
-void Speaker::setVolume(QString speaker, qreal volume)
+void Speaker::setVolume(User *speaker, qreal volume)
 {
-    qDebug() << "Set speaker " << speaker << "volume:" << volume;
-    Q_ASSERT(volume >= 0 && volume <= 1);
+    qDebug() << "Set speaker" << speaker->getID().show()
+             << "volume:" << volume;
     if(!proc.contains(speaker))
     {
-        qWarning() << "Unregistered speaker" << speaker;
+        qWarning() << "Unregistered speaker" << speaker->getID().show();
         return;
     }
     // Disabled behaviour
@@ -121,11 +132,11 @@ void Speaker::setVolume(QString speaker, qreal volume)
     proc[speaker]->setVolume(volume);
 }
 
-void Speaker::incomingData(QString speaker, QByteArray packet)
+void Speaker::incomingData(User *speaker, QByteArray packet)
 {
     if(!proc.contains(speaker))
     {
-        qWarning() << "Unregistered speaker" << speaker;
+        qWarning() << "Unregistered speaker" << speaker->getID().show();
         return;
     }
     // Disabled behaviour
@@ -138,8 +149,9 @@ void Speaker::speakHeartbeat()
 {
     QByteArray sample, sample_out(Filter::sample_length * 2, 0);
     bool silence = true;
-    foreach (Processing *p, proc.values()) {
+    foreach (User *speaker, proc.keys()) {
         QTime t = QTime::currentTime();
+        Processing *p = proc[speaker];
         sample = p->take();
         qDebug() << "Processing elapsed" << t.elapsed() << "ms";
         // Empty sample when no data to process
@@ -147,7 +159,6 @@ void Speaker::speakHeartbeat()
             continue;
         else
             silence = false;
-        QString speaker = proc.key(p);
         // Emit amplitude signal
         emit audioAmpUpdated(speaker, p->getAmp());
         // Emit unmixed sample

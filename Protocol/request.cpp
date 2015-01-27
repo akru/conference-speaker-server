@@ -8,7 +8,7 @@ QJsonObject Request::toJson() const
     case Registration:
         obj.insert("request", QString("registration"));
         break;
-    case Channel:
+    case ChannelOpen:
         obj.insert("request", QString("channel_open"));
         break;
     case ChannelClose:
@@ -30,7 +30,7 @@ Request Request::fromJson(const QJsonObject &json)
     if (type.toString() == "registration")
         return Request(Registration);
     if (type.toString() == "channel_open")
-        return Request(Channel);
+        return Request(ChannelOpen);
     if (type.toString() == "channel_close")
         return Request(ChannelClose);
     if (type.toString() == "vote")

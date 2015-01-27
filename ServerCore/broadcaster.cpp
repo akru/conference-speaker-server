@@ -19,8 +19,8 @@ Broadcaster::Broadcaster(QObject *parent)
     message.insert("uuid", QUuid::createUuid().toString());
     // Setup broadcasting interval
     QTimer *t = new QTimer(this);
-    t->setInterval(BROADCASTER_TIME_INTERVAL);
     connect(t, SIGNAL(timeout()), SLOT(sendInformation()));
+    t->setInterval(timeInterval);
     t->start();
 }
 
@@ -62,9 +62,8 @@ void Broadcaster::setAppInfo(AppInformation info)
 
 void Broadcaster::sendInformation()
 {
-
     foreach (const QHostAddress &addr, addreses) {
         if (packetCache.size())
-            sock.writeDatagram(packetCache, addr, SERVER_DISCOVER_PORT);
+            sock.writeDatagram(packetCache, addr, discoverPort);
     }
 }
