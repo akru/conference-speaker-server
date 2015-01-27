@@ -1,7 +1,7 @@
 #ifndef TRANSMITTER_H
 #define TRANSMITTER_H
 
-#include <QTcpSocket>
+#include <QUdpSocket>
 #include <QAudioDecoder>
 #include <channel_information.h>
 
@@ -20,9 +20,13 @@ private slots:
     void connected();
     void readBuffer();
 
+    void sendData();
+
 private:
-    QTcpSocket sock;
+    ChannelInformation ch;
+    QUdpSocket sock;
     QAudioDecoder *decoder;
+    QList<QByteArray> data;
 };
 
 #endif // TRANSMITTER_H
