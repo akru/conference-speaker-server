@@ -206,7 +206,7 @@ void MainWindow::requestVote(QJsonObject request)
         user->voteResponse(res.toJson());
     }
     else
-        user->voteResponse(vote->vote(user->getID(), request));
+        user->voteResponse(vote->vote(user->getAddress(), request));
 }
 
 void MainWindow::channelWidgetRemove()

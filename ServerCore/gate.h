@@ -29,15 +29,15 @@ private slots:
 
 private:
     // TCP server instance
-    QTcpServer      *server;
+    QTcpServer    *server;
     // User by ID map
-    QList<User::ID>  users;
+    QList<QString> users;
 #ifndef QT_DEBUG
     // Licensing policy
-    Licensing    license;
+    Licensing      license;
 #endif
     // Listening flag
-    bool         listenEnabled;
+    bool           listenEnabled;
 };
 
 #endif // GATE_H

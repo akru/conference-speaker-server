@@ -35,13 +35,13 @@ public:
      * inputs: user id and request
      * returns: response
      */
-    QJsonObject vote(User::ID id, QJsonObject request);
+    QJsonObject vote(QString id, QJsonObject request);
 
 signals:
     void resultsUpdated(VoteResults);
 
 private:
-    QList<User::ID> voters;
+    QList<QString> voters;
     VoteResults     results;
 };
 

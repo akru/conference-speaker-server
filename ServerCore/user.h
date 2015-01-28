@@ -22,25 +22,12 @@ class User : public QObject
 public:
     explicit User(QTcpSocket *connection,
                   QObject *parent = 0);
-    // Uniq User ident
-    class ID {
-        const quint32 value;
-    public:
-        ID(const QString &address);
-        ID(const QHostAddress &address);
-        QString show() const;
-        bool operator <(const ID &id) const;
-        bool operator ==(const ID &id) const;
-    };
     // Available User states
     enum State {
         Unregistered,
         Registered,
         Speak
     };
-    // User ident getter
-    inline const ID & getID() const
-    { return userID; }
     // User state getter
     inline const State & getState() const
     { return userState; }
@@ -50,6 +37,8 @@ public:
     // Channel information getter
     inline const ChannelInformation & getChannelInfo() const
     { return channelInfo; }
+    // User address getter
+    inline QString getAddress() const;
 
 signals:
     void disconnected();
@@ -78,8 +67,6 @@ private: // Private methods
 private: // Private rows
     // TCP user connection
     QTcpSocket        *sock;
-    // User ident
-    ID                 userID;
     // User state
     State              userState;
     // User information

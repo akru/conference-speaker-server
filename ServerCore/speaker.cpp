@@ -119,11 +119,11 @@ void Speaker::setVolume(qreal volume)
 
 void Speaker::setVolume(User *speaker, qreal volume)
 {
-    qDebug() << "Set speaker" << speaker->getID().show()
+    qDebug() << "Set speaker" << speaker->getAddress()
              << "volume:" << volume;
     if(!proc.contains(speaker))
     {
-        qWarning() << "Unregistered speaker" << speaker->getID().show();
+        qWarning() << "Unregistered speaker" << speaker->getAddress();
         return;
     }
     // Disabled behaviour
@@ -136,7 +136,7 @@ void Speaker::incomingData(User *speaker, QByteArray packet)
 {
     if(!proc.contains(speaker))
     {
-        qWarning() << "Unregistered speaker" << speaker->getID().show();
+        qWarning() << "Unregistered speaker" << speaker->getAddress();
         return;
     }
     // Disabled behaviour

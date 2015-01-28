@@ -35,7 +35,7 @@ void Receiver::sockReadyRead()
     // Cast check
     if (!user) return;
     // Sender simple check
-    if (user->getID() == User::ID(peer))
+    if (user->getAddress() == peer.toString())
         emit sampleReceived(user, buf);
 }
 

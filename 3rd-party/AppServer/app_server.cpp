@@ -58,16 +58,16 @@ static int remote_admin_handler(struct mg_connection *conn)
         QJsonObject userMap;
         QJsonArray channels;
         foreach (const User *u, users) {
-            userMap.insert(u->getID().show(), u->getInfo().toJson());
+            userMap.insert(u->getAddress(), u->getInfo().toJson());
             if (u->getState() == User::Speak)
-                channels.append(u->getID().show());
+                channels.append(u->getAddress());
         }
         msg.insert("users", userMap);
         msg.insert("channels", channels);
 
         QJsonArray reqs;
         foreach (const User *u, requests) {
-            reqs.append(u->getID().show());
+            reqs.append(u->getAddress());
         }
         msg.insert("requests", reqs);
 
@@ -187,9 +187,8 @@ void AppServer::remoteRequest()
 
 void AppServer::channelOpen(QString id)
 {
-    User::ID uid(id);
     foreach (User *u, users) {
-        if(u->getID() == uid)
+        if(u->getAddress() == id)
         {
             UserAdapter(u).openChannel();
             break;
@@ -199,9 +198,8 @@ void AppServer::channelOpen(QString id)
 
 void AppServer::channelClose(QString id)
 {
-    User::ID uid(id);
     foreach (User *u, users) {
-        if(u->getID() == uid)
+        if(u->getAddress() == id)
         {
             // TODO: Too dangerous! >:-|
             if (requests.contains(u))

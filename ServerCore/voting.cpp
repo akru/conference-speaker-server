@@ -26,11 +26,11 @@ Voting::~Voting()
     emit resultsUpdated(results);
 }
 
-QJsonObject Voting::vote(User::ID id, QJsonObject request)
+QJsonObject Voting::vote(QString id, QJsonObject request)
 {
     if (voters.contains(id))
     {
-        qDebug() << "VOTE :: denied for" << id.show() << ", double vote";
+        qDebug() << "VOTE :: denied for" << id << ", double vote";
         return Response(Request::Vote,
                         Response::Error, "Try to double vote").toJson();
     }
@@ -38,7 +38,7 @@ QJsonObject Voting::vote(User::ID id, QJsonObject request)
     QJsonValue uuid = request["uuid"];
     if (uuid.isUndefined() || QUuid(uuid.toString()) != results.invite.uuid)
     {
-        qDebug() << "Vote denied for" << id.show() << "mismatch uuid";
+        qDebug() << "Vote denied for" << id << "mismatch uuid";
         return Response(Request::Vote,
                         Response::Error, "Mismatch vote uuid").toJson();
     }
@@ -46,7 +46,7 @@ QJsonObject Voting::vote(User::ID id, QJsonObject request)
     QJsonValue answer = request["answer"];
     if (answer.isUndefined())
     {
-        qDebug() << "Vote denied for" << id.show() << "unexist answer";
+        qDebug() << "Vote denied for" << id << "unexist answer";
         return Response(Request::Vote,
                         Response::Error, "Answer does not exist").toJson();
     }
@@ -55,7 +55,7 @@ QJsonObject Voting::vote(User::ID id, QJsonObject request)
     case VotingInvite::Simple:
         if (!answer.isBool())
         {
-            qDebug() << "Vote denied for" << id.show() << "broken bool answer";
+            qDebug() << "Vote denied for" << id << "broken bool answer";
             return Response(Request::Vote,
                             Response::Error, "Answer does not bool").toJson();
         }
@@ -67,7 +67,7 @@ QJsonObject Voting::vote(User::ID id, QJsonObject request)
     case VotingInvite::Custom:
         if (!answer.isDouble() || answer.toInt() < 0 || answer.toInt() >= results.values.size())
         {
-            qDebug() << "VOTE :: denied for" << id.show() << "broken answer";
+            qDebug() << "VOTE :: denied for" << id << "broken answer";
             return Response(Request::Vote,
                             Response::Error, "Answer does not integer").toJson();
         }
@@ -76,6 +76,6 @@ QJsonObject Voting::vote(User::ID id, QJsonObject request)
     }
     voters.append(id);
     emit resultsUpdated(results);
-    qDebug() << "VOTE :: accepted for" << id.show();
+    qDebug() << "VOTE :: accepted for" << id;
     return Response(Request::Vote, Response::Success).toJson();
 }

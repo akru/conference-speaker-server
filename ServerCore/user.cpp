@@ -13,32 +13,19 @@
 #include <QTcpSocket>
 #include <QDebug>
 
-User::ID::ID(const QString &address)
-    : value(QHostAddress(address).toIPv4Address())
-{}
-
-User::ID::ID(const QHostAddress &address)
-    : value(address.toIPv4Address())
-{}
-
-QString User::ID::show() const
-{ return QString::number(value); }
-
-bool User::ID::operator <(const ID &id) const
-{ return value < id.value; }
-
-bool User::ID::operator ==(const ID &id) const
-{ return value == id.value; }
-
 User::User(QTcpSocket *connection, QObject *parent)
     : QObject(parent),
       sock(connection),
-      userID(ID(connection->peerAddress())),
       userState(Unregistered),
       receiver(0)
 {
     connect(sock, SIGNAL(readyRead()),    SLOT(readMessage()));
     connect(sock, SIGNAL(disconnected()), SLOT(sockDisconnected()));
+}
+
+QString User::getAddress() const
+{
+    return sock->peerAddress().toString();
 }
 
 void User::registration(UserInformation info)
@@ -48,13 +35,13 @@ void User::registration(UserInformation info)
     {
         userInfo = info;
         userState = Registered;
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Registered.";
         res = Response(Request::Registration, Response::Success);
     }
     else
     {
-        qWarning() << "USER" << userID.show() << "::"
+        qWarning() << "USER" << getAddress() << "::"
                    << "Try to double registration.";
         res = Response(Request::Registration,
                        Response::Error, "User already registered");
@@ -68,7 +55,7 @@ void User::channelAction(ChannelAction action)
     // Registration check
     if (userState == Unregistered)
     {
-        qWarning() << "USER" << userID.show() << "::"
+        qWarning() << "USER" << getAddress() << "::"
                    << "Try to channelAction without registration!";
         Response response(Request::ChannelOpen,
                           Response::Error, "Please register first");
@@ -88,7 +75,7 @@ void User::channelAction(ChannelAction action)
                         Speaker::instance(), SLOT(incomingData(User*,QByteArray)));
                 userState = Speak;
             } catch (...) {
-                qWarning() << "USER" << userID.show() << "::"
+                qWarning() << "USER" << getAddress() << "::"
                            << "Unable to open channel!";
                 res = Response(Request::ChannelOpen,
                                Response::Error, "Server fault").toJson();
@@ -96,7 +83,7 @@ void User::channelAction(ChannelAction action)
             }
         }
         res = ChannelResponse(receiver->getChannelInfo()).toJson();
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Channel opened:" << receiver->getChannelInfo().toJson();
         emit channelOpened();
         break;
@@ -107,13 +94,13 @@ void User::channelAction(ChannelAction action)
         {
             delete receiver;
             userState = Registered;
-            qDebug() << "USER" << userID.show() << "::"
+            qDebug() << "USER" << getAddress() << "::"
                      << "Channel close success.";
             res = Response(Request::ChannelClose, Response::Success).toJson();
         }
         else
         {
-            qWarning() << "USER" << userID.show() << "::"
+            qWarning() << "USER" << getAddress() << "::"
                        << "Try to close unopened channel!";
             res = Response(Request::ChannelClose,
                            Response::Error, "Channel is not open").toJson();
@@ -122,7 +109,7 @@ void User::channelAction(ChannelAction action)
         break;
 
     case ChDeny:
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Channel open request denied.";
         res = Response(Request::ChannelOpen,
                        Response::Error, "Channel open request denied").toJson();
@@ -134,7 +121,7 @@ void User::channelAction(ChannelAction action)
 
 void User::voteResponse(QJsonObject response)
 {
-    qDebug() << "USER" << userID.show() << "::"
+    qDebug() << "USER" << getAddress() << "::"
              << "Vote response:" << response;
     messageSend(response);
 }
@@ -146,14 +133,14 @@ void User::readMessage()
     // Perse error check
     if (err.error != QJsonParseError::NoError)
     {
-        qWarning() << "USER" << userID.show() << "::"
+        qWarning() << "USER" << getAddress() << "::"
                    << "Message parse error:" << err.errorString();
         return;
     }
     try {
         messageParser(message.object());
     } catch (std::exception &e) {
-        qWarning() << "USER" << userID.show() << "::"
+        qWarning() << "USER" << getAddress() << "::"
                    << "Message parse exception:" << e.what();
         return;
     }
@@ -170,28 +157,28 @@ void User::messageParser(const QJsonObject &message)
     switch (req.type)
     {
     case Request::Registration:
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Registration request.";
         emit requestRegistration(
                     RegistrationRequest::fromJson(message).user);
         break;
     case Request::ChannelOpen:
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Channel open request.";
         emit requestChannelOpen();
         break;
     case Request::ChannelClose:
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Channel close request.";
         emit requestChannelClose();
         break;
     case Request::Vote:
-        qDebug() << "USER" << userID.show() << "::"
+        qDebug() << "USER" << getAddress() << "::"
                  << "Vote request:" << message;
         emit requestVote(message);
         break;
     default:
-        qWarning() << "USER" << userID.show() << "::"
+        qWarning() << "USER" << getAddress() << "::"
                    << "Unknown request:" << message;
     }
 }
