@@ -32,7 +32,7 @@ private slots:
     void appendUser(User *user);
     void removeUser();
     void appendRequest();
-    void remoteRequest();
+    void removeRequest();
 
 private:
     mg_server *staticServer;

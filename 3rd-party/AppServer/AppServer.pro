@@ -2,7 +2,8 @@ QT      -= gui
 
 TARGET   = AppServer
 TEMPLATE = lib
-CONFIG  += staticlib
+
+!unix: CONFIG  += staticlib
 
 DEFINES += APPSERVER_LIBRARY
 

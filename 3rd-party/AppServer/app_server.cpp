@@ -155,8 +155,9 @@ void AppServer::appendUser(User *user)
     users.append(user);
     connect(user, SIGNAL(disconnected()), SLOT(removeUser()));
     connect(user, SIGNAL(requestChannelOpen()), SLOT(appendRequest()));
-    connect(user, SIGNAL(channelOpened()), SLOT(remoteRequest()));
-    connect(user, SIGNAL(channelClosed()), SLOT(remoteRequest()));
+    connect(user, SIGNAL(channelOpened()), SLOT(removeRequest()));
+    connect(user, SIGNAL(channelClosed()), SLOT(removeRequest()));
+    connect(user, SIGNAL(disconnected()), SLOT(removeRequest()));
 }
 
 void AppServer::removeUser()
@@ -176,7 +177,7 @@ void AppServer::appendRequest()
         requests.append(user);
 }
 
-void AppServer::remoteRequest()
+void AppServer::removeRequest()
 {
     User *user = qobject_cast<User *>(sender());
     // Cast check

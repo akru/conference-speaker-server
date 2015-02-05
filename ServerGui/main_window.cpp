@@ -8,6 +8,7 @@
 #include <gate.h>
 #include <user.h>
 #include <response.h>
+#include <speaker.h>
 
 #include <app_server.h>
 #include <qrpage.h>
@@ -137,6 +138,7 @@ void MainWindow::userAppend(User *user)
                   SLOT(requestChannelClose()));
     connect(user, SIGNAL(requestVote(QJsonObject)),
                   SLOT(requestVote(QJsonObject)));
+    Speaker::instance()->speakerNew(user);
 }
 
 void MainWindow::userRemove()
@@ -150,6 +152,7 @@ void MainWindow::userRemove()
     // Cleaning speaker widget
     if (speakers.contains(user))
         delete speakers.take(user);
+    Speaker::instance()->speakerDelete(user);
 }
 
 void MainWindow::requestRegistration(UserInformation info)

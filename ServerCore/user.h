@@ -38,7 +38,7 @@ public:
     inline const ChannelInformation & getChannelInfo() const
     { return channelInfo; }
     // User address getter
-    inline QString getAddress() const;
+    QString getAddress() const;
 
 signals:
     void disconnected();
