@@ -11,6 +11,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTcpSocket>
+
+#include <QTimer>
 #include <QDebug>
 
 User::User(QTcpSocket *connection, QObject *parent)
@@ -21,6 +23,16 @@ User::User(QTcpSocket *connection, QObject *parent)
 {
     connect(sock, SIGNAL(readyRead()),    SLOT(readMessage()));
     connect(sock, SIGNAL(disconnected()), SLOT(sockDisconnected()));
+
+    QTimer *t = new QTimer(this);
+    connect(t, SIGNAL(timeout()), SLOT(timeout()));
+    t->setInterval(1000);
+    t->start();
+}
+
+void User::timeout()
+{
+    ss = sock->state();
 }
 
 QString User::getAddress() const

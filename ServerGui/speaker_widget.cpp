@@ -10,9 +10,9 @@ SpeakerWidget::SpeakerWidget(User *user, QWidget *parent)
       stepVal(0)
 {
     ui->setupUi(this);
-    ui->nameLabel->setText(user->getInfo().name);
-    ui->titleLabel->setText(user->getInfo().title);
-    ui->companyLabel->setText(user->getInfo().company);
+    ui->nameLabel->setText(user->getInfo().name.isEmpty() ? tr("Anonymous") : user->getInfo().name);
+    ui->titleLabel->setText(user->getInfo().title.isEmpty() ? tr(" ") : user->getInfo().title);
+    ui->companyLabel->setText(user->getInfo().company.isEmpty() ? tr(" ") : user->getInfo().company);
     setState(Request);
 
     QTimer *t = new QTimer(this);
@@ -27,6 +27,8 @@ SpeakerWidget::SpeakerWidget(User *user, QWidget *parent)
 SpeakerWidget::~SpeakerWidget()
 {
     delete ui;
+    if (state == Stream)
+        Speaker::instance()->speakerDelete(user);
 }
 
 void SpeakerWidget::setState(State s)
@@ -93,8 +95,9 @@ void SpeakerWidget::stepUp()
 void SpeakerWidget::connectSpeaker()
 {
     Speaker *s = Speaker::instance();
+    s->speakerNew(user);
     connect(this, SIGNAL(volumeChanged(User*,qreal)),
-            s,    SLOT(setVolume(User*,qreal)));
+                       s,    SLOT(setVolume(User*,qreal)));
     connect(s,    SIGNAL(audioAmpUpdated(User*,ushort)),
                   SLOT(setAmplitude(User*,ushort)));
 }

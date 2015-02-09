@@ -1,4 +1,5 @@
 QT      -= gui
+QT      += network
 
 TARGET   = AppServer
 TEMPLATE = lib

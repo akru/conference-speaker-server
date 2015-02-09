@@ -138,7 +138,6 @@ void MainWindow::userAppend(User *user)
                   SLOT(requestChannelClose()));
     connect(user, SIGNAL(requestVote(QJsonObject)),
                   SLOT(requestVote(QJsonObject)));
-    Speaker::instance()->speakerNew(user);
 }
 
 void MainWindow::userRemove()
@@ -152,7 +151,6 @@ void MainWindow::userRemove()
     // Cleaning speaker widget
     if (speakers.contains(user))
         delete speakers.take(user);
-    Speaker::instance()->speakerDelete(user);
 }
 
 void MainWindow::requestRegistration(UserInformation info)
@@ -161,7 +159,7 @@ void MainWindow::requestRegistration(UserInformation info)
     // Cast check
     if (!user) return;
     // Append item into user list
-    QListWidgetItem *item = new QListWidgetItem(info.name);
+    QListWidgetItem *item = new QListWidgetItem(info.name.isEmpty() ? tr("Anonymous") : info.name);
     ui->userList->addItem(item);
     userItem.insert(user, item);
     // Register user
@@ -194,7 +192,6 @@ void MainWindow::requestChannelClose()
     if (!user) return;
     // Send response
     user->channelAction(ChClose);
-
 }
 
 void MainWindow::requestVote(QJsonObject request)

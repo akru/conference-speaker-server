@@ -105,7 +105,8 @@ void Speaker::speakerNew(User *id)
 
 void Speaker::speakerDelete(User *id)
 {
-    delete proc.take(id);
+    if (proc.contains(id))
+        delete proc.take(id);
 }
 
 void Speaker::setVolume(qreal volume)
