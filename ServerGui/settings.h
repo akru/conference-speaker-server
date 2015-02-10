@@ -21,7 +21,7 @@ public:
 
     /* Settings rows */
     // Server information loaded
-    ServerInformation info();
+//    ServerInformation info();
     /* Settings rows end */
 
 signals:

@@ -121,14 +121,14 @@ void Settings::usNoiseControl()
     load();
 }
 
-ServerInformation Settings::info()
-{
-    ServerInformation info;
-    QSettings s(filename, QSettings::IniFormat);
-    info.name    = ui->labelName->text();
-    info.address = ui->addressBox->currentText();
-    return info;
-}
+//ServerInformation Settings::info()
+//{
+//    ServerInformation info;
+//    QSettings s(filename, QSettings::IniFormat);
+//    info.name    = ui->labelName->text();
+//    info.address = ui->addressBox->currentText();
+//    return info;
+//}
 
 void Settings::load()
 {
@@ -166,8 +166,8 @@ void Settings::saveAsDialog()
 void Settings::loadAs(QString fname)
 {
     QSettings s(fname, QSettings::IniFormat);
-    ui->labelName->setText(s.value("conference-name", "").toString());
-    ui->addressBox->setCurrentText(s.value("ip-address", "").toString());
+//    ui->labelName->setText(s.value("conference-name", "").toString());
+//    ui->addressBox->setCurrentText(s.value("ip-address", "").toString());
 
     // Equalizer
     ex->eqBox->setChecked(s.value("eq-enable", true).toBool());
@@ -190,12 +190,15 @@ void Settings::loadAs(QString fname)
     ex->ismdSpin->setValue(s.value("hs-ismd", 0.03).toFloat());
 
     // NS
-    ex->nsBox->setChecked(s.value("ns-enable", true).toBool());
+    ex->nsBox->setChecked(s.value("ns-enable", false).toBool());
     QString level = s.value("ns-level", "low").toString();
     if (level == "low")
     {
         ex->lowRadioButton->setChecked(true);
-        us->mediumRadioButton->setChecked(true);
+        if (ex->nsBox->isChecked())
+            us->mediumRadioButton->setChecked(true);
+        else
+            us->lowRadioButton->setChecked(true);
     } else if (level == "medium")
     {
         ex->mediumRadioButton->setChecked(true);
@@ -210,15 +213,15 @@ void Settings::loadAs(QString fname)
 
     // Gate
     ex->gateBox->setChecked(s.value("gate-enable", true).toBool());
-    ex->raiseSpinBox->setValue(s.value("gate-raise", -24.0).toDouble());
-    ex->fallSpinBox->setValue(s.value("gate-fall", -28.0).toDouble());
-    ex->attackSpinBox->setValue(s.value("gate-attack", 0.1).toDouble());
-    ex->holdSpinBox->setValue(s.value("gate-hold", 0.2).toDouble());
-    ex->releaseSpinBox->setValue(s.value("gate-release", 0.1).toDouble());
+    ex->raiseSpinBox->setValue(s.value("gate-raise", -31.0).toDouble());
+    ex->fallSpinBox->setValue(s.value("gate-fall", -35.0).toDouble());
+    ex->attackSpinBox->setValue(s.value("gate-attack", 0.05).toDouble());
+    ex->holdSpinBox->setValue(s.value("gate-hold", 0.20).toDouble());
+    ex->releaseSpinBox->setValue(s.value("gate-release", 0.20).toDouble());
 
     // Compressor
-    ex->compressorBox->setChecked(s.value("compressor-enable", true).toBool());
-    us->compressorBox->setChecked(s.value("compressor-enable", true).toBool());
+    ex->compressorBox->setChecked(s.value("compressor-enable", false).toBool());
+    us->compressorBox->setChecked(s.value("compressor-enable", false).toBool());
 
     ex->normalizeCheckBox->setChecked(s.value("compressor-normalize",true).toBool());
     ex->peakCheckBox->setChecked(s.value("compressor-peak", false).toBool());
@@ -230,8 +233,8 @@ void Settings::loadAs(QString fname)
     ex->cNoiseSpinBox->setValue(s.value("compressor-noise", -40).toFloat());
 
     // Pitch shift
-    ex->psBox->setChecked(s.value("ps-enable", true).toBool());
-    us->psBox->setChecked(s.value("ps-enable", true).toBool());
+    ex->psBox->setChecked(s.value("ps-enable", false).toBool());
+    us->psBox->setChecked(s.value("ps-enable", false).toBool());
 
     // Records storage
     ui->storageEdit->setText(s.value("records-storage", "").toString());
@@ -240,8 +243,8 @@ void Settings::loadAs(QString fname)
 void Settings::saveAs(QString fname)
 {
     QSettings s(fname, QSettings::IniFormat);
-    s.setValue("conference-name", ui->labelName->text());
-    s.setValue("ip-address", ui->addressBox->currentText());
+//    s.setValue("conference-name", ui->labelName->text());
+//    s.setValue("ip-address", ui->addressBox->currentText());
 
     s.setValue("eq-enable", ex->eqBox->isChecked());
     s.setValue("eq-slider-1", ex->verticalSlider->value());

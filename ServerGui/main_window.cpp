@@ -84,9 +84,6 @@ void MainWindow::loadFonts()
 
 void MainWindow::setupUi()
 {
-    // Power button saves current settings
-    connect(ui->powerButton, SIGNAL(clicked()),
-            settings,        SLOT(save()));
     // Sound mode switcher
     connect(ui->rbExpertMode, SIGNAL(clicked()), SLOT(updateSoundMode()));
     connect(ui->rbUserMode,   SIGNAL(clicked()), SLOT(updateSoundMode()));
@@ -113,8 +110,6 @@ void MainWindow::setStatus(const char *status)
 
 void MainWindow::updateServerInfo()
 {
-    settings->save();
-
     if (server)
     {
         QMessageBox::StandardButton reply;
@@ -231,7 +226,7 @@ void MainWindow::channelWidgetBoost()
 
 void MainWindow::serverStart()
 {
-    server = new Gate(this, settings->info().address);
+    server = new Gate(this, ui->addressBox->currentText());
     connect(server, SIGNAL(connected(User*)), SLOT(userAppend(User*)));
     // Check gate enabling
     if (!server->isEnabled())
@@ -243,7 +238,7 @@ void MainWindow::serverStart()
         return;
     }
     // Set broadcast information
-    broadcaster.setServerInformation(settings->info());
+    broadcaster.setServerInformation(ServerInformation(ui->labelName->text(), ui->addressBox->currentText()));
     // Connect to appServer
     AppServer::instance()->connectGate(server);
     if (!ui->raPasswordEdit->text().isEmpty())
@@ -423,7 +418,6 @@ void MainWindow::on_storageSelectButton_clicked()
     QString path = QFileDialog::getExistingDirectory(this, tr("Open records directory"));
     recorder.setRecordDirectory(path);
     ui->storageEdit->setText(path);
-    settings->save();
 }
 
 void MainWindow::updateSoundMode()

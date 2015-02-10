@@ -23,7 +23,7 @@ NSFilter::~NSFilter()
 void NSFilter::reloadSettings()
 {
     QSettings s(settingsFiltename(), QSettings::IniFormat);
-    enable(s.value("ns-enable", true).toBool());
+    enable(s.value("ns-enable", false).toBool());
     QString level = s.value("ns-level", "low").toString();
     if (level == "low")
         setPolicy(Low);
@@ -34,7 +34,7 @@ void NSFilter::reloadSettings()
         else
             setPolicy(High);
     }
-    qDebug() << "NS settings reloaded";
+    qDebug() << "NS settings reloaded.";
 }
 
 void NSFilter::processFilter(float sample[])

@@ -34,11 +34,11 @@ void GateFilter::reloadSettings()
 {
     QSettings s(settingsFiltename(), QSettings::IniFormat);
     enable(s.value("gate-enable", true).toBool());
-    setParams(s.value("gate-raise", 0.05).toFloat(),
-              s.value("gate-fall", 0.2).toFloat(),
-              s.value("gate-attack", 0.1).toFloat(),
-              s.value("gate-hold", 0.2).toFloat(),
-              s.value("gate-release", 0.1).toFloat());
+    setParams(s.value("gate-raise",-31.0).toFloat(),
+              s.value("gate-fall", -35.0).toFloat(),
+              s.value("gate-attack", 0.05).toFloat(),
+              s.value("gate-hold", 0.20).toFloat(),
+              s.value("gate-release", 0.20).toFloat());
     qDebug() << "Gate settings reloaded";
 }
 

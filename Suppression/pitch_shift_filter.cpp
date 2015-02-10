@@ -101,7 +101,7 @@ PitchShiftFilter::~PitchShiftFilter()
 void PitchShiftFilter::reloadSettings()
 {
     QSettings s(settingsFiltename(), QSettings::IniFormat);
-    enable(s.value("ps-enable", true).toBool());
+    enable(s.value("ps-enable", false).toBool());
     qDebug() << "PS settings reloaded";
 }
 
