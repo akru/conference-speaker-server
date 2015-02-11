@@ -22,13 +22,14 @@ SpeakerWidget::SpeakerWidget(User *user, QWidget *parent)
 
     connect(user, SIGNAL(channelOpened()), SLOT(channelOpened()));
     connect(user, SIGNAL(channelClosed()), SLOT(channelClosed()));
+    connectSpeaker();
 }
 
 SpeakerWidget::~SpeakerWidget()
 {
     delete ui;
     if (state == Stream)
-        Speaker::instance()->speakerDelete(user);
+        emit speakerDelete(user);
 }
 
 void SpeakerWidget::setState(State s)
@@ -51,7 +52,7 @@ void SpeakerWidget::setState(State s)
         ui->acceptButton->hide();
         ui->delayBox->hide();
         setMaximumHeight(130);
-        connectSpeaker();
+        emit speakerNew(user);
         break;
     }
     state = s;
@@ -95,9 +96,12 @@ void SpeakerWidget::stepUp()
 void SpeakerWidget::connectSpeaker()
 {
     Speaker *s = Speaker::instance();
-    s->speakerNew(user);
     connect(this, SIGNAL(volumeChanged(User*,qreal)),
-                       s,    SLOT(setVolume(User*,qreal)));
+            s,    SLOT(setVolume(User*,qreal)));
     connect(s,    SIGNAL(audioAmpUpdated(User*,ushort)),
                   SLOT(setAmplitude(User*,ushort)));
+    connect(this, SIGNAL(speakerNew(User*)),
+            s,    SLOT(speakerNew(User*)));
+    connect(this, SIGNAL(speakerDelete(User*)),
+            s,    SLOT(speakerDelete(User*)));
 }

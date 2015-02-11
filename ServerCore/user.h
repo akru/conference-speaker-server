@@ -7,8 +7,6 @@
 #include <user_information.h>
 #include <channel_information.h>
 
-#include <QTcpSocket>
-
 class QHostAddress;
 class QTcpSocket;
 class Receiver;
@@ -59,8 +57,6 @@ private slots:
     void readMessage();
     void sockDisconnected();
 
-    void timeout();
-
 private: // Private methods
     void messageParser(const QJsonObject &message);
     void messageSend(const QJsonObject &message);
@@ -68,7 +64,6 @@ private: // Private methods
 private: // Private rows
     // TCP user connection
     QTcpSocket        *sock;
-    QTcpSocket::SocketState ss;
     // User state
     State              userState;
     // User information

@@ -27,6 +27,8 @@ public:
 signals:
     void dismiss();
     void volumeChanged(User*, qreal);
+    void speakerNew(User*);
+    void speakerDelete(User*);
 
 public slots:
     void setState(State s);
