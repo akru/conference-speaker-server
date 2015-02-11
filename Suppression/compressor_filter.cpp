@@ -52,7 +52,7 @@ void CompressorFilter::setParams(bool normalize,
 void CompressorFilter::reloadSettings()
 {
     QSettings s(settingsFiltename(), QSettings::IniFormat);
-    enable(s.value("compressor-enable", true).toBool());
+    enable(s.value("compressor-enable", false).toBool());
     setParams(s.value("compressor-normalize",true).toBool(),
               s.value("compressor-peak", false).toBool(),
               s.value("compressor-attack", 0.2).toFloat(),
@@ -323,6 +323,7 @@ void CompressorFilter::processFilter(float sample[])
         TwoBufferProcessPass1(mSampleOut, mSampleIn);
 
     // Return sample
-    for (short i = 0; i < sample_length; ++i)
+    for (short i = 0; i < sample_length; ++i) {
         sample[i] = mSampleOut[i];
+    }
 }

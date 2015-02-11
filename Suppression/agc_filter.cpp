@@ -1,8 +1,9 @@
 #include "agc_filter.h"
 #include <cmath>
+#include <QDebug>
 
 AGCFilter::AGCFilter()
-    : maxAmp(0), firstSample(true)
+    : maxAmp(0.4), firstSample(true)
 {
     enable(true);
     speakingTime.start();

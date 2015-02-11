@@ -30,10 +30,11 @@
   <property name="styleSheet">
    <string notr="true">QWidget#centralWidget {
     background-color: #0A3C6D;
+	font-size: 14pt;
 }
 
 QLabel, QCheckBox, QGroupBox {
-    font-size: 10pt;
+    font-size: 12pt;
 }
 
 QLabel#statusLabel {
