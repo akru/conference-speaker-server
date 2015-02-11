@@ -288,7 +288,7 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
         if (ui->simpleRB->isChecked())
             // Simple case
         {
-            VotingInvite vi(ui->questionTextEdit->toPlainText());
+            VotingInvite vi(ui->questionTextEdit->text());
             vote = new Voting(vi, this);
             broadcaster.setVotingInvite(vi);
         }
@@ -300,7 +300,7 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
                     answersText.append(l->text());
             }
             // Custom case
-            VotingInvite vi(ui->questionTextEdit->toPlainText(),
+            VotingInvite vi(ui->questionTextEdit->text(),
                             VotingInvite::Custom,
                             answersText);
             vote = new Voting(vi, this);
@@ -338,10 +338,12 @@ void MainWindow::voteUpdateResults(VoteResults results)
         answer = new QLabel(tr(resultLabelText)
                             .arg(results.values[0])
                             .arg(results.values[0] * 100.0 / sumAnswers), this);
+        answer->setWordWrap(true);
         ui->resultsLayout->addRow(tr("Yes"), answer);
         answer = new QLabel(tr(resultLabelText)
                             .arg(results.values[1])
                             .arg(results.values[1] * 100.0 / sumAnswers), this);
+        answer->setWordWrap(true);
         ui->resultsLayout->addRow(tr("No"), answer);
     }
     else
@@ -352,6 +354,7 @@ void MainWindow::voteUpdateResults(VoteResults results)
             answer = new QLabel(tr(resultLabelText)
                                 .arg(results.values[i])
                                 .arg(results.values[i] * 100.0 / sumAnswers), this);
+            answer->setWordWrap(true);
             ui->resultsLayout->addRow(results.invite.answers[i], answer);
         }
     }
@@ -369,7 +372,9 @@ void MainWindow::on_popupResultsButton_toggled(bool checked)
 void MainWindow::on_plusButton_clicked()
 {
     QString name = tr("Answer %1:").arg(ui->customLayout->rowCount() + 1);
-    answers.append(new QLineEdit(this));
+    QLineEdit *e = new QLineEdit(this);
+    e->setMaxLength(200);
+    answers.append(e);
     ui->customLayout->addRow(name, answers.last());
 }
 

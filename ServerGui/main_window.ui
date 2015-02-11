@@ -479,7 +479,7 @@ QDateEdit {
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="iconSize">
          <size>
@@ -773,7 +773,7 @@ image: url(:/gui/drophands-button-pressed);
              <property name="spacing">
               <number>15</number>
              </property>
-             <item row="7" column="2">
+             <item row="8" column="2">
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -786,7 +786,7 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </spacer>
              </item>
-             <item row="7" column="3">
+             <item row="8" column="3">
               <widget class="QPushButton" name="startVoteButton">
                <property name="maximumSize">
                 <size>
@@ -812,14 +812,14 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <widget class="QRadioButton" name="customRB">
                <property name="text">
                 <string>Custom</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="3" column="1">
               <widget class="QRadioButton" name="simpleRB">
                <property name="text">
                 <string>Yes / No</string>
@@ -829,7 +829,7 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="label_32">
                <property name="text">
                 <string>Answers</string>
@@ -843,26 +843,7 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
-             <item row="1" column="1" colspan="2">
-              <widget class="QPlainTextEdit" name="questionTextEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>80</height>
-                </size>
-               </property>
-               <property name="placeholderText">
-                <string>Where are you from?</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1" rowspan="3" colspan="2">
+             <item row="5" column="1" rowspan="3" colspan="2">
               <layout class="QFormLayout" name="customLayout">
                <property name="fieldGrowthPolicy">
                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -878,7 +859,7 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </layout>
              </item>
-             <item row="6" column="3">
+             <item row="7" column="3">
               <widget class="QPushButton" name="plusButton">
                <property name="maximumSize">
                 <size>
@@ -904,7 +885,7 @@ image: url(:/gui/drophands-button-pressed);
                </property>
               </widget>
              </item>
-             <item row="4" column="3" rowspan="2">
+             <item row="5" column="3" rowspan="2">
               <spacer name="verticalSpacer">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -916,6 +897,13 @@ image: url(:/gui/drophands-button-pressed);
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="1" column="1" colspan="2">
+              <widget class="QLineEdit" name="questionTextEdit">
+               <property name="maxLength">
+                <number>500</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -1028,6 +1016,9 @@ image: url(:/gui/drophands-button-pressed);
               <widget class="QLabel" name="resultQuestion">
                <property name="text">
                 <string/>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
