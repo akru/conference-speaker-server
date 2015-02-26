@@ -89,7 +89,7 @@ private:
     VoteResultsWidget   *resultWidget;
     AnswerList           answers;
 
-    Broadcaster          broadcaster;
+    Broadcaster         *broadcaster;
     Recorder             recorder;
 
     void loadFonts();
