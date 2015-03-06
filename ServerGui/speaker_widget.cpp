@@ -22,6 +22,8 @@ SpeakerWidget::SpeakerWidget(User *user, QWidget *parent)
 
     connect(user, SIGNAL(channelOpened()), SLOT(channelOpened()));
     connect(user, SIGNAL(channelClosed()), SLOT(channelClosed()));
+    connect(this, SIGNAL(channelAction(ChannelAction)),
+            user, SLOT(channelAction(ChannelAction)));
     connectSpeaker();
 }
 
@@ -60,17 +62,17 @@ void SpeakerWidget::setState(State s)
 
 void SpeakerWidget::on_acceptButton_clicked()
 {
-    user->channelAction(ChOpen);
+    emit channelAction(ChOpen);
 }
 
 void SpeakerWidget::on_dismissButton_clicked()
 {
     switch (state) {
     case Request:
-        user->channelAction(ChDeny);
+        emit channelAction(ChDeny);
         break;
     case Stream:
-        user->channelAction(ChClose);
+        emit channelAction(ChClose);
         break;
     }
 }
