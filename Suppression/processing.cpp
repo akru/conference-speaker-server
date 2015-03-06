@@ -44,10 +44,10 @@ QByteArray Processing::take()
     QByteArray sample_raw(Filter::sample_length * sizeof(qint16),
                           Qt::Uninitialized);
     // When accumulator has too low sounds - skips
-    if (!acc.avail(Filter::sample_length * sizeof(qint16) * 2))
+    if (!acc.avail(Filter::sample_length * sizeof(qint16) * 10))
         return QByteArray();
     // Drop too old samples from acc
-    acc.purity(Filter::sample_length * sizeof(qint16) * 4);
+    acc.purity(Filter::sample_length * sizeof(qint16) * 20);
     // Prepare sample
     acc.getData((qint16 *) sample_raw.data(), Filter::sample_length);
     // Apply filters

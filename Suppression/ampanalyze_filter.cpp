@@ -25,5 +25,5 @@ void AmpAnalyzeFilter::processFilter(float sample[])
     // Divize sum by count and normalize it
     avgAmp = avgAmp / sample_length;
     // Return average amplitude in percents
-    amp = avgAmp * 100;
+    amp = avgAmp * 100.0;
 }

@@ -3,7 +3,7 @@
 #include <QDebug>
 
 AGCFilter::AGCFilter()
-    : maxAmp(0.4), firstSample(true)
+    : maxAmp(0.4f), firstSample(true)
 {
     enable(true);
     speakingTime.start();

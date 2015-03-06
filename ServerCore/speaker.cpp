@@ -32,11 +32,16 @@ Speaker::Speaker(QObject *parent) :
 
     QAudioDeviceInfo info =
             QAudioDeviceInfo::defaultOutputDevice();
+    qDebug() << "Speaker :: using" << info.deviceName();
+    qDebug() << "Speaker ::     where support";
+    qDebug() << "Speaker ::         codec:" << info.supportedCodecs();
+    qDebug() << "Speaker ::         rates:" << info.supportedSampleRates();
+    qDebug() << "Speaker ::         sizes:" << info.supportedSampleSizes();
+    qDebug() << "Speaker ::         types:" << info.supportedSampleTypes();
+    qDebug() << "Speaker ::         chans:" << info.supportedChannelCounts();
+    qDebug() << "Speaker ::         ords:"  << info.supportedByteOrders();
 
     if (!info.isFormatSupported(format)) {
-        qWarning() << "supported rates:" << info.supportedSampleRates();
-        qWarning() << "supported sizes:" << info.supportedSampleSizes();
-        qWarning() << "supported order:" << info.supportedByteOrders();
         qWarning() << "Raw audio format not supported by backend, cannot play audio.";
         disabled = true;
         return;
@@ -48,11 +53,11 @@ Speaker::Speaker(QObject *parent) :
     resampler = soxr_create(Filter::sample_rate, formatSampleRate,
                             1, &error, &io_spec, &q_spec, NULL);
     if (error) {
-        qWarning() << "SoX has an error" << error;
+        qWarning() << "SoXr :: has an error" << error;
         disabled = true;
         return;
     }
-    qDebug() << "Speaker resampler:" << soxr_engine(resampler)
+    qDebug() << "Speaker :: resampler is" << soxr_engine(resampler)
              << "delay" << soxr_delay(resampler);
 
     // Open audio device
@@ -65,7 +70,7 @@ Speaker::Speaker(QObject *parent) :
     // Moving to separate thread
     this->moveToThread(&myThread);
     // Setting heartbeat timer
-    heartbeat.setInterval(Filter::sample_length * 999.0 / Filter::sample_rate);
+    heartbeat.setInterval(heartBeatInterval);
     connect(&heartbeat, SIGNAL(timeout()),
                         SLOT(speakHeartbeat()));
     connect(&myThread,  SIGNAL(started()),

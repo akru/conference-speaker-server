@@ -60,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     t->start();
     // Load settings
     settings = new Settings(ui, soundExpert, soundUser, this);
+    connect(settings,            SIGNAL(settingsSaved()),
+            Speaker::instance(), SLOT(reloadFilterSettings()));
     // Setup UI elements
     setupUi();
 }
@@ -155,8 +157,7 @@ void MainWindow::requestRegistration(UserInformation info)
     // Cast check
     if (!user) return;
     // Append item into user list
-    QListWidgetItem *item = new QListWidgetItem(info.name.isEmpty() ? tr("Anonymous") : info.name);
-    ui->userList->addItem(item);
+    QListWidgetItem *item = new QListWidgetItem(info.name, ui->userList);
     userItem.insert(user, item);
     // Register user
     user->registration(info);

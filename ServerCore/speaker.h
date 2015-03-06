@@ -17,6 +17,7 @@ class Speaker : public QObject
 {
     Q_OBJECT
     Speaker(QObject *parent = 0);
+    static const short heartBeatInterval = 10; //Interfal between interactions in ms
 
 public:
     // Speaker singletone instance
