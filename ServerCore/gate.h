@@ -3,9 +3,6 @@
 
 #include <QMap>
 #include "user.h"
-#ifndef QT_DEBUG
-#include "licensing.h"
-#endif
 
 class QTcpServer;
 
@@ -32,10 +29,6 @@ private:
     QTcpServer    *server;
     // User by ID map
     QList<QString> users;
-#ifndef QT_DEBUG
-    // Licensing policy
-    Licensing      license;
-#endif
     // Listening flag
     bool           listenEnabled;
 };

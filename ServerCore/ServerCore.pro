@@ -4,6 +4,9 @@ TARGET   = ServerCore
 TEMPLATE = lib
 CONFIG  += staticlib
 
+# Set the limit of connected users
+DEFINES += "USER_LIMIT=50"
+
 HEADERS += \
     broadcaster.h \
     receiver.h \
@@ -21,18 +24,6 @@ SOURCES += \
     speaker.cpp \
     gate.cpp \
     user.cpp
-
-CONFIG(release, debug|release){
-message("Release with licensing")
-
-HEADERS += licensing.h
-SOURCES += licensing.cpp
-
-DEFINES     += NDEBUG
-
-INCLUDEPATH += $$PWD/../../cryptopp
-DEPENDPATH  += $$PWD/../../cryptopp
-}
 
 INCLUDEPATH += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr
 DEPENDPATH  += $$PWD/../Protocol $$PWD/../Suppression $$PWD/../3rd-party/Soxr

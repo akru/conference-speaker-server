@@ -22,15 +22,15 @@ void Gate::newConnection()
 {
     // Get first connection
     QTcpSocket *sock = server->nextPendingConnection();
-#ifndef QT_DEBUG
-    // Licensing policy for max connections
-    if (license.getMaxConnections() &&
-            clients.size() >= license.getMaxConnections())
+    // ConLimit check
+    if (users.count() > USER_LIMIT)
     {
-        sock->close();
+        qWarning() << "GATE :: User limit has been reached!";
+        qWarning() << "GATE :: limit is " << USER_LIMIT
+                   << ", count of users is " << users.count();
         return;
     }
-#endif
+    // New connection handler
     while (sock)
     {
         qDebug() << "GATE :: New connection from"
@@ -62,6 +62,6 @@ void Gate::userDisconnected()
 {
     User *u = qobject_cast<User *>(sender());
     if (u) users.removeOne(u->getAddress());
-    // TODO: after deleting object can be used in other code =\
+    // TODO: after deleting object may be used in other code =\
     //delete u;
 }
