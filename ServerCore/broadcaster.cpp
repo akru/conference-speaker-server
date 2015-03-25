@@ -5,7 +5,7 @@
 #include <QUuid>
 
 Broadcaster::Broadcaster(QObject *parent)
-    : QObject(parent)
+    : QObject(parent), timer(new QTimer(this))
 {
     sock.setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
     // Find all broadcast addreses in all interfaces
@@ -18,10 +18,18 @@ Broadcaster::Broadcaster(QObject *parent)
     // Set server UUID
     message.insert("uuid", QUuid::createUuid().toString());
     // Setup broadcasting interval
-    QTimer *t = new QTimer(this);
-    connect(t, SIGNAL(timeout()), SLOT(sendInformation()));
-    t->setInterval(timeInterval);
-    t->start();
+    connect(timer, SIGNAL(timeout()), SLOT(sendInformation()));
+    timer->setInterval(timeInterval);
+}
+
+void Broadcaster::start()
+{
+    timer->start();
+}
+
+void Broadcaster::stop()
+{
+    timer->stop();
 }
 
 void Broadcaster::setServerInformation(ServerInformation info)

@@ -43,8 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     soundUser(new Ui::SoundUserMode),
     server(0),
     vote(0),
-    resultWidget(new VoteResultsWidget),
-    broadcaster(0)
+    resultWidget(new VoteResultsWidget)
 {
     // Loading fonts
     loadFonts();
@@ -240,9 +239,10 @@ void MainWindow::serverStart()
         return;
     }
     // Set broadcast information
-    if (!broadcaster)
-        broadcaster = new Broadcaster(this);
-    broadcaster->setServerInformation(ServerInformation(ui->labelName->text(), ui->addressBox->currentText()));
+    broadcaster.setServerInformation(
+                ServerInformation(ui->labelName->text(),
+                                  ui->addressBox->currentText()));
+    broadcaster.start();
     // Connect to appServer
     AppServer::instance()->connectGate(server);
     if (!ui->raPasswordEdit->text().isEmpty())
@@ -255,7 +255,8 @@ void MainWindow::serverStart()
 void MainWindow::serverStop()
 {
     delete server; server = 0;
-    delete broadcaster; broadcaster = 0;
+    broadcaster.stop();
+    broadcaster.unsetVotingInvite();
     setStatus(statusStoped);
 }
 
@@ -287,8 +288,7 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
     if (!checked)
     {
         if (vote) { delete vote; vote = 0; }
-        if (broadcaster)
-            broadcaster->unsetVotingInvite();
+        broadcaster.unsetVotingInvite();
         ui->startVoteButton->setText(tr("Start"));
     }
     else
@@ -298,8 +298,7 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
         {
             VotingInvite vi(ui->questionTextEdit->text());
             vote = new Voting(vi, this);
-            if (broadcaster)
-                broadcaster->setVotingInvite(vi);
+            broadcaster.setVotingInvite(vi);
         }
         else
         {
@@ -313,11 +312,12 @@ void MainWindow::on_startVoteButton_toggled(bool checked)
                             VotingInvite::Custom,
                             answersText);
             vote = new Voting(vi, this);
-            if (broadcaster)
-                broadcaster->setVotingInvite(vi);
+            broadcaster.setVotingInvite(vi);
         }
-        connect(vote, SIGNAL(resultsUpdated(VoteResults)),
-                      SLOT(voteUpdateResults(VoteResults)));
+        connect(vote,         SIGNAL(resultsUpdated(VoteResults)),
+                              SLOT(voteUpdateResults(VoteResults)));
+        connect(vote,         SIGNAL(resultsUpdated(VoteResults)),
+                resultWidget, SLOT(voteUpdateResults(VoteResults)));
         ui->startVoteButton->setText(tr("Stop"));
     }
 }

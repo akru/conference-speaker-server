@@ -7,6 +7,8 @@
 #include <app_information.h>
 #include <voting_invite.h>
 
+class QTimer;
+
 class Broadcaster : public QObject
 {
     Q_OBJECT
@@ -24,6 +26,9 @@ public slots:
 
     void setAppInfo(AppInformation info);
 
+    void start();
+    void stop();
+
 private slots:
     void sendInformation();
 
@@ -32,6 +37,7 @@ private:
     QUdpSocket          sock;
     QByteArray          packetCache;
     QJsonObject         message;
+    QTimer             *timer;
 };
 
 #endif // BROADCASTER_H
