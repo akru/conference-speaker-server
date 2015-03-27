@@ -35,6 +35,7 @@
         <file alias="flowvote-button-pressed">res/images/button/flowvote-pressed.png</file>
         <file alias="qr-button">res/images/button/qr.png</file>
         <file alias="qr-button-pressed">res/images/button/qr-pressed.png</file>
+        <file>icon.ico</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Gothic.ttf">res/fonts/Gothic.ttf</file>

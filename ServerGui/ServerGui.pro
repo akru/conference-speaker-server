@@ -31,6 +31,8 @@ TRANSLATIONS += \
     csgui_en_US.ts \
     csgui_ru_RU.ts
 
+win32:RC_FILE = res.rc
+
 ## Include & link libraries
 
 INCLUDEPATH += $$PWD/../ServerCore $$PWD/../Protocol $$PWD/../3rd-party/QRencode $$PWD/../3rd-party/AppServer

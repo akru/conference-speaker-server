@@ -22,7 +22,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">
-    <normaloff>:/gui/window-icon</normaloff>:/gui/window-icon</iconset>
+    <normaloff>:/gui/icon.ico</normaloff>:/gui/icon.ico</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
