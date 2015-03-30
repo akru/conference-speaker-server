@@ -3,6 +3,7 @@
 
 #include <QUdpSocket>
 #include <QJsonDocument>
+#include <documents_information.h>
 #include <server_information.h>
 #include <app_information.h>
 #include <voting_invite.h>
@@ -25,6 +26,8 @@ public slots:
     void unsetVotingInvite();
 
     void setAppInfo(AppInformation info);
+
+    void setDocumentsInformation(DocumentsInformation docs);
 
     void start();
     void stop();

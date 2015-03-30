@@ -13,7 +13,8 @@ SOURCES  += \
     channel_information.cpp \
     channel_response.cpp \
     voting_invite.cpp \
-    app_information.cpp
+    app_information.cpp \
+    documents_information.cpp
 
 HEADERS  += \
     user_information.h \
@@ -25,4 +26,5 @@ HEADERS  += \
     channel_information.h \
     channel_response.h \
     voting_invite.h \
-    app_information.h
+    app_information.h \
+    documents_information.h

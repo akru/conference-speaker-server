@@ -68,6 +68,15 @@ void Broadcaster::setAppInfo(AppInformation info)
     qDebug() << "New broadcast message:" << packetCache;
 }
 
+void Broadcaster::setDocumentsInformation(DocumentsInformation docs)
+{
+    // Update message
+    message.insert("documents", docs.toJson());
+    // Update cache
+    packetCache = QJsonDocument(message).toJson();
+    qDebug() << "New broadcast message:" << packetCache;
+}
+
 void Broadcaster::sendInformation()
 {
     foreach (const QHostAddress &addr, addreses) {

@@ -42,6 +42,8 @@ signals:
     void voteStop();
     void voteNew(VotingInvite);
 
+    void pubDocument(QString route, QByteArray data);
+
 private slots:
     void userAppend(User *user);
     void userRemove();
@@ -73,6 +75,7 @@ private slots:
     void on_drophandsButton_clicked();
     void on_qrButton_clicked();
     void on_storageSelectButton_clicked();
+    void on_docButton_clicked();
 
 private:
     Ui::MainWindow      *ui;

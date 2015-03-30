@@ -259,7 +259,10 @@ QPushButton#popupResultsButton:checked,
 QPushButton#popupResultsButton:pressed,
 QPushButton#qrButton,
 QPushButton#qrButton:checked,
-QPushButton#qrButton:pressed {
+QPushButton#qrButton:pressed,
+QPushButton#docButton,
+QPushButton#docButton:checked,
+QPushButton#docButton:pressed  {
     border: 0;
     background: none;
     padding: 0;
@@ -665,6 +668,23 @@ image: url(:/gui/drophands-button-pressed);
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="docButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/gui/qr-button</normaloff>:/gui/qr-button</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>48</width>
+                <height>48</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="qrButton">

@@ -135,7 +135,7 @@ AppServer * AppServer::instance()
     return self;
 }
 
-void AppServer::setAdminPassword(const QString &password)
+void AppServer::setAdminPassword(QString password)
 {
     // Calc HA1 by username, realm and password
     char _ha1[100];
@@ -222,14 +222,14 @@ void AppServer::run()
     }
 }
 
-void AppServer::addRouteFile(const QString &route, const QString &resname)
+void AppServer::addRouteFile(QString route, QString resname)
 {
     QFile res(resname);
     res.open(QIODevice::ReadOnly);
     storage.insert(route, res.readAll());
 }
 
-void AppServer::addRouteData(const QString &route, const QByteArray &res)
+void AppServer::addRouteData(QString route, QByteArray res)
 {
     storage.insert(route, res);
 }

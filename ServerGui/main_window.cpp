@@ -63,6 +63,9 @@ MainWindow::MainWindow(QWidget *parent) :
             Speaker::instance(), SLOT(reloadFilterSettings()));
     // Setup UI elements
     setupUi();
+    // Connect AppServer
+    connect(this,                  SIGNAL(pubDocument(QString,QByteArray)),
+            AppServer::instance(), SLOT(addRouteData(QString,QByteArray)));
 }
 
 MainWindow::~MainWindow()
@@ -452,4 +455,27 @@ void MainWindow::updateSoundMode()
         wSoundUser.hide();
         wSoundExpert.show();
     }
+}
+
+void MainWindow::on_docButton_clicked()
+{
+    QStringList docList =
+            QFileDialog::getOpenFileNames(this, tr("Open shared documents"),
+                                          QString(), tr("Files (*.*)"));
+    QMap<QString, QString> docs;
+    foreach (QString filePath, docList) {
+        QString fileName = QFileInfo(filePath).fileName();
+        QString uri = QString("http://%1:%2/docs/%3")
+                .arg(ui->addressBox->currentText())
+                .arg(SERVER_APP_PORT)
+                .arg(QUrl::toPercentEncoding(fileName).constData());
+        // Read file
+        QFile file(filePath);
+        file.open(QIODevice::ReadOnly);
+        if (file.isOpen()) {
+            emit pubDocument(QString("/docs/%1").arg(fileName), file.readAll());
+            docs.insert(fileName, uri);
+        }
+    }
+    broadcaster.setDocumentsInformation(DocumentsInformation(docs));
 }

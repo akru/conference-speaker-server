@@ -17,12 +17,13 @@ class AppServer : public QThread
 
 public:
     static AppServer * instance();
-
     void run();
-    void addRouteFile(const QString &route, const QString &resname);
-    void addRouteData(const QString &route, const QByteArray &res);
 
-    void setAdminPassword(const QString &password);
+public slots:
+    void addRouteFile(QString route, QString resname);
+    void addRouteData(QString route, QByteArray res);
+
+    void setAdminPassword(QString password);
     void connectGate(Gate *gate);
 
     void channelOpen(QString id);
