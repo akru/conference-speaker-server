@@ -36,6 +36,10 @@
         <file alias="qr-button">res/images/button/qr.png</file>
         <file alias="qr-button-pressed">res/images/button/qr-pressed.png</file>
         <file>icon.ico</file>
+        <file alias="sharing-button">res/images/button/sharing.png</file>
+        <file alias="sharing-button-pressed">res/images/button/sharing-pressed.png</file>
+        <file alias="wifi-button">res/images/button/wi-fi.png</file>
+        <file alias="wifi-button-pressed">res/images/button/wi-fi-pressed.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Gothic.ttf">res/fonts/Gothic.ttf</file>

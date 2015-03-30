@@ -676,7 +676,8 @@ image: url(:/gui/drophands-button-pressed);
               </property>
               <property name="icon">
                <iconset resource="resource.qrc">
-                <normaloff>:/gui/qr-button</normaloff>:/gui/qr-button</iconset>
+                <normaloff>:/gui/sharing-button</normaloff>
+                <normalon>:/gui/sharing-button-pressed</normalon>:/gui/sharing-button</iconset>
               </property>
               <property name="iconSize">
                <size>
