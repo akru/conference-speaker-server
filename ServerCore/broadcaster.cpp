@@ -8,13 +8,6 @@ Broadcaster::Broadcaster(QObject *parent)
     : QObject(parent), timer(new QTimer(this))
 {
     sock.setSocketOption(QAbstractSocket::MulticastTtlOption, 2);
-    // Find all broadcast addreses in all interfaces
-    foreach (const QNetworkInterface &iface,
-             QNetworkInterface::allInterfaces()) {
-        foreach (const QNetworkAddressEntry &addr, iface.addressEntries()) {
-            addreses.append(addr.broadcast());
-        }
-    }
     // Set server UUID
     message.insert("uuid", QUuid::createUuid().toString());
     // Setup broadcasting interval
@@ -24,6 +17,14 @@ Broadcaster::Broadcaster(QObject *parent)
 
 void Broadcaster::start()
 {
+    addreses.clear();
+    // Find all broadcast addreses in all interfaces
+    foreach (const QNetworkInterface &iface,
+             QNetworkInterface::allInterfaces()) {
+        foreach (const QNetworkAddressEntry &addr, iface.addressEntries()) {
+            addreses.append(addr.broadcast());
+        }
+    }
     timer->start();
 }
 
